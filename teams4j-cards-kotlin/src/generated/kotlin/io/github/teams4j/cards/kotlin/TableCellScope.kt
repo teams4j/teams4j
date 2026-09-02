@@ -8,7 +8,7 @@ import io.github.teams4j.cards.*
  * Collects [TableCell] values for a list-valued property.
  */
 @CardDsl
-public class TableCellScope internal constructor() {
+public open class TableCellScope internal constructor() {
 
     internal val values: MutableList<TableCell> = mutableListOf()
 

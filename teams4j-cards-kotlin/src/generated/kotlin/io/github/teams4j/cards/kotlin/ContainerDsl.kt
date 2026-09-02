@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * Containers group items together.
  */
 @CardDsl
-public class ContainerDsl internal constructor() {
+public class ContainerDsl internal constructor() : CardElementScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -48,16 +48,6 @@ public class ContainerDsl internal constructor() {
     public var spacing: Spacing? = null
 
     /**
-     * The card elements to render inside the `Container`.
-     */
-    public var items: List<CardElement>? = null
-
-    /** Collects `items`. */
-    public fun items(block: CardElementScope.() -> Unit) {
-        this.items = CardElementScope().apply(block).values
-    }
-
-    /**
      * An Action that will be invoked when the `Container` is tapped or selected. `Action.ShowCard` is not supported.
      */
     public var selectAction: SelectAction? = null
@@ -87,6 +77,16 @@ public class ContainerDsl internal constructor() {
         this.backgroundImage = BackgroundImageDsl().apply(block).build()
     }
 
+    /** Same, with `url` set. */
+    public fun backgroundImage(url: String, block: BackgroundImageDsl.() -> Unit = {}) {
+        this.backgroundImage = BackgroundImageDsl()
+            .apply {
+                this.url = url
+            }
+            .apply(block)
+            .build()
+    }
+
     /**
      * Specifies the minimum height of the container in pixels, like `"80px"`.
      */
@@ -105,7 +105,7 @@ public class ContainerDsl internal constructor() {
         .height(height)
         .separator(separator)
         .spacing(spacing)
-        .items(items)
+        .items(values.ifEmpty { null })
         .selectAction(selectAction)
         .style(style)
         .verticalContentAlignment(verticalContentAlignment)

@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * The ImageSet displays a collection of Images similar to a gallery. Acceptable formats are PNG, JPEG, and GIF
  */
 @CardDsl
-public class ImageSetDsl internal constructor() {
+public class ImageSetDsl internal constructor() : ImageScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -48,16 +48,6 @@ public class ImageSetDsl internal constructor() {
     public var spacing: Spacing? = null
 
     /**
-     * The array of `Image` elements to show.
-     */
-    public var images: List<Image>? = null
-
-    /** Collects `images`. */
-    public fun images(block: ImageScope.() -> Unit) {
-        this.images = ImageScope().apply(block).values
-    }
-
-    /**
      * Controls the approximate size of each image. The physical dimensions will vary per host. Auto and stretch are not supported for ImageSet. The size will default to medium if those values are set.
      */
     public var imageSize: ImageSize? = null
@@ -70,7 +60,7 @@ public class ImageSetDsl internal constructor() {
         .height(height)
         .separator(separator)
         .spacing(spacing)
-        .images(images)
+        .images(values.ifEmpty { null })
         .imageSize(imageSize)
         .build()
 }

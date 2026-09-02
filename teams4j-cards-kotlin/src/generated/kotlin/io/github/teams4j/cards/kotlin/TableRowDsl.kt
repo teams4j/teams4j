@@ -10,17 +10,7 @@ import io.github.teams4j.cards.*
  * Represents a row of cells within a Table element.
  */
 @CardDsl
-public class TableRowDsl internal constructor() {
-
-    /**
-     * The cells in this row. If a row contains more cells than there are columns defined on the Table element, the extra cells are ignored.
-     */
-    public var cells: List<TableCell>? = null
-
-    /** Collects `cells`. */
-    public fun cells(block: TableCellScope.() -> Unit) {
-        this.cells = TableCellScope().apply(block).values
-    }
+public class TableRowDsl internal constructor() : TableCellScope() {
 
     /**
      * Defines the style of the entire row.
@@ -38,7 +28,7 @@ public class TableRowDsl internal constructor() {
     public var verticalCellContentAlignment: VerticalAlignment? = null
 
     internal fun build(): TableRow = TableRow.builder()
-        .cells(cells)
+        .cells(values.ifEmpty { null })
         .style(style)
         .horizontalCellContentAlignment(horizontalCellContentAlignment)
         .verticalCellContentAlignment(verticalCellContentAlignment)

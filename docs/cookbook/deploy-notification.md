@@ -69,16 +69,10 @@ coroutine:
 ```kotlin
 teams.sendAwait(adaptiveCard {
     body {
-        textBlock {
-            text = "Deploy failed: $service"
-            weight = FontWeight.BOLDER
-            color = Colors.ATTENTION
-        }
-        factSet { facts { fact { title = "Commit"; value = sha } } }
+        textBlock("Deploy failed: $service") { weight = FontWeight.BOLDER; color = Colors.ATTENTION }
+        factSet { fact("Commit", sha) }
     }
-    webhookActions {
-        actionOpenUrl { title = "View logs"; url = logUrl }
-    }
+    webhookActions { actionOpenUrl("View logs", logUrl) }
 })
 ```
 

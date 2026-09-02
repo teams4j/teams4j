@@ -8,13 +8,25 @@ import io.github.teams4j.cards.*
  * Collects [CaptionSource] values for a list-valued property.
  */
 @CardDsl
-public class CaptionSourceScope internal constructor() {
+public open class CaptionSourceScope internal constructor() {
 
     internal val values: MutableList<CaptionSource> = mutableListOf()
 
     /** Appends a [CaptionSource]. */
     public fun captionSource(block: CaptionSourceDsl.() -> Unit) {
         values += CaptionSourceDsl().apply(block).build()
+    }
+
+    /** Same, with `mimeType`, `url`, `label` set. */
+    public fun captionSource(mimeType: String, url: String, label: String, block: CaptionSourceDsl.() -> Unit = {}) {
+        values += CaptionSourceDsl()
+            .apply {
+                this.mimeType = mimeType
+                this.url = url
+                this.label = label
+            }
+            .apply(block)
+            .build()
     }
 
     /** Appends already-built values; the escape hatch to the Java builders. */

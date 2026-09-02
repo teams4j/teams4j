@@ -101,5 +101,26 @@
     "string|object": "opaque"
   },
 
-  "propTypes": {}
+  "propTypes": {},
+
+  "_dslPositional_comment": [
+    "Parameters of the Kotlin DSL's positional shorthand where the schema's required list is not",
+    "what call sites set. Every action's title is optional in the schema and set in practice.",
+    "Types absent here take their required scalar properties, in schema order."
+  ],
+  "dslPositional": {
+    "Action.OpenUrl": ["title", "url"],
+    "Action.Submit": ["title"],
+    "Action.ShowCard": ["title"],
+    "Action.ToggleVisibility": ["title"],
+    "Action.Execute": ["title", "verb"]
+  },
+
+  "_dslDefaults_comment": [
+    "Set by the positional form only. textBlock(\"...\") wraps, as the Java DSL's text(\"...\") does;",
+    "textBlock { text = \"...\" } stays a plain transcription of the schema."
+  ],
+  "dslDefaults": {
+    "TextBlock": { "wrap": true }
+  }
 }

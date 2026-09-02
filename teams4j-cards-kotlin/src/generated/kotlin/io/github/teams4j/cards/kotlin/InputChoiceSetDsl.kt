@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * Allows a user to input a Choice.
  */
 @CardDsl
-public class InputChoiceSetDsl internal constructor() {
+public class InputChoiceSetDsl internal constructor() : InputChoiceScope() {
 
     /**
      * Unique identifier for the value. Used to identify collected input when the Submit action is performed.
@@ -78,16 +78,6 @@ public class InputChoiceSetDsl internal constructor() {
     public var requires: Map<String, String>? = null
 
     /**
-     * `Choice` options.
-     */
-    public var choices: List<InputChoice>? = null
-
-    /** Collects `choices`. */
-    public fun choices(block: InputChoiceScope.() -> Unit) {
-        this.choices = InputChoiceScope().apply(block).values
-    }
-
-    /**
      * Serialised as `choices.data`.
      *
      * Allows dynamic fetching of choices from the bot to be displayed as suggestions in the dropdown when the user types in the input field.
@@ -97,6 +87,16 @@ public class InputChoiceSetDsl internal constructor() {
     /** Builds the [DataQuery] for `choices.data`. */
     public fun choicesData(block: DataQueryDsl.() -> Unit) {
         this.choicesData = DataQueryDsl().apply(block).build()
+    }
+
+    /** Same, with `dataset` set. */
+    public fun choicesData(dataset: String, block: DataQueryDsl.() -> Unit = {}) {
+        this.choicesData = DataQueryDsl()
+            .apply {
+                this.dataset = dataset
+            }
+            .apply(block)
+            .build()
     }
 
     /**
@@ -135,7 +135,7 @@ public class InputChoiceSetDsl internal constructor() {
         .spacing(spacing)
         .isVisible(isVisible)
         .requires(requires)
-        .choices(choices)
+        .choices(values.ifEmpty { null })
         .choicesData(choicesData)
         .isMultiSelect(isMultiSelect)
         .style(style)

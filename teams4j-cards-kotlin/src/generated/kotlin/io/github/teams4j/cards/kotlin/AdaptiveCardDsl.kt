@@ -82,6 +82,16 @@ public class AdaptiveCardDsl internal constructor() {
         this.backgroundImage = BackgroundImageDsl().apply(block).build()
     }
 
+    /** Same, with `url` set. */
+    public fun backgroundImage(url: String, block: BackgroundImageDsl.() -> Unit = {}) {
+        this.backgroundImage = BackgroundImageDsl()
+            .apply {
+                this.url = url
+            }
+            .apply(block)
+            .build()
+    }
+
     /**
      * Defines various metadata properties typically not used for rendering the card
      */

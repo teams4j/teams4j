@@ -10,17 +10,7 @@ import io.github.teams4j.cards.*
  * Represents a cell within a row of a Table element.
  */
 @CardDsl
-public class TableCellDsl internal constructor() {
-
-    /**
-     * The card elements to render inside the `TableCell`.
-     */
-    public var items: List<CardElement>? = null
-
-    /** Collects `items`. */
-    public fun items(block: CardElementScope.() -> Unit) {
-        this.items = CardElementScope().apply(block).values
-    }
+public class TableCellDsl internal constructor() : CardElementScope() {
 
     /**
      * An Action that will be invoked when the `TableCell` is tapped or selected. `Action.ShowCard` is not supported.
@@ -52,6 +42,16 @@ public class TableCellDsl internal constructor() {
         this.backgroundImage = BackgroundImageDsl().apply(block).build()
     }
 
+    /** Same, with `url` set. */
+    public fun backgroundImage(url: String, block: BackgroundImageDsl.() -> Unit = {}) {
+        this.backgroundImage = BackgroundImageDsl()
+            .apply {
+                this.url = url
+            }
+            .apply(block)
+            .build()
+    }
+
     /**
      * Specifies the minimum height of the container in pixels, like `"80px"`.
      */
@@ -63,7 +63,7 @@ public class TableCellDsl internal constructor() {
     public var rtl: Boolean? = null
 
     internal fun build(): TableCell = TableCell.builder()
-        .items(items)
+        .items(values.ifEmpty { null })
         .selectAction(selectAction)
         .style(style)
         .verticalContentAlignment(verticalContentAlignment)

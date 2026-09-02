@@ -51,11 +51,11 @@ The shape most notifications take: a heading, a fact set, one button.
 
 :::
 
-Two decisions the Java DSL makes on your behalf are visible in the JSON. `text(...)` sets
-`wrap: true`, so a long line folds instead of being cut off after one line, which is the schema's
-default.
-And the card stamps `version: "1.5"` (`CardBuilder.DEFAULT_VERSION`), which is the highest version
-Teams renders; the Kotlin DSL uses the same default.
+Two decisions both DSLs make on your behalf are visible in the JSON. `text(...)` in Java and
+`textBlock("…")` in Kotlin set `wrap: true`, so a long line folds instead of being cut off after one
+line, which is the schema's default; the Kotlin block form, `textBlock { text = "…" }`, sets nothing
+you did not write. And the card stamps `version: "1.5"` (`CardBuilder.DEFAULT_VERSION`), which is the
+highest version Teams renders.
 
 ### Columns and a container
 

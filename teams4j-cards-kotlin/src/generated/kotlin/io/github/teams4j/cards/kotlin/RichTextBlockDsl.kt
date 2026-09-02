@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * Defines an array of inlines, allowing for inline text formatting.
  */
 @CardDsl
-public class RichTextBlockDsl internal constructor() {
+public class RichTextBlockDsl internal constructor() : InlineScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -48,16 +48,6 @@ public class RichTextBlockDsl internal constructor() {
     public var spacing: Spacing? = null
 
     /**
-     * The array of inlines.
-     */
-    public var inlines: List<Inline>? = null
-
-    /** Collects `inlines`. */
-    public fun inlines(block: InlineScope.() -> Unit) {
-        this.inlines = InlineScope().apply(block).values
-    }
-
-    /**
      * Controls the horizontal text alignment. When not specified, the value of horizontalAlignment is inherited from the parent container. If no parent container has horizontalAlignment set, it defaults to Left.
      */
     public var horizontalAlignment: HorizontalAlignment? = null
@@ -70,7 +60,7 @@ public class RichTextBlockDsl internal constructor() {
         .height(height)
         .separator(separator)
         .spacing(spacing)
-        .inlines(inlines)
+        .inlines(values.ifEmpty { null })
         .horizontalAlignment(horizontalAlignment)
         .build()
 }

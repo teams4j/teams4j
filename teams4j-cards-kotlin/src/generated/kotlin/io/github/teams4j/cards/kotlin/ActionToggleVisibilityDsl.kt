@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * An action that toggles the visibility of associated card elements.
  */
 @CardDsl
-public class ActionToggleVisibilityDsl internal constructor() {
+public class ActionToggleVisibilityDsl internal constructor() : TargetElementScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -57,16 +57,6 @@ public class ActionToggleVisibilityDsl internal constructor() {
      */
     public var mode: ActionMode? = null
 
-    /**
-     * The array of TargetElements. It is not recommended to include Input elements with validation under Action.Toggle due to confusion that can arise from invalid inputs that are not currently visible. See https://docs.microsoft.com/en-us/adaptive-cards/authoring-cards/input-validation for more information.
-     */
-    public var targetElements: List<TargetElement>? = null
-
-    /** Collects `targetElements`. */
-    public fun targetElements(block: TargetElementScope.() -> Unit) {
-        this.targetElements = TargetElementScope().apply(block).values
-    }
-
     internal fun build(): ActionToggleVisibility = ActionToggleVisibility.builder()
         .requires(requires)
         .title(title)
@@ -77,6 +67,6 @@ public class ActionToggleVisibilityDsl internal constructor() {
         .tooltip(tooltip)
         .isEnabled(isEnabled)
         .mode(mode)
-        .targetElements(targetElements)
+        .targetElements(values.ifEmpty { null })
         .build()
 }

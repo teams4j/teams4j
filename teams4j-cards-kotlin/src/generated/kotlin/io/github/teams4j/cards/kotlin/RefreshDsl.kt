@@ -22,6 +22,17 @@ public class RefreshDsl internal constructor() {
         this.action = ActionExecuteDsl().apply(block).build()
     }
 
+    /** Same, with `title`, `verb` set. */
+    public fun action(title: String, verb: String, block: ActionExecuteDsl.() -> Unit = {}) {
+        this.action = ActionExecuteDsl()
+            .apply {
+                this.title = title
+                this.verb = verb
+            }
+            .apply(block)
+            .build()
+    }
+
     /**
      * A timestamp that informs a Host when the card content has expired, and that it should trigger a refresh as appropriate. The format is ISO-8601 Instant format. E.g., 2022-01-01T12:00:00Z
      */

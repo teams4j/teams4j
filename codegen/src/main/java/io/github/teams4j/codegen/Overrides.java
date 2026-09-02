@@ -30,7 +30,9 @@ record Overrides(
         Map<String, Map<String, String>> propTypes,
         Map<String, String> anyOfTypes,
         Map<String, Marker> markerInterfaces,
-        Set<String> authorsDiscriminator) {
+        Set<String> authorsDiscriminator,
+        Map<String, List<String>> dslPositional,
+        Map<String, Map<String, String>> dslDefaults) {
 
     /**
      * A sealed interface the schema knows nothing about, layered over a hand-picked set of
@@ -52,7 +54,9 @@ record Overrides(
                 nestedMaps(root.path("propTypes")),
                 stringMap(root.path("anyOfTypes")),
                 markers(root.path("markerInterfaces")),
-                stringSet(root.path("authorsDiscriminator")));
+                stringSet(root.path("authorsDiscriminator")),
+                stringLists(root.path("dslPositional")),
+                nestedLiterals(root.path("dslDefaults")));
     }
 
     /**
@@ -92,6 +96,19 @@ record Overrides(
      */
     boolean authorsDiscriminator(String typeName) {
         return authorsDiscriminator.contains(typeName);
+    }
+
+    /**
+     * The properties a DSL's positional shorthand takes, or null to derive them from the schema.
+     * See {@link Ir.Type#positionalProps()}.
+     */
+    List<String> dslPositional(String typeName) {
+        return dslPositional.get(typeName);
+    }
+
+    /** Kotlin literals the positional form also sets. See {@link Ir.Type#positionalDefaults()}. */
+    Map<String, String> dslDefaults(String typeName) {
+        return dslDefaults.getOrDefault(typeName, Map.of());
     }
 
     boolean propExcluded(String typeName, String propName) {
@@ -147,6 +164,33 @@ record Overrides(
         return out;
     }
 
+    private static Map<String, List<String>> stringLists(JsonNode node) {
+        Map<String, List<String>> out = new LinkedHashMap<>();
+        node.properties().forEach(e -> out.put(e.getKey(), new ArrayList<>(stringSet(e.getValue()))));
+        return out;
+    }
+
+    /** Each JSON value becomes the Kotlin literal that writes it: strings quoted, the rest verbatim. */
+    private static Map<String, Map<String, String>> nestedLiterals(JsonNode node) {
+        Map<String, Map<String, String>> out = new LinkedHashMap<>();
+        node.properties().forEach(e -> {
+            Map<String, String> literals = new LinkedHashMap<>();
+            e.getValue().properties().forEach(p -> literals.put(p.getKey(), kotlinLiteral(p.getValue())));
+            out.put(e.getKey(), literals);
+        });
+        return out;
+    }
+
+    private static String kotlinLiteral(JsonNode value) {
+        if (value.isTextual()) {
+            return '"' + value.asText().replace("\\", "\\\\").replace("\"", "\\\"") + '"';
+        }
+        if (value.isBoolean() || value.isNumber()) {
+            return value.asText();
+        }
+        throw new IllegalArgumentException("dslDefaults values must be strings, booleans or numbers: " + value);
+    }
+
     private static Map<String, Set<String>> nestedSets(JsonNode node) {
         Map<String, Set<String>> out = new LinkedHashMap<>();
         node.properties().forEach(e -> out.put(e.getKey(), stringSet(e.getValue())));
@@ -177,6 +221,10 @@ record Overrides(
         authorsDiscriminator.stream()
                 .filter(n -> !knownTypes.contains(n))
                 .forEach(n -> stale.add("authorsDiscriminator: " + n));
+        dslPositional.keySet().stream()
+                .filter(n -> !knownTypes.contains(n))
+                .forEach(n -> stale.add("dslPositional: " + n));
+        dslDefaults.keySet().stream().filter(n -> !knownTypes.contains(n)).forEach(n -> stale.add("dslDefaults: " + n));
         markerInterfaces.forEach((marker, spec) -> spec.members().stream()
                 .filter(n -> !knownTypes.contains(n))
                 .forEach(n -> stale.add("markerInterfaces." + marker + ": " + n)));

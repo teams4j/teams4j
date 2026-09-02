@@ -1,6 +1,7 @@
 package io.github.teams4j.codegen;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Intermediate representation sitting between the schema parser and the code emitters.
@@ -71,6 +72,11 @@ public final class Ir {
      *     times out of 70 and {@code Input.Choice} 0 out of 1062, while {@code TableCell} carries
      *     it 125 out of 125. Recorded in {@code overrides.authorsDiscriminator} as evidence, not
      *     as a rule.
+     * @param positionalProps wire names of the properties the Kotlin DSL's positional shorthand
+     *     takes, in order. By rule the required scalar properties; {@code overrides.dslPositional}
+     *     replaces the rule where usage disagrees with the schema (an action's {@code title}).
+     * @param positionalDefaults wire name to a Kotlin literal the positional form also sets, from
+     *     {@code overrides.dslDefaults}
      */
     public record Type(
             String schemaName,
@@ -82,7 +88,9 @@ public final class Ir {
             String stringShorthand,
             boolean authorsDiscriminator,
             List<String> unions,
-            List<Prop> props) {}
+            List<Prop> props,
+            List<String> positionalProps,
+            Map<String, String> positionalDefaults) {}
 
     /**
      * @param jsonName the wire name, after schema warts (such as {@code "rtl?"}) are normalised

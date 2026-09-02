@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * Defines authentication information associated with a card. This maps to the OAuthCard type defined by the Bot Framework (https://docs.microsoft.com/dotnet/api/microsoft.bot.schema.oauthcard)
  */
 @CardDsl
-public class AuthenticationDsl internal constructor() {
+public class AuthenticationDsl internal constructor() : AuthCardButtonScope() {
 
     /**
      * Text that can be displayed to the end user when prompting them to authenticate.
@@ -32,20 +32,22 @@ public class AuthenticationDsl internal constructor() {
         this.tokenExchangeResource = TokenExchangeResourceDsl().apply(block).build()
     }
 
-    /**
-     * Buttons that should be displayed to the user when prompting for authentication. The array MUST contain one button of type "signin". Other button types are not currently supported.
-     */
-    public var buttons: List<AuthCardButton>? = null
-
-    /** Collects `buttons`. */
-    public fun buttons(block: AuthCardButtonScope.() -> Unit) {
-        this.buttons = AuthCardButtonScope().apply(block).values
+    /** Same, with `id`, `uri`, `providerId` set. */
+    public fun tokenExchangeResource(id: String, uri: String, providerId: String, block: TokenExchangeResourceDsl.() -> Unit = {}) {
+        this.tokenExchangeResource = TokenExchangeResourceDsl()
+            .apply {
+                this.id = id
+                this.uri = uri
+                this.providerId = providerId
+            }
+            .apply(block)
+            .build()
     }
 
     internal fun build(): Authentication = Authentication.builder()
         .text(text)
         .connectionName(connectionName)
         .tokenExchangeResource(tokenExchangeResource)
-        .buttons(buttons)
+        .buttons(values.ifEmpty { null })
         .build()
 }

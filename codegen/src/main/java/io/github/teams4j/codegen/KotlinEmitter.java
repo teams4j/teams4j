@@ -26,6 +26,10 @@ import java.util.Set;
  *       function per member of the union, so {@code body { textBlock { … } }} type-checks
  *   <li>{@code build()} delegates to the generated Java builder, which keeps required-property
  *       checking in one place
+ *   <li>a positional overload next to every block function, {@code fact("Service", "api")}, for
+ *       the properties in {@link Ir.Type#positionalProps()}
+ *   <li>a type with exactly one list-valued property, {@code Container.items}, extends that list's
+ *       scope, so {@code container { textBlock("…") }} needs no {@code items { }} in between
  * </ul>
  *
  * <p>This one writes strings rather than going through a source-model library: the output has one
@@ -119,12 +123,20 @@ final class KotlinEmitter {
     }
 
     private String dslClass(Ir.Type type) {
+        Ir.Prop flattened = flattenedList(type);
         StringBuilder out = new StringBuilder();
         kdoc(out, "", "Builds a [" + type.javaName() + "].", type.description());
         out.append("@CardDsl\n");
-        out.append("public class ").append(dslName(type.javaName())).append(" internal constructor() {\n");
+        out.append("public class ").append(dslName(type.javaName())).append(" internal constructor()");
+        if (flattened != null) {
+            out.append(" : ").append(scopeName(elementJavaName(flattened))).append("()");
+        }
+        out.append(" {\n");
 
         for (Ir.Prop prop : properties(type)) {
+            if (prop == flattened) {
+                continue;
+            }
             out.append('\n');
             property(out, prop);
         }
@@ -142,7 +154,7 @@ final class KotlinEmitter {
                     .append('.')
                     .append(javaSetter(prop))
                     .append('(')
-                    .append(propertyName(prop))
+                    .append(prop == flattened ? "values.ifEmpty { null }" : propertyName(prop))
                     .append(")\n");
         }
         out.append(INDENT).append(INDENT).append(".build()\n");
@@ -193,7 +205,85 @@ final class KotlinEmitter {
                     .append(dslName(javaName))
                     .append("().apply(block).build()\n");
             out.append(INDENT).append("}\n");
+            positionalFunction(out, name, typesBySchemaName.get(named.schemaName()), "this." + name + " = ");
         }
+    }
+
+    /**
+     * The positional overload: the type's {@link Ir.Type#positionalProps()} as parameters, then an
+     * optional block. Resolves apart from the block-only function on the first parameter's type.
+     */
+    private void positionalFunction(StringBuilder out, String functionName, Ir.Type target, String sink) {
+        List<Ir.Prop> params = target.positionalProps().stream()
+                .map(json -> target.props().stream()
+                        .filter(p -> p.jsonName().equals(json))
+                        .findFirst()
+                        .orElseThrow())
+                .toList();
+        if (params.isEmpty()) {
+            return;
+        }
+        String dsl = dslName(target.javaName());
+        out.append('\n');
+        out.append(INDENT).append("/** Same, with `");
+        out.append(String.join(
+                "`, `", params.stream().map(KotlinEmitter::propertyName).toList()));
+        out.append("` set. */\n");
+        out.append(INDENT).append("public fun ").append(functionName).append('(');
+        for (Ir.Prop param : params) {
+            out.append(propertyName(param))
+                    .append(": ")
+                    .append(kotlinType(param.type()))
+                    .append(", ");
+        }
+        out.append("block: ").append(dsl).append(".() -> Unit = {}) {\n");
+        out.append(INDENT).append(INDENT).append(sink).append(dsl).append("()\n");
+        out.append(INDENT).append(INDENT).append(INDENT).append(".apply {\n");
+        for (Ir.Prop param : params) {
+            out.append(INDENT.repeat(4))
+                    .append("this.")
+                    .append(propertyName(param))
+                    .append(" = ")
+                    .append(propertyName(param))
+                    .append('\n');
+        }
+        target.positionalDefaults().forEach((json, literal) -> {
+            Ir.Prop prop = target.props().stream()
+                    .filter(p -> p.jsonName().equals(json))
+                    .findFirst()
+                    .orElseThrow();
+            out.append(INDENT.repeat(4))
+                    .append("this.")
+                    .append(propertyName(prop))
+                    .append(" = ")
+                    .append(literal)
+                    .append('\n');
+        });
+        out.append(INDENT).append(INDENT).append(INDENT).append("}\n");
+        out.append(INDENT).append(INDENT).append(INDENT).append(".apply(block)\n");
+        out.append(INDENT).append(INDENT).append(INDENT).append(".build()\n");
+        out.append(INDENT).append("}\n");
+    }
+
+    /**
+     * The one list-valued model property of a type, or null when it has none or several. A type
+     * with one such list extends the list's scope instead of exposing it behind a block.
+     */
+    private Ir.Prop flattenedList(Ir.Type type) {
+        List<Ir.Prop> lists = properties(type).stream()
+                .filter(p -> elementJavaName(p) != null)
+                .toList();
+        return lists.size() == 1 ? lists.get(0) : null;
+    }
+
+    /** The Java name of a list property's element type, or null when it is not a model list. */
+    private String elementJavaName(Ir.Prop prop) {
+        if (prop.type() instanceof Ir.Ref.ListOf list
+                && list.element() instanceof Ir.Ref.Named named
+                && !enumSchemaNames.contains(named.schemaName())) {
+            return javaNames.get(named.schemaName());
+        }
+        return null;
     }
 
     /**
@@ -237,7 +327,7 @@ final class KotlinEmitter {
         out.append(" * Collects [").append(javaName).append("] values for a list-valued property.\n");
         out.append(" */\n");
         out.append("@CardDsl\n");
-        out.append("public class ").append(scopeName(javaName)).append(" internal constructor() {\n\n");
+        out.append("public open class ").append(scopeName(javaName)).append(" internal constructor() {\n\n");
         out.append(INDENT)
                 .append("internal val values: MutableList<")
                 .append(javaName)
@@ -258,6 +348,7 @@ final class KotlinEmitter {
                     .append(dslName(memberName))
                     .append("().apply(block).build()\n");
             out.append(INDENT).append("}\n");
+            positionalFunction(out, lowerCamel(memberName), typeByJavaName(memberName), "values += ");
         }
 
         out.append('\n');
@@ -270,6 +361,13 @@ final class KotlinEmitter {
         out.append(INDENT).append("}\n");
         out.append("}\n");
         return out.toString();
+    }
+
+    private Ir.Type typeByJavaName(String javaName) {
+        return typesBySchemaName.values().stream()
+                .filter(t -> t.javaName().equals(javaName))
+                .findFirst()
+                .orElseThrow();
     }
 
     /** A union's members, or the type itself when it is concrete. */

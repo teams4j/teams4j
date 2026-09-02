@@ -100,12 +100,10 @@ In Kotlin you get a type-safe DSL generated from the same schema.
 ```kotlin
 val card = adaptiveCard {
     body {
-        textBlock { text = "Deploy failed"; weight = FontWeight.BOLDER; color = Colors.ATTENTION }
-        factSet { facts { fact { title = "Service"; value = "api" } } }
+        textBlock("Deploy failed") { weight = FontWeight.BOLDER; color = Colors.ATTENTION }
+        factSet { fact("Service", "api") }
     }
-    webhookActions {
-        actionOpenUrl { title = "View logs"; url = logUrl }
-    }
+    webhookActions { actionOpenUrl("View logs", logUrl) }
 }
 ```
 

@@ -197,7 +197,9 @@ final class SchemaReader {
                 type.stringShorthand(),
                 type.authorsDiscriminator(),
                 type.unions(),
-                props);
+                props,
+                type.positionalProps(),
+                type.positionalDefaults());
     }
 
     private Ir.Ref link(Ir.Ref ref, Set<String> generated, String where) {
@@ -345,7 +347,39 @@ final class SchemaReader {
                 // Anything else keeps it only where real cards do; see Ir.Type.
                 discriminator != null && (!unions.isEmpty() || overrides.authorsDiscriminator(name)),
                 unions,
-                irProps);
+                irProps,
+                positionalProps(name, irProps),
+                positionalDefaults(name, irProps));
+    }
+
+    /** The override if there is one, else every required scalar property, in schema order. */
+    private List<String> positionalProps(String name, List<Ir.Prop> props) {
+        List<String> declared = overrides.dslPositional(name);
+        if (declared != null) {
+            declared.forEach(p -> requireProp(name, props, p, "dslPositional"));
+            return declared;
+        }
+        return props.stream()
+                .filter(p -> p.required() && isScalar(p.type()))
+                .map(Ir.Prop::jsonName)
+                .toList();
+    }
+
+    private Map<String, String> positionalDefaults(String name, List<Ir.Prop> props) {
+        Map<String, String> defaults = overrides.dslDefaults(name);
+        defaults.keySet().forEach(p -> requireProp(name, props, p, "dslDefaults"));
+        return defaults;
+    }
+
+    private static void requireProp(String type, List<Ir.Prop> props, String jsonName, String section) {
+        if (props.stream().noneMatch(p -> p.jsonName().equals(jsonName))) {
+            throw new IllegalStateException("overrides." + section + ": " + type + " has no property " + jsonName);
+        }
+    }
+
+    private boolean isScalar(Ir.Ref ref) {
+        return ref instanceof Ir.Ref.Prim
+                || (ref instanceof Ir.Ref.Named named && isEnum(definitions.path(named.schemaName())));
     }
 
     private List<Ir.Prop> readProps(

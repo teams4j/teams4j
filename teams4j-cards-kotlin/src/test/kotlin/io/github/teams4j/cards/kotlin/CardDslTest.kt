@@ -4,6 +4,7 @@ import io.github.teams4j.cards.ActionOpenUrl
 import io.github.teams4j.cards.ActionSubmit
 import io.github.teams4j.cards.Colors
 import io.github.teams4j.cards.Container
+import io.github.teams4j.cards.Fact
 import io.github.teams4j.cards.FactSet
 import io.github.teams4j.cards.FontSize
 import io.github.teams4j.cards.FontWeight
@@ -29,32 +30,17 @@ class CardDslTest {
         val kotlin =
             adaptiveCard {
                 body {
-                    textBlock {
-                        text = "Deploy failed"
+                    textBlock("Deploy failed") {
                         weight = FontWeight.BOLDER
                         size = FontSize.LARGE
                         color = Colors.ATTENTION
-                        wrap = true
                     }
                     factSet {
-                        facts {
-                            fact {
-                                title = "Service"
-                                value = "api"
-                            }
-                            fact {
-                                title = "Commit"
-                                value = "9f2c1ab"
-                            }
-                        }
+                        fact("Service", "api")
+                        fact("Commit", "9f2c1ab")
                     }
                 }
-                actions {
-                    actionOpenUrl {
-                        title = "View logs"
-                        url = "https://ci.example.com"
-                    }
-                }
+                actions { actionOpenUrl("View logs", "https://ci.example.com") }
             }
 
         val java =
@@ -74,18 +60,10 @@ class CardDslTest {
             adaptiveCard {
                 body {
                     container {
-                        items {
-                            textBlock { text = "inside" }
-                            columnSet {
-                                columns {
-                                    column {
-                                        items { textBlock { text = "left" } }
-                                    }
-                                    column {
-                                        items { textBlock { text = "right" } }
-                                    }
-                                }
-                            }
+                        textBlock("inside")
+                        columnSet {
+                            column { textBlock("left") }
+                            column { textBlock("right") }
                         }
                     }
                 }
@@ -155,6 +133,37 @@ class CardDslTest {
         )
     }
 
+    /** The one default the positional form adds, and the same one the Java DSL's `text(...)` adds. */
+    @Test
+    fun `the positional text block wraps unless told otherwise`() {
+        val wrapped = mapper.writeValueAsString(adaptiveCard { body { textBlock("hi") } })
+        val unwrapped = mapper.writeValueAsString(adaptiveCard { body { textBlock("hi") { wrap = false } } })
+
+        assertThat(wrapped).contains(""""wrap":true""")
+        assertThat(unwrapped).contains(""""wrap":false""")
+    }
+
+    @Test
+    fun `an element with one list takes its children directly`() {
+        val card =
+            adaptiveCard {
+                body {
+                    factSet {
+                        fact("a", "1")
+                        add(
+                            Fact
+                                .builder()
+                                .title("b")
+                                .value("2")
+                                .build(),
+                        )
+                    }
+                }
+            }
+
+        assertThat((card.body()!![0] as FactSet).facts()).extracting<String> { it.title() }.containsExactly("a", "b")
+    }
+
     @Test
     fun `the schema property keeps its wire name`() {
         val json =
@@ -173,14 +182,7 @@ class CardDslTest {
         val card =
             adaptiveCard {
                 body {
-                    factSet {
-                        facts {
-                            fact {
-                                title = "Files"
-                                value = "12"
-                            }
-                        }
-                    }
+                    factSet { fact("Files", "12") }
                 }
             }
 

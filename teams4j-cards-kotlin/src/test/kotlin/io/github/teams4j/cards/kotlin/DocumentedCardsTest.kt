@@ -63,36 +63,18 @@ class DocumentedCardsTest {
         // #region deploy-failure
         return adaptiveCard {
             body {
-                textBlock {
-                    text = "Deploy failed"
+                textBlock("Deploy failed") {
                     weight = FontWeight.BOLDER
                     size = FontSize.LARGE
                     color = Colors.ATTENTION
-                    wrap = true
                 }
                 factSet {
-                    facts {
-                        fact {
-                            title = "Service"
-                            value = "api"
-                        }
-                        fact {
-                            title = "Commit"
-                            value = "9f2c1ab"
-                        }
-                        fact {
-                            title = "Environment"
-                            value = "production"
-                        }
-                    }
+                    fact("Service", "api")
+                    fact("Commit", "9f2c1ab")
+                    fact("Environment", "production")
                 }
             }
-            webhookActions {
-                actionOpenUrl {
-                    title = "View logs"
-                    url = "https://ci.example.com/runs/1234"
-                }
-            }
+            webhookActions { actionOpenUrl("View logs", "https://ci.example.com/runs/1234") }
         }
         // #endregion deploy-failure
     }
@@ -102,47 +84,19 @@ class DocumentedCardsTest {
         return adaptiveCard {
             body {
                 columnSet {
-                    columns {
-                        column {
-                            width = Dimension.of("auto")
-                            items {
-                                image {
-                                    url = "https://example.com/avatar.png"
-                                    size = ImageSize.SMALL
-                                }
-                            }
-                        }
-                        column {
-                            width = Dimension.of(4L)
-                            items {
-                                textBlock {
-                                    text = "Ada Lovelace"
-                                    weight = FontWeight.BOLDER
-                                    wrap = true
-                                }
-                                textBlock {
-                                    text = "Opened a pull request"
-                                    wrap = true
-                                }
-                            }
-                        }
+                    column {
+                        width = Dimension.of("auto")
+                        image("https://example.com/avatar.png") { size = ImageSize.SMALL }
+                    }
+                    column {
+                        width = Dimension.of(4L)
+                        textBlock("Ada Lovelace") { weight = FontWeight.BOLDER }
+                        textBlock("Opened a pull request")
                     }
                 }
                 container {
-                    items {
-                        textBlock {
-                            text = "Adds the analytical engine"
-                            wrap = true
-                        }
-                        factSet {
-                            facts {
-                                fact {
-                                    title = "Files"
-                                    value = "12"
-                                }
-                            }
-                        }
-                    }
+                    textBlock("Adds the analytical engine")
+                    factSet { fact("Files", "12") }
                 }
             }
         }
@@ -152,27 +106,15 @@ class DocumentedCardsTest {
     private fun showCardNested(): AdaptiveCard {
         // #region show-card-nested
         return adaptiveCard {
-            body {
-                textBlock {
-                    text = "Release 2.4.0"
-                    wrap = true
-                }
-            }
+            body { textBlock("Release 2.4.0") }
             webhookActions {
-                actionShowCard {
-                    title = "Changelog"
+                actionShowCard("Changelog") {
                     card {
                         // A nested card takes no default version; the Java DSL stamps one.
                         version = CardBuilder.DEFAULT_VERSION
                         body {
-                            textBlock {
-                                text = "- Faster startup"
-                                wrap = true
-                            }
-                            textBlock {
-                                text = "- Fewer bugs"
-                                wrap = true
-                            }
+                            textBlock("- Faster startup")
+                            textBlock("- Fewer bugs")
                         }
                     }
                 }
@@ -184,22 +126,11 @@ class DocumentedCardsTest {
     private fun submitWithData(): AdaptiveCard {
         // #region submit-with-data
         return adaptiveCard {
-            body {
-                textBlock {
-                    text = "Approve this deployment?"
-                    wrap = true
-                }
-            }
+            body { textBlock("Approve this deployment?") }
             // Action.Submit needs a bot, so `actions` rather than `webhookActions`.
             actions {
-                actionSubmit {
-                    title = "Approve"
-                    data = CardValue.ofJava(mapOf("decision" to "approve"))
-                }
-                actionSubmit {
-                    title = "Reject"
-                    data = CardValue.ofJava(mapOf("decision" to "reject"))
-                }
+                actionSubmit("Approve") { data = CardValue.ofJava(mapOf("decision" to "approve")) }
+                actionSubmit("Reject") { data = CardValue.ofJava(mapOf("decision" to "reject")) }
             }
         }
         // #endregion submit-with-data
@@ -209,24 +140,14 @@ class DocumentedCardsTest {
         // #region toggle-visibility
         return adaptiveCard {
             body {
-                textBlock {
-                    text = "Build #4821 failed"
-                    wrap = true
-                }
-                textBlock {
+                textBlock("Build #4821 failed")
+                textBlock("java.lang.IllegalStateException") {
                     id = "stack-trace"
-                    text = "java.lang.IllegalStateException"
                     isVisible = false
-                    wrap = true
                 }
             }
             webhookActions {
-                actionToggleVisibility {
-                    title = "Show stack trace"
-                    targetElements {
-                        targetElement { elementId = "stack-trace" }
-                    }
-                }
+                actionToggleVisibility("Show stack trace") { targetElement("stack-trace") }
             }
         }
         // #endregion toggle-visibility
@@ -238,12 +159,7 @@ class DocumentedCardsTest {
             body {
                 container {
                     style = ContainerStyle.EMPHASIS
-                    items {
-                        textBlock {
-                            text = "Emphasised"
-                            wrap = true
-                        }
-                    }
+                    textBlock("Emphasised")
                 }
             }
             speak = "Build failed"

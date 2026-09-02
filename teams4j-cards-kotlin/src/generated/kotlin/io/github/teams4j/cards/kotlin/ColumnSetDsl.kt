@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * ColumnSet divides a region into Columns, allowing elements to sit side-by-side.
  */
 @CardDsl
-public class ColumnSetDsl internal constructor() {
+public class ColumnSetDsl internal constructor() : ColumnScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -48,16 +48,6 @@ public class ColumnSetDsl internal constructor() {
     public var spacing: Spacing? = null
 
     /**
-     * The array of `Columns` to divide the region into.
-     */
-    public var columns: List<Column>? = null
-
-    /** Collects `columns`. */
-    public fun columns(block: ColumnScope.() -> Unit) {
-        this.columns = ColumnScope().apply(block).values
-    }
-
-    /**
      * An Action that will be invoked when the `ColumnSet` is tapped or selected. `Action.ShowCard` is not supported.
      */
     public var selectAction: SelectAction? = null
@@ -90,7 +80,7 @@ public class ColumnSetDsl internal constructor() {
         .height(height)
         .separator(separator)
         .spacing(spacing)
-        .columns(columns)
+        .columns(values.ifEmpty { null })
         .selectAction(selectAction)
         .style(style)
         .bleed(bleed)

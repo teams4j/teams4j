@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * Displays a set of actions.
  */
 @CardDsl
-public class ActionSetDsl internal constructor() {
+public class ActionSetDsl internal constructor() : CardActionScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -47,21 +47,6 @@ public class ActionSetDsl internal constructor() {
      */
     public var spacing: Spacing? = null
 
-    /**
-     * The array of `Action` elements to show.
-     */
-    public var actions: List<CardAction>? = null
-
-    /** Collects `actions`. */
-    public fun actions(block: CardActionScope.() -> Unit) {
-        this.actions = CardActionScope().apply(block).values
-    }
-
-    /** Collects `actions`, narrowed to [WebhookAction]. */
-    public fun webhookActions(block: WebhookActionScope.() -> Unit) {
-        this.actions = WebhookActionScope().apply(block).values.toList()
-    }
-
     internal fun build(): ActionSet = ActionSet.builder()
         .requires(requires)
         .id(id)
@@ -70,6 +55,6 @@ public class ActionSetDsl internal constructor() {
         .height(height)
         .separator(separator)
         .spacing(spacing)
-        .actions(actions)
+        .actions(values.ifEmpty { null })
         .build()
 }

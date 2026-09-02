@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * Defines a container that is part of a ColumnSet.
  */
 @CardDsl
-public class ColumnDsl internal constructor() {
+public class ColumnDsl internal constructor() : CardElementScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -28,16 +28,6 @@ public class ColumnDsl internal constructor() {
     public var isVisible: Boolean? = null
 
     /**
-     * The card elements to render inside the `Column`.
-     */
-    public var items: List<CardElement>? = null
-
-    /** Collects `items`. */
-    public fun items(block: CardElementScope.() -> Unit) {
-        this.items = CardElementScope().apply(block).values
-    }
-
-    /**
      * Specifies the background image. Acceptable formats are PNG, JPEG, and GIF
      */
     public var backgroundImage: BackgroundImage? = null
@@ -45,6 +35,16 @@ public class ColumnDsl internal constructor() {
     /** Builds the [BackgroundImage] for `backgroundImage`. */
     public fun backgroundImage(block: BackgroundImageDsl.() -> Unit) {
         this.backgroundImage = BackgroundImageDsl().apply(block).build()
+    }
+
+    /** Same, with `url` set. */
+    public fun backgroundImage(url: String, block: BackgroundImageDsl.() -> Unit = {}) {
+        this.backgroundImage = BackgroundImageDsl()
+            .apply {
+                this.url = url
+            }
+            .apply(block)
+            .build()
     }
 
     /**
@@ -101,7 +101,7 @@ public class ColumnDsl internal constructor() {
         .requires(requires)
         .id(id)
         .isVisible(isVisible)
-        .items(items)
+        .items(values.ifEmpty { null })
         .backgroundImage(backgroundImage)
         .bleed(bleed)
         .fallback(fallback)

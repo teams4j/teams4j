@@ -36,25 +36,21 @@ fun main(): Unit = runBlocking {
 
     val card = adaptiveCard {
         body {
-            textBlock {
-                text = "Deploy failed: api"
+            textBlock("Deploy failed: api") {
                 weight = FontWeight.BOLDER
                 size = FontSize.LARGE
                 color = Colors.ATTENTION
-                wrap = true
             }
             factSet {
-                facts {
-                    fact { title = "Commit"; value = "9f2c1ab" }
-                    fact { title = "Reason"; value = "health check timed out" }
-                    fact { title = "At"; value = Instant.now().toString() }
-                }
+                fact("Commit", "9f2c1ab")
+                fact("Reason", "health check timed out")
+                fact("At", Instant.now().toString())
             }
         }
         // `webhookActions`, not `actions`: this scope has no actionSubmit, because a webhook has no
         // bot behind it to receive one.
         webhookActions {
-            actionOpenUrl { title = "View logs"; url = "https://ci.example.com/builds/4711" }
+            actionOpenUrl("View logs", "https://ci.example.com/builds/4711")
         }
     }
 

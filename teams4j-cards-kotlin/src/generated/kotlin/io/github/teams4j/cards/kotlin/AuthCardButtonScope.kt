@@ -8,13 +8,24 @@ import io.github.teams4j.cards.*
  * Collects [AuthCardButton] values for a list-valued property.
  */
 @CardDsl
-public class AuthCardButtonScope internal constructor() {
+public open class AuthCardButtonScope internal constructor() {
 
     internal val values: MutableList<AuthCardButton> = mutableListOf()
 
     /** Appends a [AuthCardButton]. */
     public fun authCardButton(block: AuthCardButtonDsl.() -> Unit) {
         values += AuthCardButtonDsl().apply(block).build()
+    }
+
+    /** Same, with `type`, `value` set. */
+    public fun authCardButton(type: String, value: String, block: AuthCardButtonDsl.() -> Unit = {}) {
+        values += AuthCardButtonDsl()
+            .apply {
+                this.type = type
+                this.value = value
+            }
+            .apply(block)
+            .build()
     }
 
     /** Appends already-built values; the escape hatch to the Java builders. */

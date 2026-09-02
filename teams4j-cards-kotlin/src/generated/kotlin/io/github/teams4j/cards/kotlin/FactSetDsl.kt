@@ -10,7 +10,7 @@ import io.github.teams4j.cards.*
  * The FactSet element displays a series of facts (i.e. name/value pairs) in a tabular form.
  */
 @CardDsl
-public class FactSetDsl internal constructor() {
+public class FactSetDsl internal constructor() : FactScope() {
 
     /**
      * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
@@ -47,16 +47,6 @@ public class FactSetDsl internal constructor() {
      */
     public var spacing: Spacing? = null
 
-    /**
-     * The array of `Fact`'s.
-     */
-    public var facts: List<Fact>? = null
-
-    /** Collects `facts`. */
-    public fun facts(block: FactScope.() -> Unit) {
-        this.facts = FactScope().apply(block).values
-    }
-
     internal fun build(): FactSet = FactSet.builder()
         .requires(requires)
         .id(id)
@@ -65,6 +55,6 @@ public class FactSetDsl internal constructor() {
         .height(height)
         .separator(separator)
         .spacing(spacing)
-        .facts(facts)
+        .facts(values.ifEmpty { null })
         .build()
 }

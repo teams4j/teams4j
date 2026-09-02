@@ -8,13 +8,23 @@ import io.github.teams4j.cards.*
  * Collects [MediaSource] values for a list-valued property.
  */
 @CardDsl
-public class MediaSourceScope internal constructor() {
+public open class MediaSourceScope internal constructor() {
 
     internal val values: MutableList<MediaSource> = mutableListOf()
 
     /** Appends a [MediaSource]. */
     public fun mediaSource(block: MediaSourceDsl.() -> Unit) {
         values += MediaSourceDsl().apply(block).build()
+    }
+
+    /** Same, with `url` set. */
+    public fun mediaSource(url: String, block: MediaSourceDsl.() -> Unit = {}) {
+        values += MediaSourceDsl()
+            .apply {
+                this.url = url
+            }
+            .apply(block)
+            .build()
     }
 
     /** Appends already-built values; the escape hatch to the Java builders. */
