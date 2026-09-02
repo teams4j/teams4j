@@ -1,4 +1,4 @@
 [tools]
 java = "temurin-21"
-# docs/ only; CI reads this pin too
-node = "22"
+# docs/ only
+node = "26"
