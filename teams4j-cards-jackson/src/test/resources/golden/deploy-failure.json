@@ -1,0 +1,29 @@
+{
+  "type" : "AdaptiveCard",
+  "version" : "1.5",
+  "body" : [ {
+    "type" : "TextBlock",
+    "text" : "Deploy failed",
+    "color" : "attention",
+    "size" : "large",
+    "weight" : "bolder",
+    "wrap" : true
+  }, {
+    "type" : "FactSet",
+    "facts" : [ {
+      "title" : "Service",
+      "value" : "api"
+    }, {
+      "title" : "Commit",
+      "value" : "9f2c1ab"
+    }, {
+      "title" : "Environment",
+      "value" : "production"
+    } ]
+  } ],
+  "actions" : [ {
+    "title" : "View logs",
+    "type" : "Action.OpenUrl",
+    "url" : "https://ci.example.com/runs/1234"
+  } ]
+}

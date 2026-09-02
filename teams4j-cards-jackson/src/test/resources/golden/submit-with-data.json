@@ -1,0 +1,22 @@
+{
+  "type" : "AdaptiveCard",
+  "version" : "1.5",
+  "body" : [ {
+    "type" : "TextBlock",
+    "text" : "Approve this deployment?",
+    "wrap" : true
+  } ],
+  "actions" : [ {
+    "title" : "Approve",
+    "type" : "Action.Submit",
+    "data" : {
+      "decision" : "approve"
+    }
+  }, {
+    "title" : "Reject",
+    "type" : "Action.Submit",
+    "data" : {
+      "decision" : "reject"
+    }
+  } ]
+}

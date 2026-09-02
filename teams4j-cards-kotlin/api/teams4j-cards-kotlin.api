@@ -1,0 +1,993 @@
+public final class io/github/teams4j/cards/kotlin/ActionExecuteDsl {
+	public final fun getAssociatedInputs ()Lio/github/teams4j/cards/AssociatedInputs;
+	public final fun getData ()Lio/github/teams4j/cards/CardValue;
+	public final fun getFallback ()Lio/github/teams4j/cards/ActionFallback;
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMode ()Lio/github/teams4j/cards/ActionMode;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getStyle ()Lio/github/teams4j/cards/ActionStyle;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getTooltip ()Ljava/lang/String;
+	public final fun getVerb ()Ljava/lang/String;
+	public final fun isEnabled ()Ljava/lang/Boolean;
+	public final fun setAssociatedInputs (Lio/github/teams4j/cards/AssociatedInputs;)V
+	public final fun setData (Lio/github/teams4j/cards/CardValue;)V
+	public final fun setEnabled (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ActionFallback;)V
+	public final fun setIconUrl (Ljava/lang/String;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMode (Lio/github/teams4j/cards/ActionMode;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ActionStyle;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setTooltip (Ljava/lang/String;)V
+	public final fun setVerb (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ActionOpenUrlDsl {
+	public final fun getFallback ()Lio/github/teams4j/cards/ActionFallback;
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMode ()Lio/github/teams4j/cards/ActionMode;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getStyle ()Lio/github/teams4j/cards/ActionStyle;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getTooltip ()Ljava/lang/String;
+	public final fun getUrl ()Ljava/lang/String;
+	public final fun isEnabled ()Ljava/lang/Boolean;
+	public final fun setEnabled (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ActionFallback;)V
+	public final fun setIconUrl (Ljava/lang/String;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMode (Lio/github/teams4j/cards/ActionMode;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ActionStyle;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setTooltip (Ljava/lang/String;)V
+	public final fun setUrl (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ActionSetDsl {
+	public final fun actions (Lkotlin/jvm/functions/Function1;)V
+	public final fun getActions ()Ljava/util/List;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setActions (Ljava/util/List;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun webhookActions (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ActionShowCardDsl {
+	public final fun card (Lkotlin/jvm/functions/Function1;)V
+	public final fun getCard ()Lio/github/teams4j/cards/AdaptiveCard;
+	public final fun getFallback ()Lio/github/teams4j/cards/ActionFallback;
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMode ()Lio/github/teams4j/cards/ActionMode;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getStyle ()Lio/github/teams4j/cards/ActionStyle;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getTooltip ()Ljava/lang/String;
+	public final fun isEnabled ()Ljava/lang/Boolean;
+	public final fun setCard (Lio/github/teams4j/cards/AdaptiveCard;)V
+	public final fun setEnabled (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ActionFallback;)V
+	public final fun setIconUrl (Ljava/lang/String;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMode (Lio/github/teams4j/cards/ActionMode;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ActionStyle;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setTooltip (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ActionSubmitDsl {
+	public final fun getAssociatedInputs ()Lio/github/teams4j/cards/AssociatedInputs;
+	public final fun getData ()Lio/github/teams4j/cards/CardValue;
+	public final fun getFallback ()Lio/github/teams4j/cards/ActionFallback;
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMode ()Lio/github/teams4j/cards/ActionMode;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getStyle ()Lio/github/teams4j/cards/ActionStyle;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getTooltip ()Ljava/lang/String;
+	public final fun isEnabled ()Ljava/lang/Boolean;
+	public final fun setAssociatedInputs (Lio/github/teams4j/cards/AssociatedInputs;)V
+	public final fun setData (Lio/github/teams4j/cards/CardValue;)V
+	public final fun setEnabled (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ActionFallback;)V
+	public final fun setIconUrl (Ljava/lang/String;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMode (Lio/github/teams4j/cards/ActionMode;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ActionStyle;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setTooltip (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ActionToggleVisibilityDsl {
+	public final fun getFallback ()Lio/github/teams4j/cards/ActionFallback;
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMode ()Lio/github/teams4j/cards/ActionMode;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getStyle ()Lio/github/teams4j/cards/ActionStyle;
+	public final fun getTargetElements ()Ljava/util/List;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getTooltip ()Ljava/lang/String;
+	public final fun isEnabled ()Ljava/lang/Boolean;
+	public final fun setEnabled (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ActionFallback;)V
+	public final fun setIconUrl (Ljava/lang/String;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMode (Lio/github/teams4j/cards/ActionMode;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ActionStyle;)V
+	public final fun setTargetElements (Ljava/util/List;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setTooltip (Ljava/lang/String;)V
+	public final fun targetElements (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/AdaptiveCardDsl {
+	public final fun actions (Lkotlin/jvm/functions/Function1;)V
+	public final fun authentication (Lkotlin/jvm/functions/Function1;)V
+	public final fun backgroundImage (Lkotlin/jvm/functions/Function1;)V
+	public final fun body (Lkotlin/jvm/functions/Function1;)V
+	public final fun getActions ()Ljava/util/List;
+	public final fun getAuthentication ()Lio/github/teams4j/cards/Authentication;
+	public final fun getBackgroundImage ()Lio/github/teams4j/cards/BackgroundImage;
+	public final fun getBody ()Ljava/util/List;
+	public final fun getFallbackText ()Ljava/lang/String;
+	public final fun getLang ()Ljava/lang/String;
+	public final fun getMetadata ()Lio/github/teams4j/cards/Metadata;
+	public final fun getMinHeight ()Ljava/lang/String;
+	public final fun getRefresh ()Lio/github/teams4j/cards/Refresh;
+	public final fun getRtl ()Ljava/lang/Boolean;
+	public final fun getSchema ()Ljava/lang/String;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getSpeak ()Ljava/lang/String;
+	public final fun getVersion ()Ljava/lang/String;
+	public final fun getVerticalContentAlignment ()Lio/github/teams4j/cards/VerticalContentAlignment;
+	public final fun metadata (Lkotlin/jvm/functions/Function1;)V
+	public final fun refresh (Lkotlin/jvm/functions/Function1;)V
+	public final fun setActions (Ljava/util/List;)V
+	public final fun setAuthentication (Lio/github/teams4j/cards/Authentication;)V
+	public final fun setBackgroundImage (Lio/github/teams4j/cards/BackgroundImage;)V
+	public final fun setBody (Ljava/util/List;)V
+	public final fun setFallbackText (Ljava/lang/String;)V
+	public final fun setLang (Ljava/lang/String;)V
+	public final fun setMetadata (Lio/github/teams4j/cards/Metadata;)V
+	public final fun setMinHeight (Ljava/lang/String;)V
+	public final fun setRefresh (Lio/github/teams4j/cards/Refresh;)V
+	public final fun setRtl (Ljava/lang/Boolean;)V
+	public final fun setSchema (Ljava/lang/String;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setSpeak (Ljava/lang/String;)V
+	public final fun setVersion (Ljava/lang/String;)V
+	public final fun setVerticalContentAlignment (Lio/github/teams4j/cards/VerticalContentAlignment;)V
+	public final fun webhookActions (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/AuthCardButtonDsl {
+	public final fun getImage ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getType ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun setImage (Ljava/lang/String;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setType (Ljava/lang/String;)V
+	public final fun setValue (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/AuthCardButtonScope {
+	public final fun add ([Lio/github/teams4j/cards/AuthCardButton;)V
+	public final fun authCardButton (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/AuthenticationDsl {
+	public final fun buttons (Lkotlin/jvm/functions/Function1;)V
+	public final fun getButtons ()Ljava/util/List;
+	public final fun getConnectionName ()Ljava/lang/String;
+	public final fun getText ()Ljava/lang/String;
+	public final fun getTokenExchangeResource ()Lio/github/teams4j/cards/TokenExchangeResource;
+	public final fun setButtons (Ljava/util/List;)V
+	public final fun setConnectionName (Ljava/lang/String;)V
+	public final fun setText (Ljava/lang/String;)V
+	public final fun setTokenExchangeResource (Lio/github/teams4j/cards/TokenExchangeResource;)V
+	public final fun tokenExchangeResource (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/BackgroundImageDsl {
+	public final fun getFillMode ()Lio/github/teams4j/cards/ImageFillMode;
+	public final fun getHorizontalAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getUrl ()Ljava/lang/String;
+	public final fun getVerticalAlignment ()Lio/github/teams4j/cards/VerticalAlignment;
+	public final fun setFillMode (Lio/github/teams4j/cards/ImageFillMode;)V
+	public final fun setHorizontalAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setUrl (Ljava/lang/String;)V
+	public final fun setVerticalAlignment (Lio/github/teams4j/cards/VerticalAlignment;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/CaptionSourceDsl {
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getMimeType ()Ljava/lang/String;
+	public final fun getUrl ()Ljava/lang/String;
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setMimeType (Ljava/lang/String;)V
+	public final fun setUrl (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/CaptionSourceScope {
+	public final fun add ([Lio/github/teams4j/cards/CaptionSource;)V
+	public final fun captionSource (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/CardActionScope {
+	public final fun actionExecute (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionOpenUrl (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionShowCard (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionSubmit (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionToggleVisibility (Lkotlin/jvm/functions/Function1;)V
+	public final fun add ([Lio/github/teams4j/cards/CardAction;)V
+}
+
+public abstract interface annotation class io/github/teams4j/cards/kotlin/CardDsl : java/lang/annotation/Annotation {
+}
+
+public final class io/github/teams4j/cards/kotlin/CardDslKt {
+	public static final fun adaptiveCard (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/teams4j/cards/AdaptiveCard;
+	public static synthetic fun adaptiveCard$default (Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/teams4j/cards/AdaptiveCard;
+}
+
+public final class io/github/teams4j/cards/kotlin/CardElementScope {
+	public final fun actionSet (Lkotlin/jvm/functions/Function1;)V
+	public final fun add ([Lio/github/teams4j/cards/CardElement;)V
+	public final fun columnSet (Lkotlin/jvm/functions/Function1;)V
+	public final fun container (Lkotlin/jvm/functions/Function1;)V
+	public final fun factSet (Lkotlin/jvm/functions/Function1;)V
+	public final fun image (Lkotlin/jvm/functions/Function1;)V
+	public final fun imageSet (Lkotlin/jvm/functions/Function1;)V
+	public final fun inputChoiceSet (Lkotlin/jvm/functions/Function1;)V
+	public final fun inputDate (Lkotlin/jvm/functions/Function1;)V
+	public final fun inputNumber (Lkotlin/jvm/functions/Function1;)V
+	public final fun inputText (Lkotlin/jvm/functions/Function1;)V
+	public final fun inputTime (Lkotlin/jvm/functions/Function1;)V
+	public final fun inputToggle (Lkotlin/jvm/functions/Function1;)V
+	public final fun media (Lkotlin/jvm/functions/Function1;)V
+	public final fun richTextBlock (Lkotlin/jvm/functions/Function1;)V
+	public final fun table (Lkotlin/jvm/functions/Function1;)V
+	public final fun textBlock (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ColumnDsl {
+	public final fun backgroundImage (Lkotlin/jvm/functions/Function1;)V
+	public final fun getBackgroundImage ()Lio/github/teams4j/cards/BackgroundImage;
+	public final fun getBleed ()Ljava/lang/Boolean;
+	public final fun getFallback ()Lio/github/teams4j/cards/ColumnFallback;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getItems ()Ljava/util/List;
+	public final fun getMinHeight ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getRtl ()Ljava/lang/Boolean;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/ContainerStyle;
+	public final fun getVerticalContentAlignment ()Lio/github/teams4j/cards/VerticalContentAlignment;
+	public final fun getWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun items (Lkotlin/jvm/functions/Function1;)V
+	public final fun setBackgroundImage (Lio/github/teams4j/cards/BackgroundImage;)V
+	public final fun setBleed (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ColumnFallback;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setItems (Ljava/util/List;)V
+	public final fun setMinHeight (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setRtl (Ljava/lang/Boolean;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ContainerStyle;)V
+	public final fun setVerticalContentAlignment (Lio/github/teams4j/cards/VerticalContentAlignment;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun setWidth (Lio/github/teams4j/cards/Dimension;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ColumnScope {
+	public final fun add ([Lio/github/teams4j/cards/Column;)V
+	public final fun column (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ColumnSetDsl {
+	public final fun columns (Lkotlin/jvm/functions/Function1;)V
+	public final fun getBleed ()Ljava/lang/Boolean;
+	public final fun getColumns ()Ljava/util/List;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getHorizontalAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMinHeight ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/ContainerStyle;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setBleed (Ljava/lang/Boolean;)V
+	public final fun setColumns (Ljava/util/List;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setHorizontalAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMinHeight (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ContainerStyle;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ContainerDsl {
+	public final fun backgroundImage (Lkotlin/jvm/functions/Function1;)V
+	public final fun getBackgroundImage ()Lio/github/teams4j/cards/BackgroundImage;
+	public final fun getBleed ()Ljava/lang/Boolean;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getItems ()Ljava/util/List;
+	public final fun getMinHeight ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getRtl ()Ljava/lang/Boolean;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/ContainerStyle;
+	public final fun getVerticalContentAlignment ()Lio/github/teams4j/cards/VerticalContentAlignment;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun items (Lkotlin/jvm/functions/Function1;)V
+	public final fun setBackgroundImage (Lio/github/teams4j/cards/BackgroundImage;)V
+	public final fun setBleed (Ljava/lang/Boolean;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setItems (Ljava/util/List;)V
+	public final fun setMinHeight (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setRtl (Ljava/lang/Boolean;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ContainerStyle;)V
+	public final fun setVerticalContentAlignment (Lio/github/teams4j/cards/VerticalContentAlignment;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/DataQueryDsl {
+	public final fun getCount ()Ljava/lang/Number;
+	public final fun getDataset ()Ljava/lang/String;
+	public final fun getSkip ()Ljava/lang/Number;
+	public final fun setCount (Ljava/lang/Number;)V
+	public final fun setDataset (Ljava/lang/String;)V
+	public final fun setSkip (Ljava/lang/Number;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/FactDsl {
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setValue (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/FactScope {
+	public final fun add ([Lio/github/teams4j/cards/Fact;)V
+	public final fun fact (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/FactSetDsl {
+	public final fun facts (Lkotlin/jvm/functions/Function1;)V
+	public final fun getFacts ()Ljava/util/List;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setFacts (Ljava/util/List;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ImageDsl {
+	public final fun getAltText ()Ljava/lang/String;
+	public final fun getBackgroundColor ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Ljava/lang/String;
+	public final fun getHorizontalAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSize ()Lio/github/teams4j/cards/ImageSize;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/ImageStyle;
+	public final fun getUrl ()Ljava/lang/String;
+	public final fun getWidth ()Ljava/lang/String;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setAltText (Ljava/lang/String;)V
+	public final fun setBackgroundColor (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Ljava/lang/String;)V
+	public final fun setHorizontalAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSize (Lio/github/teams4j/cards/ImageSize;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ImageStyle;)V
+	public final fun setUrl (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun setWidth (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ImageScope {
+	public final fun add ([Lio/github/teams4j/cards/Image;)V
+	public final fun image (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/ImageSetDsl {
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getImageSize ()Lio/github/teams4j/cards/ImageSize;
+	public final fun getImages ()Ljava/util/List;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun images (Lkotlin/jvm/functions/Function1;)V
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setImageSize (Lio/github/teams4j/cards/ImageSize;)V
+	public final fun setImages (Ljava/util/List;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InlineScope {
+	public final fun add ([Lio/github/teams4j/cards/Inline;)V
+	public final fun textRun (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputChoiceDsl {
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setValue (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputChoiceScope {
+	public final fun add ([Lio/github/teams4j/cards/InputChoice;)V
+	public final fun inputChoice (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputChoiceSetDsl {
+	public final fun choices (Lkotlin/jvm/functions/Function1;)V
+	public final fun choicesData (Lkotlin/jvm/functions/Function1;)V
+	public final fun getChoices ()Ljava/util/List;
+	public final fun getChoicesData ()Lio/github/teams4j/cards/DataQuery;
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInputStyle ()Lio/github/teams4j/cards/InputStyle;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getLabelPosition ()Lio/github/teams4j/cards/InputLabelPosition;
+	public final fun getLabelWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/ChoiceInputStyle;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun getWrap ()Ljava/lang/Boolean;
+	public final fun isMultiSelect ()Ljava/lang/Boolean;
+	public final fun isRequired ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setChoices (Ljava/util/List;)V
+	public final fun setChoicesData (Lio/github/teams4j/cards/DataQuery;)V
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInputStyle (Lio/github/teams4j/cards/InputStyle;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setLabelPosition (Lio/github/teams4j/cards/InputLabelPosition;)V
+	public final fun setLabelWidth (Lio/github/teams4j/cards/Dimension;)V
+	public final fun setMultiSelect (Ljava/lang/Boolean;)V
+	public final fun setPlaceholder (Ljava/lang/String;)V
+	public final fun setRequired (Ljava/lang/Boolean;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ChoiceInputStyle;)V
+	public final fun setValue (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun setWrap (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputDateDsl {
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInputStyle ()Lio/github/teams4j/cards/InputStyle;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getLabelPosition ()Lio/github/teams4j/cards/InputLabelPosition;
+	public final fun getLabelWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun getMax ()Ljava/lang/String;
+	public final fun getMin ()Ljava/lang/String;
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun isRequired ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInputStyle (Lio/github/teams4j/cards/InputStyle;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setLabelPosition (Lio/github/teams4j/cards/InputLabelPosition;)V
+	public final fun setLabelWidth (Lio/github/teams4j/cards/Dimension;)V
+	public final fun setMax (Ljava/lang/String;)V
+	public final fun setMin (Ljava/lang/String;)V
+	public final fun setPlaceholder (Ljava/lang/String;)V
+	public final fun setRequired (Ljava/lang/Boolean;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setValue (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputNumberDsl {
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInputStyle ()Lio/github/teams4j/cards/InputStyle;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getLabelPosition ()Lio/github/teams4j/cards/InputLabelPosition;
+	public final fun getLabelWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun getMax ()Ljava/lang/Number;
+	public final fun getMin ()Ljava/lang/Number;
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getValue ()Ljava/lang/Number;
+	public final fun isRequired ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInputStyle (Lio/github/teams4j/cards/InputStyle;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setLabelPosition (Lio/github/teams4j/cards/InputLabelPosition;)V
+	public final fun setLabelWidth (Lio/github/teams4j/cards/Dimension;)V
+	public final fun setMax (Ljava/lang/Number;)V
+	public final fun setMin (Ljava/lang/Number;)V
+	public final fun setPlaceholder (Ljava/lang/String;)V
+	public final fun setRequired (Ljava/lang/Boolean;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setValue (Ljava/lang/Number;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputTextDsl {
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInlineAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getInputStyle ()Lio/github/teams4j/cards/InputStyle;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getLabelPosition ()Lio/github/teams4j/cards/InputLabelPosition;
+	public final fun getLabelWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun getMaxLength ()Ljava/lang/Number;
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public final fun getRegex ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/TextInputStyle;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun isMultiline ()Ljava/lang/Boolean;
+	public final fun isRequired ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInlineAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setInputStyle (Lio/github/teams4j/cards/InputStyle;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setLabelPosition (Lio/github/teams4j/cards/InputLabelPosition;)V
+	public final fun setLabelWidth (Lio/github/teams4j/cards/Dimension;)V
+	public final fun setMaxLength (Ljava/lang/Number;)V
+	public final fun setMultiline (Ljava/lang/Boolean;)V
+	public final fun setPlaceholder (Ljava/lang/String;)V
+	public final fun setRegex (Ljava/lang/String;)V
+	public final fun setRequired (Ljava/lang/Boolean;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/TextInputStyle;)V
+	public final fun setValue (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputTimeDsl {
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInputStyle ()Lio/github/teams4j/cards/InputStyle;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getLabelPosition ()Lio/github/teams4j/cards/InputLabelPosition;
+	public final fun getLabelWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun getMax ()Ljava/lang/String;
+	public final fun getMin ()Ljava/lang/String;
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun isRequired ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInputStyle (Lio/github/teams4j/cards/InputStyle;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setLabelPosition (Lio/github/teams4j/cards/InputLabelPosition;)V
+	public final fun setLabelWidth (Lio/github/teams4j/cards/Dimension;)V
+	public final fun setMax (Ljava/lang/String;)V
+	public final fun setMin (Ljava/lang/String;)V
+	public final fun setPlaceholder (Ljava/lang/String;)V
+	public final fun setRequired (Ljava/lang/Boolean;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setValue (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/InputToggleDsl {
+	public final fun getErrorMessage ()Ljava/lang/String;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInputStyle ()Lio/github/teams4j/cards/InputStyle;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getLabelPosition ()Lio/github/teams4j/cards/InputLabelPosition;
+	public final fun getLabelWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun getValueOff ()Ljava/lang/String;
+	public final fun getValueOn ()Ljava/lang/String;
+	public final fun getWrap ()Ljava/lang/Boolean;
+	public final fun isRequired ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setErrorMessage (Ljava/lang/String;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInputStyle (Lio/github/teams4j/cards/InputStyle;)V
+	public final fun setLabel (Ljava/lang/String;)V
+	public final fun setLabelPosition (Lio/github/teams4j/cards/InputLabelPosition;)V
+	public final fun setLabelWidth (Lio/github/teams4j/cards/Dimension;)V
+	public final fun setRequired (Ljava/lang/Boolean;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setValue (Ljava/lang/String;)V
+	public final fun setValueOff (Ljava/lang/String;)V
+	public final fun setValueOn (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun setWrap (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/MediaDsl {
+	public final fun captionSources (Lkotlin/jvm/functions/Function1;)V
+	public final fun getAltText ()Ljava/lang/String;
+	public final fun getCaptionSources ()Ljava/util/List;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getPoster ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSources ()Ljava/util/List;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setAltText (Ljava/lang/String;)V
+	public final fun setCaptionSources (Ljava/util/List;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setPoster (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSources (Ljava/util/List;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun sources (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/MediaSourceDsl {
+	public final fun getMimeType ()Ljava/lang/String;
+	public final fun getUrl ()Ljava/lang/String;
+	public final fun setMimeType (Ljava/lang/String;)V
+	public final fun setUrl (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/MediaSourceScope {
+	public final fun add ([Lio/github/teams4j/cards/MediaSource;)V
+	public final fun mediaSource (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/MetadataDsl {
+	public final fun getWebUrl ()Ljava/lang/String;
+	public final fun setWebUrl (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/RefreshDsl {
+	public final fun action (Lkotlin/jvm/functions/Function1;)V
+	public final fun getAction ()Lio/github/teams4j/cards/ActionExecute;
+	public final fun getExpires ()Ljava/lang/String;
+	public final fun getUserIds ()Ljava/util/List;
+	public final fun setAction (Lio/github/teams4j/cards/ActionExecute;)V
+	public final fun setExpires (Ljava/lang/String;)V
+	public final fun setUserIds (Ljava/util/List;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/RichTextBlockDsl {
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getHorizontalAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInlines ()Ljava/util/List;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun inlines (Lkotlin/jvm/functions/Function1;)V
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setHorizontalAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setInlines (Ljava/util/List;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableCellDsl {
+	public final fun backgroundImage (Lkotlin/jvm/functions/Function1;)V
+	public final fun getBackgroundImage ()Lio/github/teams4j/cards/BackgroundImage;
+	public final fun getBleed ()Ljava/lang/Boolean;
+	public final fun getItems ()Ljava/util/List;
+	public final fun getMinHeight ()Ljava/lang/String;
+	public final fun getRtl ()Ljava/lang/Boolean;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getStyle ()Lio/github/teams4j/cards/ContainerStyle;
+	public final fun getVerticalContentAlignment ()Lio/github/teams4j/cards/VerticalContentAlignment;
+	public final fun items (Lkotlin/jvm/functions/Function1;)V
+	public final fun setBackgroundImage (Lio/github/teams4j/cards/BackgroundImage;)V
+	public final fun setBleed (Ljava/lang/Boolean;)V
+	public final fun setItems (Ljava/util/List;)V
+	public final fun setMinHeight (Ljava/lang/String;)V
+	public final fun setRtl (Ljava/lang/Boolean;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ContainerStyle;)V
+	public final fun setVerticalContentAlignment (Lio/github/teams4j/cards/VerticalContentAlignment;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableCellScope {
+	public final fun add ([Lio/github/teams4j/cards/TableCell;)V
+	public final fun tableCell (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableColumnDefinitionDsl {
+	public final fun getHorizontalCellContentAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getVerticalCellContentAlignment ()Lio/github/teams4j/cards/VerticalAlignment;
+	public final fun getWidth ()Lio/github/teams4j/cards/Dimension;
+	public final fun setHorizontalCellContentAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setVerticalCellContentAlignment (Lio/github/teams4j/cards/VerticalAlignment;)V
+	public final fun setWidth (Lio/github/teams4j/cards/Dimension;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableColumnDefinitionScope {
+	public final fun add ([Lio/github/teams4j/cards/TableColumnDefinition;)V
+	public final fun tableColumnDefinition (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableDsl {
+	public final fun columns (Lkotlin/jvm/functions/Function1;)V
+	public final fun getColumns ()Ljava/util/List;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getFirstRowAsHeader ()Ljava/lang/Boolean;
+	public final fun getGridStyle ()Lio/github/teams4j/cards/ContainerStyle;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getHorizontalCellContentAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getRows ()Ljava/util/List;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getShowGridLines ()Ljava/lang/Boolean;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getVerticalCellContentAlignment ()Lio/github/teams4j/cards/VerticalAlignment;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun rows (Lkotlin/jvm/functions/Function1;)V
+	public final fun setColumns (Ljava/util/List;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setFirstRowAsHeader (Ljava/lang/Boolean;)V
+	public final fun setGridStyle (Lio/github/teams4j/cards/ContainerStyle;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setHorizontalCellContentAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setRows (Ljava/util/List;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setShowGridLines (Ljava/lang/Boolean;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setVerticalCellContentAlignment (Lio/github/teams4j/cards/VerticalAlignment;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableRowDsl {
+	public final fun cells (Lkotlin/jvm/functions/Function1;)V
+	public final fun getCells ()Ljava/util/List;
+	public final fun getHorizontalCellContentAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getStyle ()Lio/github/teams4j/cards/ContainerStyle;
+	public final fun getVerticalCellContentAlignment ()Lio/github/teams4j/cards/VerticalAlignment;
+	public final fun setCells (Ljava/util/List;)V
+	public final fun setHorizontalCellContentAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setStyle (Lio/github/teams4j/cards/ContainerStyle;)V
+	public final fun setVerticalCellContentAlignment (Lio/github/teams4j/cards/VerticalAlignment;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TableRowScope {
+	public final fun add ([Lio/github/teams4j/cards/TableRow;)V
+	public final fun tableRow (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TargetElementDsl {
+	public final fun getElementId ()Ljava/lang/String;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setElementId (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TargetElementScope {
+	public final fun add ([Lio/github/teams4j/cards/TargetElement;)V
+	public final fun targetElement (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TextBlockDsl {
+	public final fun getColor ()Lio/github/teams4j/cards/Colors;
+	public final fun getFallback ()Lio/github/teams4j/cards/ElementFallback;
+	public final fun getFontType ()Lio/github/teams4j/cards/FontType;
+	public final fun getHeight ()Lio/github/teams4j/cards/BlockElementHeight;
+	public final fun getHorizontalAlignment ()Lio/github/teams4j/cards/HorizontalAlignment;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMaxLines ()Ljava/lang/Number;
+	public final fun getRequires ()Ljava/util/Map;
+	public final fun getSeparator ()Ljava/lang/Boolean;
+	public final fun getSize ()Lio/github/teams4j/cards/FontSize;
+	public final fun getSpacing ()Lio/github/teams4j/cards/Spacing;
+	public final fun getStyle ()Lio/github/teams4j/cards/TextBlockStyle;
+	public final fun getText ()Ljava/lang/String;
+	public final fun getWeight ()Lio/github/teams4j/cards/FontWeight;
+	public final fun getWrap ()Ljava/lang/Boolean;
+	public final fun isSubtle ()Ljava/lang/Boolean;
+	public final fun isVisible ()Ljava/lang/Boolean;
+	public final fun setColor (Lio/github/teams4j/cards/Colors;)V
+	public final fun setFallback (Lio/github/teams4j/cards/ElementFallback;)V
+	public final fun setFontType (Lio/github/teams4j/cards/FontType;)V
+	public final fun setHeight (Lio/github/teams4j/cards/BlockElementHeight;)V
+	public final fun setHorizontalAlignment (Lio/github/teams4j/cards/HorizontalAlignment;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setMaxLines (Ljava/lang/Number;)V
+	public final fun setRequires (Ljava/util/Map;)V
+	public final fun setSeparator (Ljava/lang/Boolean;)V
+	public final fun setSize (Lio/github/teams4j/cards/FontSize;)V
+	public final fun setSpacing (Lio/github/teams4j/cards/Spacing;)V
+	public final fun setStyle (Lio/github/teams4j/cards/TextBlockStyle;)V
+	public final fun setSubtle (Ljava/lang/Boolean;)V
+	public final fun setText (Ljava/lang/String;)V
+	public final fun setVisible (Ljava/lang/Boolean;)V
+	public final fun setWeight (Lio/github/teams4j/cards/FontWeight;)V
+	public final fun setWrap (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TextRunDsl {
+	public final fun getColor ()Lio/github/teams4j/cards/Colors;
+	public final fun getFontType ()Lio/github/teams4j/cards/FontType;
+	public final fun getHighlight ()Ljava/lang/Boolean;
+	public final fun getItalic ()Ljava/lang/Boolean;
+	public final fun getSelectAction ()Lio/github/teams4j/cards/SelectAction;
+	public final fun getSize ()Lio/github/teams4j/cards/FontSize;
+	public final fun getStrikethrough ()Ljava/lang/Boolean;
+	public final fun getText ()Ljava/lang/String;
+	public final fun getUnderline ()Ljava/lang/Boolean;
+	public final fun getWeight ()Lio/github/teams4j/cards/FontWeight;
+	public final fun isSubtle ()Ljava/lang/Boolean;
+	public final fun setColor (Lio/github/teams4j/cards/Colors;)V
+	public final fun setFontType (Lio/github/teams4j/cards/FontType;)V
+	public final fun setHighlight (Ljava/lang/Boolean;)V
+	public final fun setItalic (Ljava/lang/Boolean;)V
+	public final fun setSelectAction (Lio/github/teams4j/cards/SelectAction;)V
+	public final fun setSize (Lio/github/teams4j/cards/FontSize;)V
+	public final fun setStrikethrough (Ljava/lang/Boolean;)V
+	public final fun setSubtle (Ljava/lang/Boolean;)V
+	public final fun setText (Ljava/lang/String;)V
+	public final fun setUnderline (Ljava/lang/Boolean;)V
+	public final fun setWeight (Lio/github/teams4j/cards/FontWeight;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/TokenExchangeResourceDsl {
+	public final fun getId ()Ljava/lang/String;
+	public final fun getProviderId ()Ljava/lang/String;
+	public final fun getUri ()Ljava/lang/String;
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setProviderId (Ljava/lang/String;)V
+	public final fun setUri (Ljava/lang/String;)V
+}
+
+public final class io/github/teams4j/cards/kotlin/WebhookActionScope {
+	public final fun actionExecute (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionOpenUrl (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionShowCard (Lkotlin/jvm/functions/Function1;)V
+	public final fun actionToggleVisibility (Lkotlin/jvm/functions/Function1;)V
+	public final fun add ([Lio/github/teams4j/cards/WebhookAction;)V
+}
+

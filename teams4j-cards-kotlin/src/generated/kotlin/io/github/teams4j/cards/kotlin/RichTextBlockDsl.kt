@@ -1,0 +1,76 @@
+// Generated from the Adaptive Cards 1.6.0 schema. DO NOT EDIT.
+// Regenerate with: ./gradlew generateModel
+package io.github.teams4j.cards.kotlin
+
+import io.github.teams4j.cards.*
+
+/**
+ * Builds a [RichTextBlock].
+ *
+ * Defines an array of inlines, allowing for inline text formatting.
+ */
+@CardDsl
+public class RichTextBlockDsl internal constructor() {
+
+    /**
+     * A series of key/value pairs indicating features that the item requires with corresponding minimum version. When a feature is missing or of insufficient version, fallback is triggered.
+     */
+    public var requires: Map<String, String>? = null
+
+    /**
+     * A unique identifier associated with the item.
+     */
+    public var id: String? = null
+
+    /**
+     * If `false`, this item will be removed from the visual tree.
+     */
+    public var isVisible: Boolean? = null
+
+    /**
+     * Describes what to do when an unknown element is encountered or the requires of this or any children can't be met.
+     */
+    public var fallback: ElementFallback? = null
+
+    /**
+     * Specifies the height of the element.
+     */
+    public var height: BlockElementHeight? = null
+
+    /**
+     * When `true`, draw a separating line at the top of the element.
+     */
+    public var separator: Boolean? = null
+
+    /**
+     * Controls the amount of spacing between this element and the preceding element.
+     */
+    public var spacing: Spacing? = null
+
+    /**
+     * The array of inlines.
+     */
+    public var inlines: List<Inline>? = null
+
+    /** Collects `inlines`. */
+    public fun inlines(block: InlineScope.() -> Unit) {
+        this.inlines = InlineScope().apply(block).values
+    }
+
+    /**
+     * Controls the horizontal text alignment. When not specified, the value of horizontalAlignment is inherited from the parent container. If no parent container has horizontalAlignment set, it defaults to Left.
+     */
+    public var horizontalAlignment: HorizontalAlignment? = null
+
+    internal fun build(): RichTextBlock = RichTextBlock.builder()
+        .requires(requires)
+        .id(id)
+        .isVisible(isVisible)
+        .fallback(fallback)
+        .height(height)
+        .separator(separator)
+        .spacing(spacing)
+        .inlines(inlines)
+        .horizontalAlignment(horizontalAlignment)
+        .build()
+}

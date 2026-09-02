@@ -1,0 +1,48 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin build sessions (Kotlin 2.x writes this next to each Kotlin-enabled project)
+.kotlin/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+out/
+bin/
+.classpath
+.project
+.settings/
+
+# JVM crash dumps
+hs_err_pid*.log
+replay_pid*.log
+
+# OS
+.DS_Store
+
+# Tool-local overrides (mise.toml itself is committed)
+.mise.local.toml
+mise.local.toml
+
+# Local credentials - never commit
+local.properties
+.env
+.env.*
+*.gpg
+*.asc
+*.jks
+*.p12
+secring.*
+
+# Pre-release documents kept for reference while the docs site is written; never committed
+.backup/
+
+# Docs site
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/

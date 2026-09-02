@@ -1,0 +1,30 @@
+# Deltas from detekt's default config, which `buildUponDefaultConfig = true` keeps underneath.
+# Only rules this project deliberately differs on belong here; anything absent runs at its default.
+
+build:
+  # Zero, for the reason -Werror exists on the Java side: a threshold above zero is a budget for
+  # findings nobody reads.
+  maxIssues: 0
+
+style:
+  MaxLineLength:
+    # Matches palantir-java-format's 120 on the Java side, so one line-length rule governs the
+    # repository rather than two that disagree at the boundary.
+    maxLineLength: 120
+  ReturnCount:
+    active: false
+
+complexity:
+  LongParameterList:
+    # The generated DSL mirrors Adaptive Cards types, and TextBlock alone has eighteen properties.
+    # A finding here would be a complaint about the schema, which is not ours to simplify.
+    active: false
+  TooManyFunctions:
+    # Same reason: a `...Dsl` class has one function per schema property.
+    active: false
+
+naming:
+  FunctionNaming:
+    # DSL entry points are named after schema types, so `Action.OpenUrl` becomes `openUrl` but
+    # `Input.ChoiceSet` becomes `inputChoiceSet`; both are correct and neither is a style choice.
+    ignoreAnnotated: ['DslMarker']

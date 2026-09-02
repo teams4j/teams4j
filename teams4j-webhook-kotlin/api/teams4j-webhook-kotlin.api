@@ -1,0 +1,6 @@
+public final class io/github/teams4j/webhook/kotlin/WebhookCoroutinesKt {
+	public static final fun sendAwait (Lio/github/teams4j/webhook/WorkflowsWebhookClient;Lio/github/teams4j/cards/AdaptiveCard;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sendAwait (Lio/github/teams4j/webhook/WorkflowsWebhookClient;Lio/github/teams4j/cards/dsl/CardBuilder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sendAwait (Lio/github/teams4j/webhook/WorkflowsWebhookClient;Lio/github/teams4j/webhook/WebhookMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+

@@ -1,0 +1,26 @@
+{
+  "type" : "AdaptiveCard",
+  "version" : "1.5",
+  "body" : [ {
+    "type" : "TextBlock",
+    "text" : "Release 2.4.0",
+    "wrap" : true
+  } ],
+  "actions" : [ {
+    "title" : "Changelog",
+    "type" : "Action.ShowCard",
+    "card" : {
+      "type" : "AdaptiveCard",
+      "version" : "1.5",
+      "body" : [ {
+        "type" : "TextBlock",
+        "text" : "- Faster startup",
+        "wrap" : true
+      }, {
+        "type" : "TextBlock",
+        "text" : "- Fewer bugs",
+        "wrap" : true
+      } ]
+    }
+  } ]
+}

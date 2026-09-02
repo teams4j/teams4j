@@ -1,0 +1,15 @@
+{
+  "type" : "AdaptiveCard",
+  "version" : "1.6",
+  "body" : [ {
+    "type" : "Container",
+    "items" : [ {
+      "type" : "TextBlock",
+      "text" : "Emphasised",
+      "wrap" : true
+    } ],
+    "style" : "emphasis"
+  } ],
+  "fallbackText" : "Build failed",
+  "speak" : "Build failed"
+}

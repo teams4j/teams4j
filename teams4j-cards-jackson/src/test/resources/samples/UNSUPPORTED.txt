@@ -1,0 +1,47 @@
+# Samples the current model cannot round-trip.
+#
+# This is an EXPECTED-FAILURE list, not a skip list: SampleRoundTripTest asserts that every
+# entry still fails, so an entry that starts passing breaks the build and has to be deleted.
+# Its length is the coverage metric for schema conformance.
+#
+# Most entries are samples that use elements or properties absent from every published 1.6.0
+# schema; they exist only in the upstream schemas/src tree for a future release. Teams supports
+# Adaptive Cards up to 1.6, so those are outside the profile this library targets and
+# not supporting them is correct behaviour rather than a gap. See samples/MANIFEST.md.
+#
+# Format: <sample file><TAB><reason>
+# Entries: 33 of 184 samples
+
+v1.0.Action.ShowCard.Style.json	sample uses AdaptiveCard.style, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.0.Container.Style.json	sample uses AdaptiveCard.style, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.2.Action.OpenUrl.Style.json	deliberately invalid ActionStyle value "other"; the strict mapper is right to reject it
+v1.2.Action.ShowCard.Style.json	deliberately invalid ActionStyle value "other"; the strict mapper is right to reject it
+v1.2.Action.Submit.Style.json	deliberately invalid ActionStyle value "other"; the strict mapper is right to reject it
+v1.2.ActionFallback.json	deliberately unknown element type 'NoExist'; the sample exercises fallback and will never be supported
+v1.2.Column.BackgroundImage.json	sample uses Column.horizontalAlignment, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.2.Column.Fallback.json	deliberately unknown element type 'Graph'; the sample exercises fallback and will never be supported
+v1.5.ExpenseReport.json	sample uses Table.firstRowAsHeaders, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.FlightUpdateTable.json	sample uses TableRow.spacing, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.InputsWithValidation.json	sample uses ActionOpenUrl.role, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.Table.FirstRowAsHeaders.json	sample uses Table.firstRowAsHeaders, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.Table.GridStyle.json	sample uses Table.firstRowAsHeaders, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.Table.HorizontalCellContentAlignment.json	sample uses Table.firstRowAsHeaders, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.Table.VerticalCellContentAlignment.json	sample uses Table.firstRowAsHeaders, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.5.Table.json	sample uses Table.firstRowAsHeaders, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Action.Role.json	sample uses ActionOpenUrl.role, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.Header.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.Height.Vertical.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.Height.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.HeightInPixels.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.InitialPage.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.Loop.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.ScenarioCards.Timer.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.ScenarioCards.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.Styles.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.Vertical.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Carousel.json	element type 'Carousel' is absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Column.BackgroundImage.svg.json	sample uses Column.horizontalAlignment, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.Image.ForceLoad.json	sample uses Image.forceLoad, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.ImageSet.Stacked.Style.json	sample uses ImageSet.style, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.InputLabelPosition.json	sample uses ActionSubmit.disabledUnlessAssociatedInputsChange, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)
+v1.6.InputStyle.json	sample uses ActionSubmit.disabledUnlessAssociatedInputsChange, absent from the 1.6.0 schema (see MANIFEST: not in any published 1.6.0 schema)

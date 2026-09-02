@@ -1,0 +1,42 @@
+{
+  "type" : "AdaptiveCard",
+  "version" : "1.5",
+  "body" : [ {
+    "type" : "ColumnSet",
+    "columns" : [ {
+      "type" : "Column",
+      "items" : [ {
+        "type" : "Image",
+        "url" : "https://example.com/avatar.png",
+        "size" : "small"
+      } ],
+      "width" : "auto"
+    }, {
+      "type" : "Column",
+      "items" : [ {
+        "type" : "TextBlock",
+        "text" : "Ada Lovelace",
+        "weight" : "bolder",
+        "wrap" : true
+      }, {
+        "type" : "TextBlock",
+        "text" : "Opened a pull request",
+        "wrap" : true
+      } ],
+      "width" : 4
+    } ]
+  }, {
+    "type" : "Container",
+    "items" : [ {
+      "type" : "TextBlock",
+      "text" : "Adds the analytical engine",
+      "wrap" : true
+    }, {
+      "type" : "FactSet",
+      "facts" : [ {
+        "title" : "Files",
+        "value" : "12"
+      } ]
+    } ]
+  } ]
+}

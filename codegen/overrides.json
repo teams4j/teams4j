@@ -1,0 +1,105 @@
+{
+  "_comment": [
+    "Records, as data, everything the generator's rules cannot handle.",
+    "An empty allowlist generates the whole schema, which is what this one does."
+  ],
+
+  "_allowlist_comment": [
+    "Empty, so the whole schema is generated.",
+    "It once held 21 types, to get the pipeline working end to end."
+  ],
+  "allowlist": [],
+
+  "excludedTypes": [],
+
+  "unionNames": {
+    "ImplementationsOf.Element": "CardElement",
+    "ImplementationsOf.Action": "CardAction",
+    "ImplementationsOf.Input": "Input",
+    "ImplementationsOf.ISelectAction": "SelectAction",
+    "ImplementationsOf.Inline": "Inline",
+    "ImplementationsOf.Item": "CardItem",
+    "ImplementationsOf.ToggleableItem": "ToggleableItem"
+  },
+
+  "_typePackages_comment": [
+    "Outside a named module a sealed hierarchy must live in one package, so the whole",
+    "generated model goes into io.github.teams4j.cards. The mechanism stays; there are no entries."
+  ],
+  "typePackages": {},
+
+  "_stringShorthand_comment": [
+    "Definitions declared as \"a string or this object\", where the bare string is shorthand for the",
+    "object with one property set. The schema never says which property, so it is named here.",
+    "Leaving one out is a build failure rather than a silent guess."
+  ],
+  "stringShorthand": {
+    "TextRun": "text",
+    "TargetElement": "elementId",
+    "BackgroundImage": "url"
+  },
+
+  "_authorsDiscriminator_comment": [
+    "Types that belong to no union, so nothing dispatches on their \"type\", but whose builders",
+    "still fill it in because real cards always carry it. Measured over the 184 vendored samples:",
+    "  always present  -> AdaptiveCard 219/219 (184 roots + 35 nested in Action.ShowCard),",
+    "                     TableCell 125/125, TableRow 56/56",
+    "  never present   -> Input.Choice 0/1062, Fact 0/70, TableColumnDefinition 0/43,",
+    "                     BackgroundImage 0/38, Data.Query 0/18, TargetElement 0/6,",
+    "                     CaptionSource 0/4, MediaSource 0/3, Authentication 0/1, Refresh 0/1,",
+    "                     TokenExchangeResource 0/1",
+    "Union members are not listed here: they always author it, because Jackson dispatches on it.",
+    "Parsing is unaffected either way -- the component preserves whatever the card carried."
+  ],
+  "authorsDiscriminator": [
+    "AdaptiveCard",
+    "TableCell",
+    "TableRow"
+  ],
+
+  "_markerInterfaces_comment": [
+    "Sealed interfaces the schema knows nothing about, layered over hand-picked types so that a",
+    "transport restriction becomes a compile-time one.",
+    "Only WebhookAction is declared. A BotAction covering all five actions was considered, but",
+    "CardAction already permits exactly those five, so BotAction would be a synonym that",
+    "constrains nothing -- a second interface to maintain for no added safety."
+  ],
+  "markerInterfaces": {
+    "WebhookAction": {
+      "extends": "ImplementationsOf.Action",
+      "doc": "An action a Teams Workflows webhook accepts.\n\n<p>Cards posted to a Workflows webhook support Action.OpenUrl, Action.ShowCard, Action.ToggleVisibility and Action.Execute; Action.Submit needs a bot to receive the invoke and is therefore excluded. An API that takes a WebhookAction cannot be handed an Action.Submit at all.\n\n<p>This catches the top-level mistake only. Actions nested inside Action.ShowCard or a container's selectAction are outside any signature, so the full tree is checked at runtime by TeamsProfileValidator.",
+      "members": [
+        "Action.OpenUrl",
+        "Action.ShowCard",
+        "Action.ToggleVisibility",
+        "Action.Execute"
+      ]
+    }
+  },
+
+  "excludedProps": {},
+
+  "_anyOfTypes_comment": [
+    "Shapes the schema states as an anyOf of several real branches. The schema never names the",
+    "pair, so it is named here -- keyed by the branches themselves, because the same shape means",
+    "the same thing wherever it appears, and these five shapes cover 37 properties.",
+    "",
+    "A 'model:' prefix names a type written by hand in the model package (Ir.Ref.Model); anything",
+    "else is resolved as it would be in propTypes. Without an entry a shape becomes CardValue,",
+    "which is lossless but says nothing -- the report lists what is still in that state.",
+    "",
+    "Why not JsonNode, which is what these were before: it is a record component type, not an",
+    "annotation, so it put jackson-databind in the public signature of every consumer."
+  ],
+  "anyOfTypes": {
+    "ImplementationsOf.Element|FallbackOption": "model:ElementFallback",
+    "ImplementationsOf.Action|FallbackOption": "model:ActionFallback",
+    "Column|FallbackOption": "model:ColumnFallback",
+    "string|number": "model:Dimension",
+    "BackgroundImage|string": "BackgroundImage",
+    "string|BlockElementHeight": "string",
+    "string|object": "opaque"
+  },
+
+  "propTypes": {}
+}

@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build (Boot baseline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Build
+        run: ./gradlew build --stacktrace
+
+      # The generated model is committed, so CI only has to prove that regenerating it
+      # produces no diff. A failure here means someone edited generated sources by hand, or changed
+      # the generator without regenerating.
+      - name: Check the generated model, Kotlin DSL and kotlinx binding are up to date
+        run: |
+          # Three emitters, three committed trees. Leaving one out of this list is the failure the
+          # check exists to prevent, one level up. Listed as an array rather than one string so the
+          # paths cannot depend on the shell's word splitting.
+          generated=(
+            teams4j-cards/src/generated
+            teams4j-cards-kotlin/src/generated
+            teams4j-cards-kotlinx/src/generated
+          )
+          ./gradlew :codegen:generateModel
+          git diff --exit-code -- "${generated[@]}"
+          # git diff alone would pass over a newly generated, still-untracked file
+          test -z "$(git status --porcelain -- "${generated[@]}")" \
+            || {
+              echo 'generated sources changed:'
+              git status --short -- "${generated[@]}"
+              exit 1
+            }
+
+  starter-boot-matrix:
+    # One starter artifact covers both Boot lines; a failure here is the signal to split it.
+    name: starter on Spring Boot ${{ matrix.boot }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        boot: ['3.5.16', '4.1.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Test starter against Boot ${{ matrix.boot }}
+        run: ./gradlew :teams4j-webhook-spring-boot-starter:test -PbootTestVersion=${{ matrix.boot }}
+
+  examples:
+    # The examples are a separate build that resolves teams4j from a repository, so this is the
+    # only place that checks the published artifacts as a stranger sees them: POMs, dependency
+    # scopes, the BOM's module list, and the ServiceLoader registrations that pick a JSON binding.
+    # The cookbook's snippets were verified by hand once and the harness was lost; this is that
+    # check made permanent.
+    name: examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Publish the artifacts the examples resolve
+        run: ./gradlew publishToMavenLocal
+
+      - name: Build the examples
+        working-directory: ./examples
+        run: ./gradlew build --stacktrace
+
+      # The starter example has to start on both Boot lines, not merely compile.
+      - name: Build the Spring example against Boot 4.1.1
+        working-directory: ./examples
+        run: ./gradlew :spring-boot:build -PbootVersion=4.1.1
+
+  docs:
+    # The site includes source files by path and #region; a rename in the tree fails this build.
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: mise.toml
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Build the docs site
+        working-directory: docs
+        run: |
+          npm ci
+          npm run build

@@ -1,0 +1,21 @@
+spring:
+  main:
+    banner-mode: off
+
+teams4j:
+  webhook:
+    # No URL, no client bean, and the application still starts. That is how you switch notifications
+    # off in a profile: leave it unset.
+    url: ${TEAMS_WEBHOOK_URL:}
+
+    # Development only. Lets the URL above be plain http, so this example can be pointed at a
+    # loopback stub by someone who has no Teams channel to hand:
+    #
+    #   TEAMS_WEBHOOK_URL='http://127.0.0.1:8099/hook' TEAMS_WEBHOOK_ALLOW_PLAIN_HTTP=true \
+    #     ./gradlew :spring-boot:run
+    #
+    # It stays false everywhere else, and startup fails on an http URL without it. A real webhook
+    # URL carries its signature in the query string, so posting one over http hands anything on the
+    # path the ability to write into the channel; the client logs a warning whenever the URL it is
+    # about to use is in fact not https.
+    allow-plain-http: ${TEAMS_WEBHOOK_ALLOW_PLAIN_HTTP:false}

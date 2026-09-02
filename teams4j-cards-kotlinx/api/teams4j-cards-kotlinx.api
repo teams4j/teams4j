@@ -1,0 +1,587 @@
+public final class io/github/teams4j/cards/kotlinx/ActionExecuteSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionExecuteSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionExecute;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionExecute;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionModeSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionModeSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionMode;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionMode;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionOpenUrlSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionOpenUrlSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionOpenUrl;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionOpenUrl;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionSetSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionSetSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionSet;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionSet;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionShowCardSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionShowCardSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionShowCard;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionShowCard;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionSubmitSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionSubmitSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionSubmit;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionSubmit;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ActionToggleVisibilitySerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ActionToggleVisibilitySerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ActionToggleVisibility;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ActionToggleVisibility;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/AdaptiveCardSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/AdaptiveCardSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/AdaptiveCard;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/AdaptiveCard;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/AssociatedInputsSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/AssociatedInputsSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/AssociatedInputs;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/AssociatedInputs;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/AuthCardButtonSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/AuthCardButtonSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/AuthCardButton;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/AuthCardButton;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/AuthenticationSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/AuthenticationSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Authentication;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Authentication;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/BackgroundImageSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/BackgroundImageSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/BackgroundImage;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/BackgroundImage;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/BlockElementHeightSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/BlockElementHeightSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/BlockElementHeight;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/BlockElementHeight;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/CaptionSourceSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/CaptionSourceSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/CaptionSource;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/CaptionSource;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/CardActionSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/CardActionSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/CardAction;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/CardAction;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/CardElementSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/CardElementSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/CardElement;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/CardElement;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/CardItemSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/CardItemSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/CardItem;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/CardItem;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/CardJson {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/CardJson;
+	public final fun decode (Ljava/lang/String;)Lio/github/teams4j/cards/AdaptiveCard;
+	public final fun encode (Lio/github/teams4j/cards/AdaptiveCard;)Ljava/lang/String;
+	public final fun getJson ()Lkotlinx/serialization/json/Json;
+}
+
+public abstract class io/github/teams4j/cards/kotlinx/CardSerializer : kotlinx/serialization/KSerializer {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public abstract fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public abstract fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/CardValueSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/CardValueSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/CardValue;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/CardValue;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ChoiceInputStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ChoiceInputStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ChoiceInputStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ChoiceInputStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ColorsSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ColorsSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Colors;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Colors;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ColumnSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ColumnSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Column;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Column;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ColumnSetSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ColumnSetSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ColumnSet;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ColumnSet;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ContainerSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ContainerSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Container;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Container;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ContainerStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ContainerStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ContainerStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ContainerStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/DataQuerySerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/DataQuerySerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/DataQuery;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/DataQuery;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/DimensionSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/DimensionSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Dimension;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Dimension;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/FactSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/FactSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Fact;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Fact;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/FactSetSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/FactSetSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/FactSet;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/FactSet;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/FontSizeSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/FontSizeSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/FontSize;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/FontSize;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/FontTypeSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/FontTypeSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/FontType;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/FontType;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/FontWeightSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/FontWeightSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/FontWeight;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/FontWeight;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/HorizontalAlignmentSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/HorizontalAlignmentSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/HorizontalAlignment;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/HorizontalAlignment;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ImageFillModeSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ImageFillModeSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ImageFillMode;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ImageFillMode;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ImageSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ImageSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Image;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Image;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ImageSetSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ImageSetSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ImageSet;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ImageSet;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ImageSizeSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ImageSizeSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ImageSize;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ImageSize;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ImageStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ImageStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ImageStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ImageStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InlineSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InlineSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Inline;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Inline;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputChoiceSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputChoiceSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputChoice;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputChoice;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputChoiceSetSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputChoiceSetSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputChoiceSet;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputChoiceSet;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputDateSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputDateSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputDate;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputDate;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputLabelPositionSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputLabelPositionSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputLabelPosition;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputLabelPosition;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputNumberSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputNumberSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputNumber;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputNumber;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Input;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Input;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputTextSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputTextSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputText;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputText;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputTimeSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputTimeSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputTime;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputTime;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/InputToggleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/InputToggleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/InputToggle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/InputToggle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/KotlinxCardWriter : io/github/teams4j/cards/CardWriter {
+	public fun <init> ()V
+	public fun write (Lio/github/teams4j/cards/AdaptiveCard;)Ljava/lang/String;
+}
+
+public final class io/github/teams4j/cards/kotlinx/MediaSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/MediaSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Media;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Media;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/MediaSourceSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/MediaSourceSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/MediaSource;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/MediaSource;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/MetadataSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/MetadataSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Metadata;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Metadata;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/RefreshSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/RefreshSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Refresh;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Refresh;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/RichTextBlockSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/RichTextBlockSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/RichTextBlock;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/RichTextBlock;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/SelectActionSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/SelectActionSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/SelectAction;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/SelectAction;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/SpacingSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/SpacingSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Spacing;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Spacing;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TableCellSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TableCellSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TableCell;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TableCell;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TableColumnDefinitionSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TableColumnDefinitionSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TableColumnDefinition;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TableColumnDefinition;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TableRowSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TableRowSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TableRow;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TableRow;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TableSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TableSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Table;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/Table;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TargetElementSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TargetElementSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TargetElement;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TargetElement;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TextBlockSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TextBlockSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TextBlock;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TextBlock;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TextBlockStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TextBlockStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TextBlockStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TextBlockStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TextInputStyleSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TextInputStyleSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TextInputStyle;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TextInputStyle;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TextRunSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TextRunSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TextRun;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TextRun;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ToggleableItemSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/ToggleableItemSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/ToggleableItem;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/ToggleableItem;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/TokenExchangeResourceSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/TokenExchangeResourceSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/TokenExchangeResource;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/TokenExchangeResource;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/ValueSerializersKt {
+	public static final fun getActionFallbackSerializer ()Lio/github/teams4j/cards/kotlinx/CardSerializer;
+	public static final fun getColumnFallbackSerializer ()Lio/github/teams4j/cards/kotlinx/CardSerializer;
+	public static final fun getElementFallbackSerializer ()Lio/github/teams4j/cards/kotlinx/CardSerializer;
+}
+
+public final class io/github/teams4j/cards/kotlinx/VerticalAlignmentSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/VerticalAlignmentSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/VerticalAlignment;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/VerticalAlignment;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/VerticalContentAlignmentSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/VerticalContentAlignmentSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/VerticalContentAlignment;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/VerticalContentAlignment;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+
+public final class io/github/teams4j/cards/kotlinx/WebhookActionSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
+	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/WebhookActionSerializer;
+	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/WebhookAction;
+	public synthetic fun fromJson (Lkotlinx/serialization/json/JsonElement;)Ljava/lang/Object;
+	public fun toJson (Lio/github/teams4j/cards/WebhookAction;)Lkotlinx/serialization/json/JsonElement;
+	public synthetic fun toJson (Ljava/lang/Object;)Lkotlinx/serialization/json/JsonElement;
+}
+

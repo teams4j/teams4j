@@ -1,0 +1,22 @@
+{
+  "type" : "AdaptiveCard",
+  "version" : "1.5",
+  "body" : [ {
+    "type" : "TextBlock",
+    "text" : "Build #4821 failed",
+    "wrap" : true
+  }, {
+    "id" : "stack-trace",
+    "isVisible" : false,
+    "type" : "TextBlock",
+    "text" : "java.lang.IllegalStateException",
+    "wrap" : true
+  } ],
+  "actions" : [ {
+    "title" : "Show stack trace",
+    "type" : "Action.ToggleVisibility",
+    "targetElements" : [ {
+      "elementId" : "stack-trace"
+    } ]
+  } ]
+}
