@@ -1,6 +1,6 @@
 # Cards authored in the Designer
 
-The [Adaptive Cards Designer](https://adaptivecards.io/designer/) is the fastest way to lay a card out
+The [Adaptive Cards Designer](https://adaptivecards.microsoft.com/designer) is the fastest way to lay a card out
 by eye. It produces JSON; teams4j reads JSON into the same model the DSLs build, so a card designed there
 can be shipped as a resource and sent unchanged, or used as the reference while you transcribe it into
 the DSL. This page covers the first route and its one real trap.
