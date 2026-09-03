@@ -49,6 +49,10 @@ WorkflowsWebhookClient teams = WorkflowsWebhookClient.create(webhookUrl);
 teams.send(card);
 ```
 
+In the channel:
+
+<img src="/screenshots/deploy-failed.png" width="420" alt="The card above as rendered in a Teams channel">
+
 ::: warning Pre-release
 0.1.0 has not shipped yet. The coordinates on this site become valid with the first release; until then,
 `./gradlew publishToMavenLocal` from a clone and `mavenLocal()` in your build is the way to try it.

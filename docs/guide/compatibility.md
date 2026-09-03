@@ -22,23 +22,28 @@ row lists only what the `starter-boot-matrix` CI job runs.
 **0.1.0 has not shipped yet.** The first release covers the card model and the Workflows webhook
 client; the rows marked `0.1.0` are complete and are what that release contains.
 
-| Module | Layer | What it does | Status |
-|---|---|---|---|
-| `teams4j-cards` | L0 | Adaptive Cards model + Java builder DSL. Pure specification, nothing Teams-specific. **Zero runtime dependencies** | 0.1.0 |
-| `teams4j-cards-kotlin` | L0 | Kotlin type-safe DSL, generated from the same schema IR | 0.1.0 |
-| `teams4j-cards-jackson` | L0 | Jackson binding | 0.1.0 |
-| `teams4j-cards-kotlinx` | L0 | kotlinx.serialization binding | 0.1.0 |
-| `teams4j-teams` | L0 | Teams profile: platform limits + `TeamsProfileValidator` | 0.1.0 |
-| `teams4j-webhook` | L1 | Sends cards to a channel through a Workflows webhook. **Zero runtime dependencies** | 0.1.0 |
-| `teams4j-webhook-kotlin` | L1 | Coroutine `sendAwait` | 0.1.0 |
-| `teams4j-webhook-spring-boot-starter` | L1 | Spring Boot auto-configuration | 0.1.0 |
-| `teams4j-bom` | — | Version alignment for all of the above | 0.1.0 |
-| `teams4j-graph-messaging` | L2 | Microsoft Graph helpers | Not started |
-| `teams4j-activity` / `teams4j-connector` | L3 | Activity Protocol + Bot Connector | Not started |
-| `teams4j-bolt` | L4 | Routing framework | Not started |
+| Module | What it does | Status |
+|---|---|---|
+| `teams4j-cards` | Adaptive Cards model + Java builder DSL. Pure specification, nothing Teams-specific. **Zero runtime dependencies** | 0.1.0 |
+| `teams4j-cards-kotlin` | Kotlin type-safe DSL, generated from the same schema | 0.1.0 |
+| `teams4j-cards-jackson` | Jackson binding | 0.1.0 |
+| `teams4j-cards-kotlinx` | kotlinx.serialization binding | 0.1.0 |
+| `teams4j-teams` | Teams profile: platform limits + `TeamsProfileValidator` | 0.1.0 |
+| `teams4j-webhook` | Sends cards to a channel through a Workflows webhook. **Zero runtime dependencies** | 0.1.0 |
+| `teams4j-webhook-kotlin` | Coroutine `sendAwait` | 0.1.0 |
+| `teams4j-webhook-spring-boot-starter` | Spring Boot auto-configuration | 0.1.0 |
+| `teams4j-bom` | Version alignment for all of the above | 0.1.0 |
 
-The L2 and above modules wait on demand. There is no plan to start them without adoption signals,
-and not starting them is a normal outcome.
+### Roadmap
+
+Not started, and waiting on demand. There is no plan to begin these without adoption signals, and not
+starting them is a normal outcome.
+
+- **Microsoft Graph messaging**: posting to chats and channels through Graph, for cases a webhook
+  cannot cover.
+- **Bots**: the Activity Protocol and Bot Connector, which is where receiving anything from Teams
+  belongs. The webhook client is outbound only.
+- **A routing framework** on top of the bot modules.
 
 ## The nullness contract
 

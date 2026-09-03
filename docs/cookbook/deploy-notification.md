@@ -206,6 +206,8 @@ instead of a production incident.
 
 ## 9. What you will see in the channel
 
+<img src="/screenshots/deploy-failed.png" width="420" alt="The deploy-failure card as rendered in a Teams channel">
+
 The card in the channel is not byte-for-byte the card you sent. Two things Teams does, both observed on
 a real tenant:
 

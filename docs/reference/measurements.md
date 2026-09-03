@@ -39,6 +39,13 @@ not teams4j, gave the answer.
 | `media-direct-mime` | `media-host` | (isolation probe) | **Arrived.** Unsupported host, but the card came, rendering "This content is currently unavailable" with an "Open in browser" link | `media-host` **kept as WARNING**; message rewritten |
 | `media-youtube` | `media-host` | Plays | As expected, embedded and playable | Kept |
 
+Two of the probes as they arrived, `action-style` on the left and `media-youtube` on the right:
+
+<p>
+  <img src="/screenshots/action-styles.png" width="360" alt="Default, positive and destructive buttons rendered plain, blue and red">
+  <img src="/screenshots/media-youtube.png" width="360" alt="An embedded, playable YouTube video in the card">
+</p>
+
 ### Isolating the media rule
 
 One variable at a time, four combinations:
