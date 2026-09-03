@@ -6,8 +6,48 @@ import org.jreleaser.model.api.deploy.maven.MavenCentralMavenDeployer.Stage
 plugins {
     // For `clean` alone: the JReleaser plugin orders its own tasks against it.
     base
+    alias(libs.plugins.git.version)
     alias(libs.plugins.jreleaser)
     alias(libs.plugins.binary.compatibility.validator)
+}
+
+// The version is the nearest `vX.Y.Z` tag, so a release is a tag and nothing in the tree changes.
+//
+//   on the tag `v0.1.0`, clean tree   -> 0.1.0
+//   any commit after it, or dirty     -> 0.1.1-SNAPSHOT
+//   before the first tag              -> 0.1.0-SNAPSHOT
+//
+// A dirty tree never yields a release version, so a release built over uncommitted changes fails
+// Central's version check instead of shipping. `git describe --always` falls back to a commit hash
+// when there is no tag at all, and the plugin reports that hash as the tag, so a hash means "before
+// the first release". Any other tag shape is an error rather than a guess: `git describe` takes the
+// nearest tag of any kind, so one stray tag would otherwise turn every build into 0.1.0-SNAPSHOT.
+// CI needs the tags to be present, so checkout runs with fetch-depth 0.
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+val git = versionDetails()
+val releaseTag = Regex("""v(\d+)\.(\d+)\.(\d+)""")
+val commitHash = Regex("""[0-9a-f]{7,40}""")
+val lastTag = git.lastTag
+val derivedVersion = when {
+    lastTag == null || commitHash.matches(lastTag) -> "0.1.0-SNAPSHOT"
+    !releaseTag.matches(lastTag) -> error(
+        "The nearest tag is '$lastTag', which is not a release tag (vX.Y.Z). Only release tags may " +
+            "exist in this repository: the version is derived from the nearest one."
+    )
+    else -> {
+        val (major, minor, patch) = releaseTag.matchEntire(lastTag)!!.groupValues.drop(1).map(String::toInt)
+        if (git.isCleanTag) "$major.$minor.$patch" else "$major.$minor.${patch + 1}-SNAPSHOT"
+    }
+}
+allprojects { version = derivedVersion }
+
+// The plugin's `printVersion` reads `project.version` at execution time, which the configuration
+// cache refuses. Same task, same output, with the value captured while configuring.
+tasks.named("printVersion") {
+    actions.clear()
+    // A local, not the script-level val: a lambda that reaches for the script is not serialisable.
+    val v = derivedVersion
+    doLast { println(v) }
 }
 
 // The public ABI of every published module, dumped to `api/*.api` and committed.
@@ -23,12 +63,6 @@ plugins {
 apiValidation {
     // Build tooling, never published, so it has no public ABI to speak of.
     ignoredProjects.add("codegen")
-}
-
-tasks.register("printVersion") {
-    val v = version.toString()
-    val g = group.toString()
-    doLast { println("$g:${rootProject.name}:$v") }
 }
 
 jreleaser {

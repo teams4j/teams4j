@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version is derived from the nearest release tag; a shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
@@ -62,6 +65,9 @@ jobs:
         boot: ['3.5.16', '4.1.1']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version is derived from the nearest release tag; a shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
@@ -83,6 +89,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version is derived from the nearest release tag; a shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
@@ -94,14 +103,19 @@ jobs:
       - name: Publish the artifacts the examples resolve
         run: ./gradlew publishToMavenLocal
 
+      # The examples pin teams4jVersion for a reader; CI overrides it with whatever was just
+      # published, so this job follows the tag-derived version without a file to keep in step.
+      - name: Read the published version
+        run: echo "TEAMS4J_VERSION=$(./gradlew -q printVersion)" >> "$GITHUB_ENV"
+
       - name: Build the examples
         working-directory: ./examples
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build --stacktrace -Pteams4jVersion="$TEAMS4J_VERSION"
 
       # The starter example has to start on both Boot lines, not merely compile.
       - name: Build the Spring example against Boot 4.1.1
         working-directory: ./examples
-        run: ./gradlew :spring-boot:build -PbootVersion=4.1.1
+        run: ./gradlew :spring-boot:build -PbootVersion=4.1.1 -Pteams4jVersion="$TEAMS4J_VERSION"
 
   docs:
     # The site includes source files by path and #region; a rename in the tree fails this build.

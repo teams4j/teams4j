@@ -20,6 +20,9 @@ spotless = "8.10.0"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
 # -- Gradle's signing plugin does, and exactly one of the two may be active.
 jreleaser = "1.25.0"
+# The version comes from the nearest `v*` tag (see the root build), so no file in the tree carries
+# it and a release is a tag rather than a commit. Read-only: it never tags or pushes.
+gitVersion = "5.1.0"
 # Nullness enforcement. NullAway runs as an Error Prone plugin, so the three move together.
 errorprone = "2.50.0"
 errorpronePlugin = "5.1.1"
@@ -77,4 +80,5 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 
 [plugins]
 jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
+git-version = { id = "com.palantir.git-version", version.ref = "gitVersion" }
 binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
