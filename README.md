@@ -1,5 +1,8 @@
 # teams4j
 
+[![CI](https://github.com/teams4j/teams4j/actions/workflows/ci.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/teams4j/teams4j/badge)](https://scorecard.dev/viewer/?uri=github.com/teams4j/teams4j)
+
 Adaptive Cards and Microsoft Teams for the JVM. Build a card in Java or Kotlin, check it against
 what Teams actually renders, and post it to a channel through a Workflows webhook.
 

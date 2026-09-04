@@ -181,11 +181,17 @@ on a few patterns worth knowing before adding to it:
 
 ## Pull requests
 
-CI runs three jobs, and all three have to be green:
+The CI workflow runs four jobs, and all four have to be green:
 
 1. **build** — `./gradlew build`, then a regeneration check across the three generated trees
 2. **starter-boot-matrix** — the starter's tests on Boot 3.5.16 and 4.1.1
 3. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on both Boot lines
+4. **docs** — the docs site build, which fails on a dead link or a missing snippet
+
+Alongside it, a few security checks run on every pull request: Trivy and Semgrep (`security.yml`),
+zizmor on the workflow files themselves, and a dependency review that compares the Gradle
+dependency graph with `main` and rejects a newly introduced vulnerable package. Actions are pinned
+to commit SHAs; `pinact run` updates them.
 
 Beyond that:
 
