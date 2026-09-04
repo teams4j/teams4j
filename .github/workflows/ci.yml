@@ -63,12 +63,12 @@ jobs:
 
   starter-boot-matrix:
     # One starter artifact covers both Boot lines; a failure here is the signal to split it.
-    name: starter on Spring Boot ${{ matrix.boot }}
+    name: starter on Spring Boot ${{ matrix.boot }}.x
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        boot: ['3.5.16', '4.1.1']
+        boot: ['3', '4']
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -88,10 +88,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
-      - name: Test starter against Boot ${{ matrix.boot }}
+      - name: Test starter against Boot ${{ matrix.boot }}.x
         env:
-          BOOT_VERSION: ${{ matrix.boot }}
-        run: ./gradlew :teams4j-webhook-spring-boot-starter:test -PbootTestVersion="$BOOT_VERSION"
+          BOOT_LINE: ${{ matrix.boot }}
+        run: ./gradlew :teams4j-webhook-spring-boot-starter:test -PbootLine="$BOOT_LINE"
 
   examples:
     # The examples are a separate build that resolves teams4j from a repository, so this is the
@@ -132,10 +132,14 @@ jobs:
         working-directory: ./examples
         run: ./gradlew build --stacktrace -Pteams4jVersion="$TEAMS4J_VERSION"
 
-      # The starter example has to start on both Boot lines, not merely compile.
-      - name: Build the Spring example against Boot 4.1.1
+      # The starter example has to start on both Boot lines, not merely compile. The Boot 4 version
+      # is the catalog's, so Dependabot moves this too.
+      - name: Build the Spring example against Boot 4.x
         working-directory: ./examples
-        run: ./gradlew :spring-boot:build -PbootVersion=4.1.1 -Pteams4jVersion="$TEAMS4J_VERSION"
+        run: |
+          boot4=$(sed -n 's/^springBoot4 = "\(.*\)"$/\1/p' ../gradle/libs.versions.toml)
+          test -n "$boot4"
+          ./gradlew :spring-boot:build -PbootVersion="$boot4" -Pteams4jVersion="$TEAMS4J_VERSION"
 
   docs:
     # The site includes source files by path and #region; a rename in the tree fails this build.

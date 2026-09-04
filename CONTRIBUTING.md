@@ -28,7 +28,7 @@ One starter artifact supports Boot 3.5.x and 4.1.x. CI runs the starter's tests 
 both; locally you pick one:
 
 ```bash
-./gradlew :teams4j-webhook-spring-boot-starter:test -PbootTestVersion=4.1.1
+./gradlew :teams4j-webhook-spring-boot-starter:test -PbootLine=4   # default is 3
 ```
 
 If a change makes that matrix fail, the answer might be to split the artifact per Boot line
@@ -184,7 +184,7 @@ on a few patterns worth knowing before adding to it:
 The CI workflow runs four jobs, and all four have to be green:
 
 1. **build** — `./gradlew build`, then a regeneration check across the three generated trees
-2. **starter-boot-matrix** — the starter's tests on Boot 3.5.16 and 4.1.1
+2. **starter-boot-matrix** — the starter's tests on both Boot lines (`springBoot` and `springBoot4` in the catalog)
 3. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on both Boot lines
 4. **docs** — the docs site build, which fails on a dead link or a missing snippet
 

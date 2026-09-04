@@ -13,7 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * <p>The starter uses only a handful of annotations plus {@code AutoConfiguration.imports}
  * registration, and those sit at the same coordinates in 3.5 and 4.1. Run in the CI matrix
- * ({@code -PbootTestVersion}); a failure is the signal to split the artifact per Boot major.
+ * ({@code -PbootLine=3|4}); a failure is the signal to split the artifact per Boot major.
  */
 class BootCompatibilityTest {
 

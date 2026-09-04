@@ -14,7 +14,8 @@ assertj = "3.27.7"
 wiremock = "3.13.2"
 # Boot compile baseline: the lowest supported version. A consumer's Boot BOM raises it.
 springBoot = "3.5.16"
-# The newer line, verified at runtime only by the CI matrix (injected via -PbootTestVersion).
+# The newer line; the starter's tests run against it with -PbootLine=4. Dependabot keeps each line
+# within its major (see .github/dependabot.yml).
 springBoot4 = "4.1.1"
 spotless = "8.10.0"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
@@ -54,6 +55,8 @@ jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 javapoet = { module = "com.palantir.javapoet:javapoet", version.ref = "javapoet" }
 
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
+# Test-only: the Boot 4 BOM. Listed here so Dependabot tracks the 4.x line too.
+spring-boot4-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot4" }
 # The starter's compile dependency. The version is pinned as a POM lower bound, so no BOM import is exported.
 spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "springBoot" }
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }

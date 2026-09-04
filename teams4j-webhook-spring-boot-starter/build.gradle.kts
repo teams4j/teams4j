@@ -9,10 +9,21 @@ description = "Spring Boot starter for the teams4j Workflows webhook client"
 //  - the compile baseline is the lowest supported version (springBoot in the catalog), pinned in the
 //    POM as a lower bound
 //  - consumers on a newer Boot have their own BOM raise it
-//  - whether that premise actually holds is proven continuously by the bootTestVersion matrix in
-//    CI; the moment it stops holding is the moment to split the artifact
-val bootTestVersion: String =
-    providers.gradleProperty("bootTestVersion").orNull ?: libs.versions.springBoot.get()
+//  - whether that premise actually holds is proven continuously by the bootLine matrix in CI;
+//    the moment it stops holding is the moment to split the artifact
+//
+// -PbootLine selects the line under test: 3 (the baseline, default) or 4. Both versions come from
+// the catalog rather than the command line so that Dependabot moves each within its own major.
+val bootLine = providers.gradleProperty("bootLine").getOrElse("3")
+val bootTestBom = when (bootLine) {
+    "3" -> libs.spring.boot.dependencies
+    "4" -> libs.spring.boot4.dependencies
+    else -> error("bootLine must be 3 or 4, got '$bootLine'")
+}
+val bootTestVersion: String = when (bootLine) {
+    "3" -> libs.versions.springBoot.get()
+    else -> libs.versions.springBoot4.get()
+}
 
 dependencies {
     api(project(":teams4j-webhook"))
@@ -30,7 +41,7 @@ dependencies {
 
     // Put the target Boot BOM on the test classpath only. Platform constraints are not strict, so
     // the higher version wins when it sits alongside the baseline.
-    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$bootTestVersion"))
+    testImplementation(platform(bootTestBom))
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.wiremock)
     // The JUnit version comes from the target Boot BOM rather than the catalog, matching what a
