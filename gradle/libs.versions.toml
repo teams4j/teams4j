@@ -20,7 +20,7 @@ springBoot4 = "4.1.1"
 spotless = "8.10.0"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
 # -- Gradle's signing plugin does, and exactly one of the two may be active.
-jreleaser = "1.25.0"
+jreleaser = "1.26.0"
 # The version comes from the nearest `v*` tag (see the root build), so no file in the tree carries
 # it and a release is a tag rather than a commit. Read-only: it never tags or pushes.
 gitVersion = "5.1.0"
