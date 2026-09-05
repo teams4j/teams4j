@@ -4,6 +4,10 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
     }
+    // From gradle.properties, so CI can pass -PkotlinVersion to build on the Kotlin baseline.
+    plugins {
+        kotlin("jvm") version (extra["kotlinVersion"] as String)
+    }
 }
 
 dependencyResolutionManagement {

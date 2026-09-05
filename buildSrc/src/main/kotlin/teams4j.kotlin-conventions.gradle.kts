@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,7 +14,14 @@ plugins {
 val javaRelease = 17
 val javaToolchain = 21
 
+// Lowest Kotlin a consumer may be on: metadata and stdlib are pinned to it so ours never raises
+// theirs. 2.2 is the oldest the compiler accepts without a deprecation warning (= error here).
+// Mirrors kotlinBaseline in gradle/libs.versions.toml by hand.
+val kotlinBaseline = KotlinVersion.KOTLIN_2_2
+val kotlinBaselineStdlib = "2.2.21"
+
 kotlin {
+    coreLibrariesVersion = kotlinBaselineStdlib
     compilerOptions {
         // A published library should not leak implicit visibility or inferred public return types.
         explicitApi()
@@ -28,6 +36,8 @@ kotlin {
 tasks.named<KotlinCompile>("compileKotlin") {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(javaRelease.toString()))
+        languageVersion.set(kotlinBaseline)
+        apiVersion.set(kotlinBaseline)
         // Without this the 21 JDK's APIs are on the compile classpath even at target 17.
         freeCompilerArgs.add("-Xjdk-release=$javaRelease")
     }

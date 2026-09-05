@@ -6,11 +6,11 @@ claimed.
 | | Supported | Notes |
 |---|---|---|
 | Java | **17+** | The card model uses sealed interfaces and records. Java 8 and 11 are not supported |
-| Kotlin (DSL modules) | **2.0+ on JVM 17+** | Only for `teams4j-cards-kotlin` and `teams4j-webhook-kotlin`. The core is plain Java and works without Kotlin |
+| Kotlin (DSL modules) | **2.2+ on JVM 17+** | Only for `teams4j-cards-kotlin`, `teams4j-cards-kotlinx` and `teams4j-webhook-kotlin`. They are compiled at language and API version 2.2 against the 2.2 stdlib, so a 2.2 compiler reads them and your Kotlin version is never raised by ours. CI builds the Kotlin example on the 2.2 compiler. The core is plain Java and works without Kotlin |
 | Java 21+ | bonus | Exhaustive `switch` and record patterns over the sealed model. The jar targets 17, but sealed information lives in the class file, so it works at *your* compile time: drop a case and you get a compile error. Java 17 consumers get the closed hierarchy and `instanceof` patterns |
 | Spring Boot (starter) | **3.5.x, 4.1.x** | One artifact for both. CI runs the starter's tests on 3.5.16 and 4.1.1 and builds the example against both |
 | Adaptive Cards | **1.5** | The model covers the full 1.6 schema, but **1.5 is the ceiling Teams renders**: on a real tenant a 1.6 card is rejected and falls back to `fallbackText` (2026-09-01). The DSL defaults to 1.5 |
-| JSON binding | **Jackson 2.x** or **kotlinx.serialization 1.9+** | The model requires neither; see [JSON binding](./json-binding) |
+| JSON binding | **Jackson 2.18+** or **kotlinx.serialization 1.9+** | The model requires neither; see [JSON binding](./json-binding). `teams4j-cards-jackson` names 2.18 as a lower bound and nothing else: your own Jackson version wins. CI runs the tests on 2.18 and on the newest 2.x |
 | Coroutines | **kotlinx-coroutines 1.10+** | Only for `teams4j-webhook-kotlin` |
 | Nullness | **JSpecify `@NullMarked`** | Every module, without adding a runtime dependency. Below |
 

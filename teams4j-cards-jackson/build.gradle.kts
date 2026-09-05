@@ -7,7 +7,8 @@ description = "Jackson binding for the Adaptive Cards model"
 
 dependencies {
     api(project(":teams4j-cards"))
-    api(platform(libs.jackson.bom))
+    // No BOM: an exported platform raised every consumer's Jackson to ours. databind aligns core
+    // and annotations on its own.
     api(libs.jackson.databind)
 
     testImplementation(platform(libs.junit.bom))

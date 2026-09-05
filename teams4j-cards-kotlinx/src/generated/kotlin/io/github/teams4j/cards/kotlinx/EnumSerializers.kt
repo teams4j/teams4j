@@ -27,7 +27,7 @@ public object ActionModeSerializer : CardSerializer<ActionMode>("ActionMode") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ActionMode? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ActionMode? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `ActionStyle`, matched case-insensitively. */
@@ -49,7 +49,7 @@ public object ActionStyleSerializer : CardSerializer<ActionStyle>("ActionStyle")
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ActionStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ActionStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `AssociatedInputs`, matched case-insensitively. */
@@ -69,7 +69,7 @@ public object AssociatedInputsSerializer : CardSerializer<AssociatedInputs>("Ass
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): AssociatedInputs? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): AssociatedInputs? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `BlockElementHeight`, matched case-insensitively. */
@@ -89,7 +89,7 @@ public object BlockElementHeightSerializer : CardSerializer<BlockElementHeight>(
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): BlockElementHeight? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): BlockElementHeight? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `ChoiceInputStyle`, matched case-insensitively. */
@@ -111,7 +111,7 @@ public object ChoiceInputStyleSerializer : CardSerializer<ChoiceInputStyle>("Cho
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ChoiceInputStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ChoiceInputStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `Colors`, matched case-insensitively. */
@@ -141,7 +141,7 @@ public object ColorsSerializer : CardSerializer<Colors>("Colors") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): Colors? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): Colors? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `ContainerStyle`, matched case-insensitively. */
@@ -169,7 +169,7 @@ public object ContainerStyleSerializer : CardSerializer<ContainerStyle>("Contain
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ContainerStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ContainerStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `FontSize`, matched case-insensitively. */
@@ -195,7 +195,7 @@ public object FontSizeSerializer : CardSerializer<FontSize>("FontSize") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): FontSize? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): FontSize? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `FontType`, matched case-insensitively. */
@@ -215,7 +215,7 @@ public object FontTypeSerializer : CardSerializer<FontType>("FontType") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): FontType? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): FontType? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `FontWeight`, matched case-insensitively. */
@@ -237,7 +237,7 @@ public object FontWeightSerializer : CardSerializer<FontWeight>("FontWeight") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): FontWeight? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): FontWeight? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `HorizontalAlignment`, matched case-insensitively. */
@@ -259,7 +259,7 @@ public object HorizontalAlignmentSerializer : CardSerializer<HorizontalAlignment
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): HorizontalAlignment? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): HorizontalAlignment? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `ImageFillMode`, matched case-insensitively. */
@@ -283,7 +283,7 @@ public object ImageFillModeSerializer : CardSerializer<ImageFillMode>("ImageFill
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ImageFillMode? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ImageFillMode? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `ImageSize`, matched case-insensitively. */
@@ -309,7 +309,7 @@ public object ImageSizeSerializer : CardSerializer<ImageSize>("ImageSize") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ImageSize? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ImageSize? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `ImageStyle`, matched case-insensitively. */
@@ -329,7 +329,7 @@ public object ImageStyleSerializer : CardSerializer<ImageStyle>("ImageStyle") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): ImageStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): ImageStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `InputLabelPosition`, matched case-insensitively. */
@@ -349,7 +349,7 @@ public object InputLabelPositionSerializer : CardSerializer<InputLabelPosition>(
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): InputLabelPosition? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): InputLabelPosition? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `InputStyle`, matched case-insensitively. */
@@ -369,7 +369,7 @@ public object InputStyleSerializer : CardSerializer<InputStyle>("InputStyle") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): InputStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): InputStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `Spacing`, matched case-insensitively. */
@@ -399,7 +399,7 @@ public object SpacingSerializer : CardSerializer<Spacing>("Spacing") {
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): Spacing? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): Spacing? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `TextBlockStyle`, matched case-insensitively. */
@@ -419,7 +419,7 @@ public object TextBlockStyleSerializer : CardSerializer<TextBlockStyle>("TextBlo
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): TextBlockStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): TextBlockStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `TextInputStyle`, matched case-insensitively. */
@@ -445,7 +445,7 @@ public object TextInputStyleSerializer : CardSerializer<TextInputStyle>("TextInp
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): TextInputStyle? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): TextInputStyle? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `VerticalAlignment`, matched case-insensitively. */
@@ -467,7 +467,7 @@ public object VerticalAlignmentSerializer : CardSerializer<VerticalAlignment>("V
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): VerticalAlignment? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): VerticalAlignment? = element.asString()?.let { byJson[it.lowercase()] }
 }
 
 /** `VerticalContentAlignment`, matched case-insensitively. */
@@ -489,6 +489,6 @@ public object VerticalContentAlignmentSerializer : CardSerializer<VerticalConten
 
     // An unrecognised value reads as null rather than failing: the official
     // samples carry deliberately invalid ones to exercise renderer fallback.
-    override fun fromJson(element: JsonElement): VerticalContentAlignment? = byJson[element.asString()?.lowercase() ?: return null]
+    override fun fromJson(element: JsonElement): VerticalContentAlignment? = element.asString()?.let { byJson[it.lowercase()] }
 }
 

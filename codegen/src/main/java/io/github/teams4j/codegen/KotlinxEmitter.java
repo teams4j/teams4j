@@ -130,9 +130,10 @@ final class KotlinxEmitter {
                     .append("): JsonElement = JsonPrimitive(toWire[value] ?: value.name)\n\n");
             out.append("    // An unrecognised value reads as null rather than failing: the official\n");
             out.append("    // samples carry deliberately invalid ones to exercise renderer fallback.\n");
+            // `?.let`, not `?: return null`: a return in an expression body is an error at language 2.2.
             out.append("    override fun fromJson(element: JsonElement): ")
                     .append(name)
-                    .append("? = byJson[element.asString()?.lowercase() ?: return null]\n");
+                    .append("? = element.asString()?.let { byJson[it.lowercase()] }\n");
             out.append("}\n\n");
         }
         return out.toString();

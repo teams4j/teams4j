@@ -12,7 +12,7 @@ repositories.
 
 ## Requirements
 
-Java 17 or newer. Everything else is optional and depends on how you consume the library: Kotlin 2.0+
+Java 17 or newer. Everything else is optional and depends on how you consume the library: Kotlin 2.2+
 for the Kotlin DSL and coroutine modules, Spring Boot 3.5.x or 4.1.x for the starter. The
 [compatibility page](./compatibility) has the full table and what "supported" means for each row.
 
