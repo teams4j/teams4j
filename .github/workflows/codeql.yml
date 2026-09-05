@@ -63,7 +63,8 @@ jobs:
 
       # CodeQL only sees code that a compiler it traced actually compiled. The build cache would
       # restore class files without running javac or kotlinc, and the Kotlin daemon compiles in a
-      # process CodeQL did not start, so both are turned off for this one build.
+      # process CodeQL did not start, so both are turned off for this one build. The heap this
+      # needs is set in gradle.properties.
       - name: Build
         if: matrix.build-mode == 'manual'
         run: >
