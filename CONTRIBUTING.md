@@ -188,10 +188,10 @@ The CI workflow runs four jobs, and all four have to be green:
 3. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on both Boot lines
 4. **docs** — the docs site build, which fails on a dead link or a missing snippet
 
-Alongside it, a few security checks run on every pull request: Trivy and Semgrep (`security.yml`),
-zizmor on the workflow files themselves, and a dependency review that compares the Gradle
-dependency graph with `main` and rejects a newly introduced vulnerable package. Actions are pinned
-to commit SHAs; `pinact run` updates them.
+Alongside it, a few security checks run on every pull request: CodeQL (`codeql.yml`), Trivy and
+Semgrep (`security.yml`), zizmor on the workflow files themselves, and a dependency review that
+compares the Gradle dependency graph with `main` and rejects a newly introduced vulnerable package.
+Actions are pinned to commit SHAs; `pinact run` updates them.
 
 Beyond that:
 
