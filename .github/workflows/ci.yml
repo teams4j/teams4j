@@ -62,7 +62,7 @@ jobs:
             }
 
   starter-boot-matrix:
-    # One starter artifact covers both Boot lines; a failure here is the signal to split it.
+    # One starter artifact covers every supported Boot line; a failure here is the signal to split it.
     name: starter on Spring Boot ${{ matrix.boot }}.x
     runs-on: ubuntu-latest
     strategy:
@@ -158,7 +158,7 @@ jobs:
         working-directory: ./examples
         run: ./gradlew build --stacktrace -Pteams4jVersion="$TEAMS4J_VERSION"
 
-      # The starter example has to start on both Boot lines, not merely compile. The Boot 4 version
+      # The starter example has to start on each supported Boot line, not merely compile. The Boot 4 version
       # is the catalog's, so Dependabot moves this too.
       - name: Build the Spring example against Boot 4.x
         working-directory: ./examples

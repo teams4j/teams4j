@@ -104,7 +104,7 @@ you rather than parking a thread for minutes.
 }
 ```
 
-Do not stack another retry layer on top of this one. That is nine requests to Teams instead of three.
+Do not stack another retry layer on top of this one; the attempts multiply.
 
 ### Retired connector hosts
 
@@ -214,7 +214,7 @@ There is no Reactor API. This call is unary, no stream and no backpressure, and
 
 ### From a coroutine: `sendAwait`
 
-`teams4j-webhook-kotlin` adds `sendAwait` for the three `send` overloads.
+`teams4j-webhook-kotlin` adds `sendAwait` for each `send` overload.
 
 ```kotlin
 val response = client.sendAwait(

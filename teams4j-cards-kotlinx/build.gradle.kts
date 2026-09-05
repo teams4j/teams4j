@@ -22,8 +22,8 @@ dependencies {
     api(project(":teams4j-cards"))
     api(libs.kotlinx.serialization.json)
 
-    // The suite reads the same 184 official samples the Jackson binding does and checks the two
-    // bindings agree, so it needs the other binding to compare against.
+    // The suite reads the same official samples the Jackson binding does and checks the bindings
+    // agree, so it needs the other binding to compare against.
     testImplementation(project(":teams4j-cards-jackson"))
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

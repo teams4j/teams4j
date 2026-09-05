@@ -55,7 +55,7 @@ let a missing URL fail at startup.
 
 ## 4. Send the card (three minutes)
 
-This is the example application from the repository, built by CI against both Boot lines.
+This is the example application from the repository, built by CI against each supported Boot line.
 
 <<< ../../examples/spring-boot/src/main/java/example/boot/DeployNotifier.java
 
@@ -96,8 +96,8 @@ everywhere; instead there is a hierarchy, so you can catch only what you would h
 | `WebhookTransportException` | Connection failure or timeout (`attempts()`) | Yes |
 
 **Retries are already inside the client.** 429 and 5xx are retried three times by default with
-exponential backoff and full jitter, honouring `Retry-After`. Do not stack another layer on top; that is
-nine requests to Teams instead of three.
+exponential backoff and full jitter, honouring `Retry-After`. Do not stack another layer on top; the
+attempts multiply.
 
 One exception to the waiting: if the server asks for a `Retry-After` longer than `max-backoff`, the
 client does **not** wait. It throws with the value in `retryAfter()` and hands the scheduling back to

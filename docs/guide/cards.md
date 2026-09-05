@@ -192,8 +192,8 @@ Name the outer variable something else (`logUrl`), or qualify the property with 
 
 ## Reading cards back
 
-Both JSON bindings read a card into the same model, and a test runs all 184 official sample cards
-through both to make sure they agree, including on what they reject. See
+Every JSON binding reads a card into the same model, and a test runs the official sample cards
+through all of them to make sure they agree, including on what they reject. See
 [JSON binding](./json-binding) for the mappers and their lenient and strict modes, and
 [Cards authored in the Designer](../cookbook/designer-cards) for loading a hand-authored card as a
 resource.

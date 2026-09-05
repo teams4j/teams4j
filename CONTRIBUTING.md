@@ -91,7 +91,7 @@ Filling in `overrides.json` from that output beats guessing, which is what it is
 
 ### Schema coverage is measured, not asserted
 
-`teams4j-cards-jackson/src/test/resources/samples/` holds 184 official sample cards, and
+`teams4j-cards-jackson/src/test/resources/samples/` holds the official sample cards, and
 `SampleRoundTripTest` parses and re-serialises every one of them with a strict mapper.
 `samples/UNSUPPORTED.txt` lists the ones the model cannot round-trip, with a reason each.
 
@@ -190,12 +190,12 @@ on a few patterns worth knowing before adding to it:
 
 ## Pull requests
 
-The CI workflow runs five jobs, and all five have to be green:
+Every job in the CI workflow has to be green:
 
-1. **build** — `./gradlew build`, then a regeneration check across the three generated trees
-2. **starter-boot-matrix** — the starter's tests on both Boot lines (`springBoot` and `springBoot4` in the catalog)
+1. **build** — `./gradlew build`, then a check that regenerating the committed generated sources produces no diff
+2. **starter-boot-matrix** — the starter's tests on each supported Boot line (the `springBoot*` versions in the catalog)
 3. **jackson-latest** — the tests on the newest Jackson 2.x, where the POMs name the `jackson` baseline
-4. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on both Boot lines and on the Kotlin baseline
+4. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on each supported Boot line and on the Kotlin baseline
 5. **docs** — the docs site build, which fails on a dead link or a missing snippet
 
 Alongside it, a few security checks run on every pull request: CodeQL (`codeql.yml`), Trivy and

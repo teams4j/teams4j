@@ -17,7 +17,7 @@ the desktop client unless noted.
 
 ## Validator rules (2026-09-01)
 
-At the start, all twelve rules in `TeamsProfileValidator` had been derived from Microsoft's
+At the start, every rule in `TeamsProfileValidator` had been derived from Microsoft's
 documentation, none from observation. The validator was switched off for these sends so that Teams,
 not teams4j, gave the answer.
 
@@ -176,7 +176,7 @@ Observed while running the probes, and worth knowing before you compare the chan
   template to send this card. Get template". It is not in the payload teams4j sends.
 - **ISO-8601 strings are reformatted.** `Instant.now().toString()` (`2026-08-31T15:00:38.xxxZ`) in a
   fact value rendered as `08/31/2026 15:00:38`. teams4j passes strings through unchanged; the renderer
-  localises them, and the three clients may differ.
+  localises them, and the Teams clients may differ.
 - **`ColumnSet` renders without borders**, like a table with invisible grid lines. Per the
   specification, and a surprise the first time.
 - **Kotlin DSL and an outer `val url`.** With a variable named `url` in scope, `actionOpenUrl { url = … }`

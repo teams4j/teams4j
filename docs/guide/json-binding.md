@@ -50,10 +50,10 @@ an `ObjectMapper`, `new CardsModule()` is what to register on it.
 needs. The serializers are generated code rather than `@Serializable` annotations on the model,
 because the model has none and cannot have any without picking a library.
 
-## The two bindings agree, and a test says so
+## The bindings agree, and a test says so
 
-Whether both bindings read the same card the same way is checked by running all 184 official sample
-cards through both and comparing the resulting JSON, **including what they reject**, because one side
+Whether the bindings read the same card the same way is checked by running the official sample
+cards through each of them and comparing the resulting JSON, **including what they reject**, because one side
 being more lenient than the other *is* the drift. The lenient-reading rules (ignore unknown properties,
 unknown enum values become `null`, enum matching is case-insensitive) are mapper configuration on the
 Jackson side and generated code on the kotlinx side, so without that comparison they would diverge
@@ -61,7 +61,7 @@ quietly.
 
 The two write the same card the same way **but not byte for byte**: property order can differ. The
 webhook client's 28 KB check counts the bytes that actually go out, so it is always right; just do not
-assume the two bindings serialise to identical lengths.
+assume the bindings serialise to identical lengths.
 
 ## The webhook client does not pick a binding either
 
@@ -114,5 +114,5 @@ why they should come from the same binding.
 ## Adding a binding
 
 The codegen intermediate representation knows nothing about any JSON library, so a new binding is one
-more emitter. `KotlinxEmitter` is the evidence: it generates the whole kotlinx binding, about 2,200
-lines, from the same IR the Java model and Kotlin DSL come from.
+more emitter. `KotlinxEmitter` is the evidence: it generates the whole kotlinx binding
+from the same IR the Java model and Kotlin DSL come from.
