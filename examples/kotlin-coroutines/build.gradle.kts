@@ -11,7 +11,7 @@ dependencies {
     // The kotlinx binding, so this example has no Jackson anywhere. That is the whole reason
     // teams4j-webhook refuses to pick a binding for you.
     runtimeOnly("io.github.teams4j:teams4j-cards-kotlinx")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 }
 
 kotlin {
