@@ -249,8 +249,14 @@ public final class ConnectorClient {
         if (status == 403 && BotNotInConversationException.ERROR_CODE.equals(errorCode)) {
             throw new BotNotInConversationException(operation, response.body(), outcome.attempts());
         }
-        throw new ConnectorException(
-                operation, status, response.body(), outcome.attempts(), outcome.retryAfter(), errorCode);
+        String body = response.body();
+        if (status == 401) {
+            // The token endpoint issued a token and the Connector refused it: almost always a single-tenant
+            // registration whose token came from the shared authority, or the other way round.
+            body = body + " -- the token was issued but not accepted. A single-tenant registration needs its"
+                    + " tenant id (BotCredentials.singleTenant); a multi-tenant one must not have one.";
+        }
+        throw new ConnectorException(operation, status, body, outcome.attempts(), outcome.retryAfter(), errorCode);
     }
 
     private @Nullable CardValue safeRead(String body) {

@@ -165,6 +165,24 @@ failure to retry. The documentation on `TokenBucket`, `RateLimitMode` and
 - Whether a 429 appears at higher concurrency.
 - The exact payload boundary between 28,269 and 40,269 bytes.
 
+## The bot (2026-09-05)
+
+`teams4j-bot` against a bot registered in the Teams Developer Portal, installed into a team through
+*Preview in Teams*, with the endpoint reached through a Cloudflare quick tunnel. Every step of the
+smoke table passed; the one not exercised is a channel `@mention`, because the test app's bot scope
+did not include Team (a unit test covers the tag stripping).
+
+| Observed | Consequence in the library |
+|---|---|
+| Installing the app delivers `installationUpdate` and then `conversationUpdate` with `membersAdded[].id = 28:<appId>`, once for the personal scope (`a:…`) and once for the channel (`19:…@thread.tacv2`) | `isBotAdded(credentials.botId())` works as written; both references were stored |
+| `serviceUrl` is regional and tenant-scoped: `https://smba.trafficmanager.net/kr/<tenantId>` with a trailing slash | `ConversationReference` strips the slash; the token's `serviceurl` claim matched |
+| The token from the shared `botframework.com` authority was issued, and the Connector refused it with `401 Authorization has been denied for this request` -- the registration was single-tenant, the Developer Portal's default | The `401` message now says so and points at `BotCredentials.singleTenant`; with the tenant id every call succeeded |
+| A channel message's `conversation.id` ends in `;messageid=<id>`; posting to it replies in that thread | `ConversationReference.withoutMessageId()` gives the channel for later posts |
+| `Action.Submit` comes back as a `message` activity with `value` and no `text` | As modelled; the round trip took the card's data through `Activity.value()` |
+| `updateActivity` replaced the card in place; `deleteActivity` removed it; `?isTargetedActivity=true` with a `recipient` showed the card to one user, labelled "Only you can see this message" | As modelled |
+| Removing the app from a *channel* changes nothing: the bot stays a team member and posts keep landing. Removing it from the *team* (Manage team → Apps) delivers `installationUpdate` and the next post is `403 {"error":{"code":"BotNotInConversationRoster",…}}` | `BotNotInConversationException` fired from that body, not retried |
+| Text containing `{…}` sent as a plain message lost the braces in the client | The smoke sends JSON in backticks; not a library concern |
+
 ## What Teams adds to a card
 
 Observed while running the probes, and worth knowing before you compare the channel with your JSON:

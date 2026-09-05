@@ -87,6 +87,10 @@ A bot may post only to conversations it is a member of, and the install event is
 hands over both the `serviceUrl` and the conversation id. A stored `ConversationReference` is what a
 scheduled job posts to later. If it goes stale -- the bot was removed -- the Connector answers with
 `BotNotInConversationException`.
+
+A channel *message* carries a conversation id with a `;messageid=…` suffix, which addresses that
+message's thread: posting to it replies there. `withoutMessageId()` gives the channel itself, which
+is the one to store for unrelated posts later.
 :::
 
 ## Sending
@@ -115,7 +119,7 @@ carry `Action.Submit`; the payload comes back as `Activity.value()`.
 ```java
 Activity ask = connector.cardActivity(Cards.card()
         .text("Which brand?")
-        .action(Actions.submit("Connect", data -> data.put("action", "connect"))));
+        .action(Actions.submit("Connect", Map.of("action", "connect"))));
 ResourceResponse sent = connector.sendActivity(where, ask);
 // later, on the submit:
 connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().text("Connected.")));

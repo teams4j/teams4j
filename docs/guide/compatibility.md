@@ -20,8 +20,8 @@ row lists only what the `starter-boot-matrix` CI job runs.
 ## Modules and status
 
 **0.1.0 has not shipped yet.** The rows marked `0.1.0` are complete and are what that release
-contains. The bot modules are the exception to "measured on a tenant": they are built from the
-protocol and from a production bot's requirements, and the tenant run is still to come.
+contains. The bot modules were run against a real tenant on 2026-09-05; [Measurements](../reference/measurements#the-bot-2026-09-05)
+has what was seen.
 
 | Module | What it does | Status |
 |---|---|---|
@@ -34,7 +34,7 @@ protocol and from a production bot's requirements, and the tenant run is still t
 | `teams4j-webhook` | Sends cards to a channel through a Workflows webhook. **Zero runtime dependencies** | 0.1.0 |
 | `teams4j-webhook-kotlin` | Coroutine `sendAwait` | 0.1.0 |
 | `teams4j-webhook-spring-boot-starter` | Spring Boot auto-configuration | 0.1.0 |
-| `teams4j-bot` | Bots: the Activity model, inbound token verification, the Bot Connector client. **Zero runtime dependencies** | 0.1.0, not yet exercised against a real tenant |
+| `teams4j-bot` | Bots: the Activity model, inbound token verification, the Bot Connector client. **Zero runtime dependencies** | 0.1.0 |
 | `teams4j-bot-kotlin` | Coroutine `…Await` forms of the bot calls | 0.1.0 |
 | `teams4j-bom` | Version alignment for all of the above | 0.1.0 |
 

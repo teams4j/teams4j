@@ -82,6 +82,19 @@ class ActivityTest {
     }
 
     @Test
+    void aChannelMessageReferenceCanBeReducedToTheChannel() {
+        ConversationReference thread =
+                Objects.requireNonNull(Activity.parse(codec, CHANNEL_MESSAGE).conversationReference());
+
+        assertThat(thread.isThread()).isTrue();
+        ConversationReference channel = thread.withoutMessageId();
+        assertThat(channel.isThread()).isFalse();
+        assertThat(channel.conversationId()).isEqualTo("19:abc@thread.tacv2");
+        assertThat(channel.serviceUrl()).isEqualTo(thread.serviceUrl());
+        assertThat(channel.withoutMessageId()).isSameAs(channel);
+    }
+
+    @Test
     void noCoordinatesNoReference() {
         assertThat(Activity.parse(codec, "{\"type\":\"message\",\"text\":\"hi\"}")
                         .conversationReference())

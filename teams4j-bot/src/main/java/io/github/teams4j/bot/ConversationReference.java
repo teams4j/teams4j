@@ -25,6 +25,21 @@ public record ConversationReference(URI serviceUrl, String conversationId) {
         return new ConversationReference(URI.create(Objects.requireNonNull(serviceUrl, "serviceUrl")), conversationId);
     }
 
+    /**
+     * The conversation without the {@code ;messageid=…} suffix Teams appends to a channel message's
+     * conversation id. Posting to the suffixed id replies in that message's thread; posting to the
+     * bare id starts a new post in the channel. Store this one for later, unrelated posts.
+     */
+    public ConversationReference withoutMessageId() {
+        int at = conversationId.indexOf(";messageid=");
+        return at < 0 ? this : new ConversationReference(serviceUrl, conversationId.substring(0, at));
+    }
+
+    /** Whether the id points into a message's thread rather than at the conversation itself. */
+    public boolean isThread() {
+        return conversationId.contains(";messageid=");
+    }
+
     static URI normalise(URI serviceUrl) {
         String text = serviceUrl.toString();
         while (text.endsWith("/")) {
