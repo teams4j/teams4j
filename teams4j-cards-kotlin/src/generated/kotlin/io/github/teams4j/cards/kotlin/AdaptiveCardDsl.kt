@@ -3,6 +3,7 @@
 package io.github.teams4j.cards.kotlin
 
 import io.github.teams4j.cards.*
+import io.github.teams4j.cards.dsl.CardBuilder
 
 /**
  * Builds a [AdaptiveCard].
@@ -15,7 +16,7 @@ public class AdaptiveCardDsl internal constructor() {
     /**
      * Schema version that this card requires. If a client is **lower** than this version, the `fallbackText` will be rendered. NOTE: Version is not required for cards within an `Action.ShowCard`. However, it *is* required for the top-level card.
      */
-    public var version: String? = null
+    public var version: String? = CardBuilder.DEFAULT_VERSION
 
     /**
      * Defines how the card can be refreshed by making a request to the target Bot.

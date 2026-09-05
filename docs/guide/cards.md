@@ -89,9 +89,9 @@ That is per the specification, and it surprises people the first time.
 
 :::
 
-Note the explicit `version` inside the Kotlin `card { }` block. The Java `showCard` hands you a
-`CardBuilder`, which stamps the default version; the Kotlin `card { }` block is a fresh
-`AdaptiveCardDsl`, which does not. Set it if you want the two to agree byte for byte, as the test does.
+The nested card gets the default `version` in both DSLs, so the two emit the same JSON here as
+everywhere else. The schema does not require a version on a card behind `Action.ShowCard`; set
+`version = null` in the Kotlin block, or nothing in Java, only if you want it left out.
 
 ### Submit, for a bot card
 

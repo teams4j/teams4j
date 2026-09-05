@@ -8,7 +8,6 @@ import io.github.teams4j.cards.Dimension
 import io.github.teams4j.cards.FontSize
 import io.github.teams4j.cards.FontWeight
 import io.github.teams4j.cards.ImageSize
-import io.github.teams4j.cards.dsl.CardBuilder
 import io.github.teams4j.cards.jackson.CardJson
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DynamicTest
@@ -110,8 +109,6 @@ class DocumentedCardsTest {
             webhookActions {
                 actionShowCard("Changelog") {
                     card {
-                        // A nested card takes no default version; the Java DSL stamps one.
-                        version = CardBuilder.DEFAULT_VERSION
                         body {
                             textBlock("- Faster startup")
                             textBlock("- Fewer bugs")

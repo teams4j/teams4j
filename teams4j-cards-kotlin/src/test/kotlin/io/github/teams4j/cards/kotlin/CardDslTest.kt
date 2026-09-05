@@ -1,6 +1,7 @@
 package io.github.teams4j.cards.kotlin
 
 import io.github.teams4j.cards.ActionOpenUrl
+import io.github.teams4j.cards.ActionShowCard
 import io.github.teams4j.cards.ActionSubmit
 import io.github.teams4j.cards.Colors
 import io.github.teams4j.cards.Container
@@ -23,6 +24,13 @@ class CardDslTest {
     fun `stamps the same default version as the Java DSL`() {
         assertThat(adaptiveCard { }.version()).isEqualTo(CardBuilder.DEFAULT_VERSION)
         assertThat(adaptiveCard(version = "1.6") { }.version()).isEqualTo("1.6")
+    }
+
+    @Test
+    fun `a nested card behind ShowCard stamps the default version too`() {
+        val card = adaptiveCard { actions { actionShowCard("More") { card { } } } }
+        val nested = (card.actions()!!.single() as ActionShowCard).card()!!
+        assertThat(nested.version()).isEqualTo(CardBuilder.DEFAULT_VERSION)
     }
 
     @Test

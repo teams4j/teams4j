@@ -138,7 +138,7 @@ final class KotlinEmitter {
                 continue;
             }
             out.append('\n');
-            property(out, prop);
+            property(out, type, prop);
         }
 
         out.append('\n');
@@ -162,15 +162,18 @@ final class KotlinEmitter {
         return out.toString();
     }
 
-    private void property(StringBuilder out, Ir.Prop prop) {
+    private void property(StringBuilder out, Ir.Type type, Ir.Prop prop) {
         String name = propertyName(prop);
         kdoc(out, INDENT, wireNote(prop), prop.description());
+        // A card's version defaults to what the Java CardBuilder stamps, so a nested `card { }`
+        // behind Action.ShowCard emits the same JSON as Java's showCard without the author setting it.
+        boolean cardVersion = "AdaptiveCard".equals(type.javaName()) && "version".equals(prop.jsonName());
         out.append(INDENT)
                 .append("public var ")
                 .append(name)
                 .append(": ")
                 .append(kotlinType(prop.type()))
-                .append("? = null\n");
+                .append(cardVersion ? "? = CardBuilder.DEFAULT_VERSION\n" : "? = null\n");
 
         if (prop.type() instanceof Ir.Ref.ListOf list
                 && list.element() instanceof Ir.Ref.Named element
@@ -440,8 +443,12 @@ final class KotlinEmitter {
         file.append("// Regenerate with: ./gradlew generateModel\n");
         file.append("package ").append(dslPackage).append("\n\n");
         // The model package star-import covers CardValue and the other hand-written types the
-        // emitted DSL refers to; nothing outside the model is needed any more.
-        file.append("import ").append(modelPackage).append(".*\n\n");
+        // emitted DSL refers to. CardBuilder is the one thing outside the model: the card version default.
+        file.append("import ").append(modelPackage).append(".*\n");
+        if (body.contains("CardBuilder.")) {
+            file.append("import ").append(modelPackage).append(".dsl.CardBuilder\n");
+        }
+        file.append('\n');
         file.append(body);
         Files.writeString(packageDir.resolve(name + ".kt"), file, StandardCharsets.UTF_8);
     }
