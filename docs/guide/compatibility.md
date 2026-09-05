@@ -19,8 +19,9 @@ row lists only what the `starter-boot-matrix` CI job runs.
 
 ## Modules and status
 
-**0.1.0 has not shipped yet.** The first release covers the card model and the Workflows webhook
-client; the rows marked `0.1.0` are complete and are what that release contains.
+**0.1.0 has not shipped yet.** The rows marked `0.1.0` are complete and are what that release
+contains. The bot modules are the exception to "measured on a tenant": they are built from the
+protocol and from a production bot's requirements, and the tenant run is still to come.
 
 | Module | What it does | Status |
 |---|---|---|
@@ -28,10 +29,13 @@ client; the rows marked `0.1.0` are complete and are what that release contains.
 | `teams4j-cards-kotlin` | Kotlin type-safe DSL, generated from the same schema | 0.1.0 |
 | `teams4j-cards-jackson` | Jackson binding | 0.1.0 |
 | `teams4j-cards-kotlinx` | kotlinx.serialization binding | 0.1.0 |
-| `teams4j-teams` | Teams profile: platform limits + `TeamsProfileValidator` | 0.1.0 |
+| `teams4j-teams-profile` | Teams profile: platform limits + `TeamsProfileValidator` | 0.1.0 |
+| `teams4j-http` | What the clients share: the `HttpTransport` seam and the retry policy. **Zero runtime dependencies** | 0.1.0 |
 | `teams4j-webhook` | Sends cards to a channel through a Workflows webhook. **Zero runtime dependencies** | 0.1.0 |
 | `teams4j-webhook-kotlin` | Coroutine `sendAwait` | 0.1.0 |
 | `teams4j-webhook-spring-boot-starter` | Spring Boot auto-configuration | 0.1.0 |
+| `teams4j-bot` | Bots: the Activity model, inbound token verification, the Bot Connector client. **Zero runtime dependencies** | 0.1.0, not yet exercised against a real tenant |
+| `teams4j-bot-kotlin` | Coroutine `…Await` forms of the bot calls | 0.1.0 |
 | `teams4j-bom` | Version alignment for all of the above | 0.1.0 |
 
 ### Roadmap
@@ -39,11 +43,11 @@ client; the rows marked `0.1.0` are complete and are what that release contains.
 Not started, and waiting on demand. There is no plan to begin these without adoption signals, and not
 starting them is a normal outcome.
 
-- **Microsoft Graph messaging**: posting to chats and channels through Graph, for cases a webhook
-  cannot cover.
-- **Bots**: the Activity Protocol and Bot Connector, which is where receiving anything from Teams
-  belongs. The webhook client is outbound only.
-- **A routing framework** on top of the bot modules.
+- **Microsoft Graph messaging**: posting to chats and channels through Graph, for cases neither a
+  webhook nor a bot covers.
+- **Framework adapters for bots**: a Spring Boot starter and a Ktor plugin around
+  `ActivityReceiver`; `invoke` responses; proactive conversation creation. See
+  [Bots](./bot#not-here-yet).
 
 ## The nullness contract
 

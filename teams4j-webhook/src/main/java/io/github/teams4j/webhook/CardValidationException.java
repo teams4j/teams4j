@@ -3,8 +3,9 @@ package io.github.teams4j.webhook;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.github.teams4j.teams.validate.Severity;
-import io.github.teams4j.teams.validate.ValidationIssue;
+import io.github.teams4j.teams.profile.Severity;
+import io.github.teams4j.teams.profile.ValidationIssue;
+import io.github.teams4j.teams.profile.ValidationMode;
 
 /**
  * The card breaks a rule Teams enforces, and was not sent. Thrown only under

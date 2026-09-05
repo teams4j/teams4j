@@ -4,7 +4,7 @@ layout: home
 hero:
   name: teams4j
   text: Adaptive Cards and Microsoft Teams for the JVM
-  tagline: A typed card model generated from the schema, a validator that knows what Teams actually renders, and a webhook client with zero runtime dependencies.
+  tagline: A typed card model generated from the schema, a validator that knows what Teams actually renders, and webhook and bot clients with zero runtime dependencies.
   actions:
     - theme: brand
       text: Get started

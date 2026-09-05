@@ -29,8 +29,9 @@ import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.TextBlock;
 import io.github.teams4j.cards.dsl.Actions;
 import io.github.teams4j.cards.dsl.Cards;
-import io.github.teams4j.teams.TeamsLimits;
-import io.github.teams4j.teams.validate.Severity;
+import io.github.teams4j.teams.profile.Severity;
+import io.github.teams4j.teams.profile.TeamsLimits;
+import io.github.teams4j.teams.profile.ValidationMode;
 
 /**
  * Covers the send path against a stubbed webhook.

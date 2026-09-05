@@ -128,7 +128,7 @@ if (apiBaseline != null) {
 }
 
 // A release publishes to a directory, which JReleaser then uploads as one deployment, so Central
-// sees all nine modules arrive together or not at all. The directory is on the root project so
+// sees every module arrive together or not at all. The directory is on the root project so
 // every module stages into the same place.
 publishing.repositories.maven {
     name = "staging"

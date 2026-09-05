@@ -6,9 +6,9 @@ import java.time.Duration;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import io.github.teams4j.teams.TeamsLimits;
+import io.github.teams4j.teams.profile.TeamsLimits;
+import io.github.teams4j.teams.profile.ValidationMode;
 import io.github.teams4j.webhook.RateLimitMode;
-import io.github.teams4j.webhook.ValidationMode;
 import io.github.teams4j.webhook.WorkflowsWebhookClient;
 
 /**

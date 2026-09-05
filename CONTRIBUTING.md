@@ -50,6 +50,15 @@ cd examples && ./gradlew build
 `examples/README.md` covers running them, including how to point the Spring example at a
 loopback stub when you have no Teams channel to hand.
 
+### The smoke repository
+
+[teams4j-smoke](https://github.com/teams4j/teams4j-smoke) is a second consumer build, outside this
+repository, that sends real cards to a real tenant. It resolves the published artifacts from
+`mavenLocal` like the examples do, and it is not in CI because it needs a channel. **A change to the
+public API, the DSL, a module's coordinates or the Kotlin baseline has to be carried into it in the
+same sitting**, or it rots silently: nothing here compiles it. `cd ../teams4j-smoke && ./gradlew build`
+after `publishToMavenLocal` is the check.
+
 ## Do not hand-edit generated sources
 
 The Adaptive Cards model is **generated from the official schema**, not written by hand:
@@ -181,12 +190,13 @@ on a few patterns worth knowing before adding to it:
 
 ## Pull requests
 
-The CI workflow runs four jobs, and all four have to be green:
+The CI workflow runs five jobs, and all five have to be green:
 
 1. **build** — `./gradlew build`, then a regeneration check across the three generated trees
 2. **starter-boot-matrix** — the starter's tests on both Boot lines (`springBoot` and `springBoot4` in the catalog)
-3. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on both Boot lines
-4. **docs** — the docs site build, which fails on a dead link or a missing snippet
+3. **jackson-latest** — the tests on the newest Jackson 2.x, where the POMs name the `jackson` baseline
+4. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on both Boot lines and on the Kotlin baseline
+5. **docs** — the docs site build, which fails on a dead link or a missing snippet
 
 Alongside it, a few security checks run on every pull request: CodeQL (`codeql.yml`), Trivy and
 Semgrep (`security.yml`), zizmor on the workflow files themselves, and a dependency review that
@@ -198,7 +208,7 @@ Beyond that:
 - One concern per pull request. A formatting sweep mixed into a behaviour change hides the
   behaviour change.
 - If you change something a reader of the README or the cookbook would then find wrong, update
-  it in the same pull request. Documentation that does not run is the worst failure mode here,
+  it in the same pull request. The same goes for `teams4j-smoke`, which no CI job compiles. Documentation that does not run is the worst failure mode here,
   which is why the examples are wired into CI at all.
 - New public API needs Javadoc that says what the caller has to know, including the failure
   mode.

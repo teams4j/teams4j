@@ -26,12 +26,13 @@ import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.WebhookAction;
 import io.github.teams4j.cards.dsl.CardBuilder;
-import io.github.teams4j.teams.TeamsLimits;
-import io.github.teams4j.teams.validate.Severity;
-import io.github.teams4j.teams.validate.TeamsProfileValidator;
-import io.github.teams4j.teams.validate.ValidationIssue;
+import io.github.teams4j.http.RetryPolicy;
+import io.github.teams4j.teams.profile.Severity;
+import io.github.teams4j.teams.profile.TeamsLimits;
+import io.github.teams4j.teams.profile.TeamsProfileValidator;
+import io.github.teams4j.teams.profile.ValidationIssue;
+import io.github.teams4j.teams.profile.ValidationMode;
 import io.github.teams4j.webhook.internal.EnvelopeWriter;
-import io.github.teams4j.webhook.internal.RetryPolicy;
 import io.github.teams4j.webhook.internal.TokenBucket;
 
 /**

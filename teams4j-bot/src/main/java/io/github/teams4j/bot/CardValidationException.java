@@ -1,0 +1,33 @@
+package io.github.teams4j.bot;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import io.github.teams4j.teams.profile.Severity;
+import io.github.teams4j.teams.profile.ValidationIssue;
+import io.github.teams4j.teams.profile.ValidationMode;
+
+/**
+ * The card breaks a rule Teams enforces, and no activity was built. Thrown only under
+ * {@link ValidationMode#ENFORCE} and only for {@link Severity#ERROR}; warnings are logged instead.
+ */
+public final class CardValidationException extends BotException {
+
+    private static final long serialVersionUID = 1L;
+
+    private final transient List<ValidationIssue> issues;
+
+    CardValidationException(List<ValidationIssue> issues) {
+        super("the card is not valid for a Teams bot: "
+                + issues.stream()
+                        .filter(i -> i.severity() == Severity.ERROR)
+                        .map(ValidationIssue::toString)
+                        .collect(Collectors.joining("; ")));
+        this.issues = List.copyOf(issues);
+    }
+
+    /** Everything the validator found, warnings included. */
+    public List<ValidationIssue> issues() {
+        return issues;
+    }
+}

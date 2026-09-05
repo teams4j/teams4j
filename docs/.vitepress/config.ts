@@ -26,6 +26,7 @@ export default defineConfig({
           { text: 'Building cards', link: '/guide/cards' },
           { text: 'Validation', link: '/guide/validation' },
           { text: 'The webhook client', link: '/guide/webhook' },
+          { text: 'Bots', link: '/guide/bot' },
           { text: 'Spring Boot', link: '/guide/spring-boot' },
           { text: 'JSON binding', link: '/guide/json-binding' },
           { text: 'Compatibility', link: '/guide/compatibility' },

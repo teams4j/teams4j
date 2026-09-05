@@ -8,7 +8,8 @@ description = "Microsoft Teams Workflows webhook client (JDK HttpClient, rate li
 
 dependencies {
     api(project(":teams4j-cards"))
-    api(project(":teams4j-teams"))
+    api(project(":teams4j-teams-profile"))
+    api(project(":teams4j-http"))
     // No JSON binding, and so no third-party runtime dependency at all. The client writes the
     // envelope itself and hands the card to whichever CardWriter the consumer put on the
     // classpath -- teams4j-cards-jackson or teams4j-cards-kotlinx. Depending on one here would

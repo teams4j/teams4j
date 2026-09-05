@@ -411,6 +411,12 @@ public final class io/github/teams4j/cards/kotlinx/KotlinxCardWriter : io/github
 	public fun write (Lio/github/teams4j/cards/AdaptiveCard;)Ljava/lang/String;
 }
 
+public final class io/github/teams4j/cards/kotlinx/KotlinxJsonCodec : io/github/teams4j/cards/JsonCodec {
+	public fun <init> ()V
+	public fun read (Ljava/lang/String;)Lio/github/teams4j/cards/CardValue;
+	public fun write (Lio/github/teams4j/cards/CardValue;)Ljava/lang/String;
+}
+
 public final class io/github/teams4j/cards/kotlinx/MediaSerializer : io/github/teams4j/cards/kotlinx/CardSerializer {
 	public static final field INSTANCE Lio/github/teams4j/cards/kotlinx/MediaSerializer;
 	public fun fromJson (Lkotlinx/serialization/json/JsonElement;)Lio/github/teams4j/cards/Media;

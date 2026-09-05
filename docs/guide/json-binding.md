@@ -21,8 +21,10 @@ val out = io.github.teams4j.cards.kotlinx.CardJson.encode(card)
 | Module | Runtime dependencies |
 |---|---|
 | `teams4j-cards` | **none** |
-| `teams4j-teams` | `teams4j-cards` only |
+| `teams4j-teams-profile` | `teams4j-cards` only |
+| `teams4j-http` | **none** |
 | `teams4j-webhook` | **none** (the JDK `HttpClient`, plus a `CardWriter` found at runtime) |
+| `teams4j-bot` | **none** (the JDK `HttpClient`, plus a `CardWriter` and a `JsonCodec` found at runtime) |
 | `teams4j-cards-jackson` | `jackson-databind` |
 | `teams4j-cards-kotlinx` | `kotlinx-serialization-json` |
 
@@ -97,6 +99,17 @@ classpath either way.
 
 Under Spring Boot the starter brings Jackson, and one bean switches to kotlinx; see
 [Spring Boot](./spring-boot#kotlinx-serialization-instead-of-jackson).
+
+## `JsonCodec`: the JSON around a card
+
+A bot reads JSON that is not a card -- the activity Teams posted, a token's claims, a key set -- and
+writes the envelope it sends back. `JsonCodec` is the second, equally small interface a binding
+registers: `CardValue read(String)` and `String write(CardValue)`, over the same open value type the
+card model already uses for `Action.Submit.data`. Both bindings provide one (`JacksonJsonCodec`,
+`KotlinxJsonCodec`), it is discovered the way `CardWriter` is, with the same priority rule, and
+`ConnectorClient.Builder.jsonCodec(...)` names one explicitly. A bot's outbound card is written by the
+`CardWriter` and read back into the activity tree by the `JsonCodec`, which is why both are needed and
+why they should come from the same binding.
 
 ## Adding a binding
 

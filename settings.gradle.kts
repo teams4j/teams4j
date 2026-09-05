@@ -18,12 +18,19 @@ include(":teams4j-cards-jackson")
 include(":teams4j-cards-kotlinx")
 
 // L0 - Teams profile: platform limits and validation
-include(":teams4j-teams")
+include(":teams4j-teams-profile")
+
+// L0 - HTTP plumbing the clients share: transport seam, retry policy
+include(":teams4j-http")
 
 // L1 - Workflows webhook client
 include(":teams4j-webhook")
 include(":teams4j-webhook-kotlin")
 include(":teams4j-webhook-spring-boot-starter")
+
+// L1 - Bot Framework: Activity model, Connector client, inbound token verification
+include(":teams4j-bot")
+include(":teams4j-bot-kotlin")
 
 // BOM that aligns module versions
 include(":teams4j-bom")

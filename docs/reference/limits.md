@@ -1,7 +1,7 @@
 # Teams limits
 
 The numeric limits Microsoft Teams puts on Adaptive Cards and on Workflows webhooks, collected in
-`io.github.teams4j.teams.TeamsLimits` because they are scattered across Microsoft's documentation and
+`io.github.teams4j.teams.profile.TeamsLimits` because they are scattered across Microsoft's documentation and
 easy to get wrong from memory. Where a value was measured rather than read, the table says so; the runs
 are on the [measurements](./measurements) page.
 

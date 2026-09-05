@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.dsl.Actions;
 import io.github.teams4j.cards.dsl.Cards;
-import io.github.teams4j.teams.TeamsLimits;
+import io.github.teams4j.teams.profile.TeamsLimits;
 
 /**
  * Covers {@code sendAsync}, and above all covers it <em>against</em> {@code send}.

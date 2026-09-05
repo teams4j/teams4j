@@ -9,10 +9,13 @@ ships, the links below resolve to nothing; build the jars locally instead (see t
 | `teams4j-cards-kotlin` | [javadoc.io/doc/io.github.teams4j/teams4j-cards-kotlin](https://javadoc.io/doc/io.github.teams4j/teams4j-cards-kotlin) |
 | `teams4j-cards-jackson` | [javadoc.io/doc/io.github.teams4j/teams4j-cards-jackson](https://javadoc.io/doc/io.github.teams4j/teams4j-cards-jackson) |
 | `teams4j-cards-kotlinx` | [javadoc.io/doc/io.github.teams4j/teams4j-cards-kotlinx](https://javadoc.io/doc/io.github.teams4j/teams4j-cards-kotlinx) |
-| `teams4j-teams` | [javadoc.io/doc/io.github.teams4j/teams4j-teams](https://javadoc.io/doc/io.github.teams4j/teams4j-teams) |
+| `teams4j-teams-profile` | [javadoc.io/doc/io.github.teams4j/teams4j-teams-profile](https://javadoc.io/doc/io.github.teams4j/teams4j-teams-profile) |
+| `teams4j-http` | [javadoc.io/doc/io.github.teams4j/teams4j-http](https://javadoc.io/doc/io.github.teams4j/teams4j-http) |
 | `teams4j-webhook` | [javadoc.io/doc/io.github.teams4j/teams4j-webhook](https://javadoc.io/doc/io.github.teams4j/teams4j-webhook) |
 | `teams4j-webhook-kotlin` | [javadoc.io/doc/io.github.teams4j/teams4j-webhook-kotlin](https://javadoc.io/doc/io.github.teams4j/teams4j-webhook-kotlin) |
 | `teams4j-webhook-spring-boot-starter` | [javadoc.io/doc/io.github.teams4j/teams4j-webhook-spring-boot-starter](https://javadoc.io/doc/io.github.teams4j/teams4j-webhook-spring-boot-starter) |
+| `teams4j-bot` | [javadoc.io/doc/io.github.teams4j/teams4j-bot](https://javadoc.io/doc/io.github.teams4j/teams4j-bot) |
+| `teams4j-bot-kotlin` | [javadoc.io/doc/io.github.teams4j/teams4j-bot-kotlin](https://javadoc.io/doc/io.github.teams4j/teams4j-bot-kotlin) |
 
 ## Where to start reading
 
@@ -25,6 +28,8 @@ reading whole:
 - `RateLimitMode` and `ValidationMode`: short, and they explain why the defaults are the defaults.
 - `CardValue` and `Dimension` in `teams4j-cards`: the open-value types.
 - `WebhookAction`: the marker whose `permits` clause is the compile-time guarantee.
+- `BotTokenVerifier` and `ConnectorClient` in `teams4j-bot`: what is checked on the way in, and what
+  happens around each call on the way out.
 
 ## Building it locally
 

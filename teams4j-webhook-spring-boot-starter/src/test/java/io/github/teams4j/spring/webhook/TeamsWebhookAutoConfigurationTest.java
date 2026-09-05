@@ -15,8 +15,8 @@ import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.dsl.Cards;
 import io.github.teams4j.cards.jackson.JacksonCardWriter;
+import io.github.teams4j.teams.profile.ValidationMode;
 import io.github.teams4j.webhook.RateLimitMode;
-import io.github.teams4j.webhook.ValidationMode;
 import io.github.teams4j.webhook.WebhookMessage;
 import io.github.teams4j.webhook.WorkflowsWebhookClient;
 

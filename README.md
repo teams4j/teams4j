@@ -41,6 +41,15 @@ Around that one call the client validates the card against the Teams profile, ch
 limit, paces to four requests per second, and retries 429 and 5xx with backoff. Each of those
 came from a measurement on a real tenant, not from the documentation.
 
+When a webhook is not enough -- you need to *receive* -- `teams4j-bot` is the Bot Framework side:
+verify what Teams posts, read the activity, answer through the Connector.
+
+```java
+Activity activity = receiver.receive(authorizationHeader, body);       // 401 on TokenVerificationException
+connector.replyToActivity(activity.conversationReference(), activity.id(),
+        connector.cardActivity(Cards.card().text("Got it").action(Actions.submit("Approve"))));
+```
+
 ## Getting started
 
 Java 17+. 0.1.0 is not on Maven Central yet; until then, `./gradlew publishToMavenLocal` from a
@@ -57,7 +66,7 @@ implementation("io.github.teams4j:teams4j-cards-jackson:0.1.0")
 
 - [Getting started](https://teams4j.github.io/teams4j/guide/getting-started) — webhook URL, dependency, first card
 - [Deploy notification in five minutes](https://teams4j.github.io/teams4j/cookbook/deploy-notification) — the Spring Boot walkthrough
-- [Building cards](https://teams4j.github.io/teams4j/guide/cards) · [Validation](https://teams4j.github.io/teams4j/guide/validation) · [The webhook client](https://teams4j.github.io/teams4j/guide/webhook)
+- [Building cards](https://teams4j.github.io/teams4j/guide/cards) · [Validation](https://teams4j.github.io/teams4j/guide/validation) · [The webhook client](https://teams4j.github.io/teams4j/guide/webhook) · [Bots](https://teams4j.github.io/teams4j/guide/bot)
 - [Compatibility](https://teams4j.github.io/teams4j/guide/compatibility) — supported Java, Kotlin and Spring Boot versions, the module list, and the roadmap
 - [Teams limits](https://teams4j.github.io/teams4j/reference/limits) and [Measurements](https://teams4j.github.io/teams4j/reference/measurements) — what was sent to a real tenant and what came back
 - [`examples/`](examples) — runnable Java, Kotlin coroutines and Spring Boot projects

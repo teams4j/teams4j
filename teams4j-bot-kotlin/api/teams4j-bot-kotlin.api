@@ -1,0 +1,10 @@
+public final class io/github/teams4j/bot/kotlin/BotCoroutinesKt {
+	public static final fun deleteActivityAwait (Lio/github/teams4j/bot/ConnectorClient;Lio/github/teams4j/bot/ConversationReference;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun receiveAwait (Lio/github/teams4j/bot/ActivityReceiver;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun replyToActivityAwait (Lio/github/teams4j/bot/ConnectorClient;Lio/github/teams4j/bot/ConversationReference;Ljava/lang/String;Lio/github/teams4j/bot/Activity;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sendActivityAwait (Lio/github/teams4j/bot/ConnectorClient;Lio/github/teams4j/bot/ConversationReference;Lio/github/teams4j/bot/Activity;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sendTargetedActivityAwait (Lio/github/teams4j/bot/ConnectorClient;Lio/github/teams4j/bot/ConversationReference;Lio/github/teams4j/bot/Activity;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun updateActivityAwait (Lio/github/teams4j/bot/ConnectorClient;Lio/github/teams4j/bot/ConversationReference;Ljava/lang/String;Lio/github/teams4j/bot/Activity;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun verifyAwait (Lio/github/teams4j/bot/BotTokenVerifier;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
