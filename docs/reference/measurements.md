@@ -182,6 +182,7 @@ did not include Team (a unit test covers the tag stripping).
 | `updateActivity` replaced the card in place; `deleteActivity` removed it; `?isTargetedActivity=true` with a `recipient` showed the card to one user, labelled "Only you can see this message" | As modelled |
 | Removing the app from a *channel* changes nothing: the bot stays a team member and posts keep landing. Removing it from the *team* (Manage team → Apps) delivers `installationUpdate` and the next post is `403 {"error":{"code":"BotNotInConversationRoster",…}}` | `BotNotInConversationException` fired from that body, not retried |
 | Text containing `{…}` sent as a plain message lost the braces in the client | The smoke sends JSON in backticks; not a library concern |
+| `POST /v3/conversations` for a user the bot already chats with returns the existing `a:…` conversation, not a new one | `createConversation` doubles as "find my chat with this user" |
 
 ## What Teams adds to a card
 
