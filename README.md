@@ -63,7 +63,7 @@ implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:0.1.0")
 implementation("io.github.teams4j:teams4j-webhook:0.1.0")
 implementation("io.github.teams4j:teams4j-cards-jackson:0.1.0")
 
-// A bot: the starter hosts the endpoint from three properties (teams4j.bot.app-id, app-secret, tenant-id);
+// A bot: three properties (teams4j.bot.app-id, app-secret, tenant-id) and one ActivityHandler bean.
 // teams4j-bot-ktor is the same endpoint as a Ktor route
 implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:0.1.0")
 ```

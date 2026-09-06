@@ -139,7 +139,7 @@ default.
 | Option | Default | Notes |
 |---|---|---|
 | `transport(HttpTransport)` | The JDK `HttpClient`, with the connect timeout below | One method to implement over OkHttp, Ktor or any other client; see [the bot guide](./bot#bring-your-own-http-client) |
-| `httpClient(HttpClient)` | | A configured JDK client, wrapped as the transport above |
+| `httpClient(HttpClient)` | — | A configured JDK client, wrapped as the transport above |
 | `cardWriter(CardWriter)` | Discovered via `ServiceLoader` | Names the JSON binding explicitly; see [JSON binding](./json-binding) |
 | `validation(ValidationMode)` | `ENFORCE` | |
 | `rateLimit(RateLimitMode)` | `BLOCK` | |

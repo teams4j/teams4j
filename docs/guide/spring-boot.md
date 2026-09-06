@@ -109,17 +109,16 @@ teams4j:
     tenant-id: ${TEAMS_BOT_TENANT_ID:}   # single-tenant registrations only
 ```
 
-**Without `teams4j.bot.app-id` no bot beans are created**, for the reason the webhook client has:
+**Without `teams4j.bot.app-id` no bot beans are created**, for the reason the webhook starter has:
 an application with the starter on its classpath and no bot configured must still start. An app id
-without a secret fails startup, since that is a misconfiguration and startup is where to learn it.
+without a secret fails startup; that is a misconfiguration, and startup is where to learn it.
 
 With the app id set, the context holds `BotCredentials`, `BotTokenVerifier`, `ActivityReceiver`,
 `ConnectorClient` and `ActivityEndpoint`, each replaceable by a bean of your own. In a Spring MVC
-application that declares an `ActivityHandler` bean, the starter also registers the messaging
-endpoint, a controller on `teams4j.bot.path`; the [bot example](https://github.com/teams4j/teams4j/tree/main/examples/bot-spring-boot)
-is that bean and nothing else. Without a handler bean there is no endpoint, and the beans are there
-for a controller of your own built on `ActivityEndpoint`. See [Bots](./bot#hosting-the-endpoint) for
-what the endpoint answers.
+application that declares an `ActivityHandler` bean, the starter also registers the endpoint, a
+controller on `teams4j.bot.path`; the [bot example](https://github.com/teams4j/teams4j/tree/main/examples/bot-spring-boot)
+is that bean and nothing else. Without a handler bean there is no endpoint, and `ActivityEndpoint`
+is there for a controller of your own. [Bots](./bot#hosting-the-endpoint) says what it answers.
 
 ### Properties
 
