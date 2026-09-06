@@ -63,7 +63,7 @@ jobs:
 
   starter-boot-matrix:
     # One starter artifact covers every supported Boot line; a failure here is the signal to split it.
-    name: starter on Spring Boot ${{ matrix.boot }}.x
+    name: starters on Spring Boot ${{ matrix.boot }}.x
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -88,10 +88,12 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
-      - name: Test starter against Boot ${{ matrix.boot }}.x
+      - name: Test the starters against Boot ${{ matrix.boot }}.x
         env:
           BOOT_LINE: ${{ matrix.boot }}
-        run: ./gradlew :teams4j-webhook-spring-boot-starter:test -PbootLine="$BOOT_LINE"
+        run: >
+          ./gradlew :teams4j-webhook-spring-boot-starter:test :teams4j-bot-spring-boot-starter:test
+          -PbootLine="$BOOT_LINE"
 
   jackson-latest:
     # The POMs name the Jackson baseline; this proves the newest 2.x still works.
@@ -118,6 +120,32 @@ jobs:
 
       - name: Test against the newest Jackson 2.x
         run: ./gradlew test -PjacksonLine=latest
+
+  ktor-latest:
+    # The POM names the Ktor baseline; this proves the newest 3.x still works.
+    name: bot-ktor on the newest Ktor 3.x
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version is derived from the nearest release tag; a shallow clone has none.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Test against the newest Ktor 3.x
+        run: ./gradlew :teams4j-bot-ktor:test -PktorLine=latest
 
   examples:
     # The examples are a separate build that resolves teams4j from a repository, so this is the
@@ -158,23 +186,23 @@ jobs:
         working-directory: ./examples
         run: ./gradlew build --stacktrace -Pteams4jVersion="$TEAMS4J_VERSION"
 
-      # The starter example has to start on each supported Boot line, not merely compile. The Boot 4 version
-      # is the catalog's, so Dependabot moves this too.
-      - name: Build the Spring example against Boot 4.x
+      # The starter examples have to start on each supported Boot line, not merely compile. The Boot 4
+      # version is the catalog's, so Dependabot moves this too.
+      - name: Build the Spring examples against Boot 4.x
         working-directory: ./examples
         run: |
           boot4=$(sed -n 's/^springBoot4 = "\(.*\)"$/\1/p' ../gradle/libs.versions.toml)
           test -n "$boot4"
-          ./gradlew :spring-boot:build -PbootVersion="$boot4" -Pteams4jVersion="$TEAMS4J_VERSION"
+          ./gradlew :spring-boot:build :bot-spring-boot:build -PbootVersion="$boot4" -Pteams4jVersion="$TEAMS4J_VERSION"
 
       # The compatibility page claims Kotlin baseline+; this is that claim checked with the
       # baseline compiler.
-      - name: Build the Kotlin example on the Kotlin baseline
+      - name: Build the Kotlin examples on the Kotlin baseline
         working-directory: ./examples
         run: |
           baseline=$(sed -n 's/^kotlinBaseline = "\(.*\)"$/\1/p' ../gradle/libs.versions.toml)
           test -n "$baseline"
-          ./gradlew :kotlin-coroutines:build -PkotlinVersion="$baseline" -Pteams4jVersion="$TEAMS4J_VERSION"
+          ./gradlew :kotlin-coroutines:build :bot-ktor:build -PkotlinVersion="$baseline" -Pteams4jVersion="$TEAMS4J_VERSION"
 
   docs:
     # The site includes source files by path and #region; a rename in the tree fails this build.

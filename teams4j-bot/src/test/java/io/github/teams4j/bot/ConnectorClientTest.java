@@ -14,6 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -279,5 +280,80 @@ class ConnectorClientTest {
                 .isInstanceOf(BotTransportException.class)
                 .satisfies(
                         e -> assertThat(((BotTransportException) e).attempts()).isEqualTo(2));
+    }
+
+    @Test
+    void createsAPersonalConversationWithTheBotFilledInAndReturnsWhereToPost() {
+        server.stubFor(post(urlEqualTo("/v3/conversations"))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("{\"id\":\"a:new\",\"serviceUrl\":\"" + server.baseUrl() + "/\"}")));
+
+        ConversationResourceResponse created = client().build()
+                .createConversation(
+                        URI.create(server.baseUrl() + "/"), ConversationParameters.personal("29:user", "tenant-1"));
+
+        assertThat(created.id()).isEqualTo("a:new");
+        assertThat(created.activityId()).isNull();
+        assertThat(created.reference()).isEqualTo(ConversationReference.of(server.baseUrl(), "a:new"));
+        server.verify(postRequestedFor(urlEqualTo("/v3/conversations"))
+                .withHeader("Authorization", equalTo("Bearer t1"))
+                .withRequestBody(equalToJson("{\"isGroup\":false,\"bot\":{\"id\":\"28:app-id\"},"
+                        + "\"tenantId\":\"tenant-1\",\"members\":[{\"id\":\"29:user\"}],"
+                        + "\"channelData\":{\"tenant\":{\"id\":\"tenant-1\"}}}")));
+    }
+
+    @Test
+    void createsAChannelPostAndFallsBackToTheServiceUrlItCalled() {
+        server.stubFor(post(urlEqualTo("/v3/conversations"))
+                .willReturn(
+                        aResponse().withStatus(201).withBody("{\"id\":\"19:chan;messageid=7\",\"activityId\":\"7\"}")));
+
+        ConversationResourceResponse created = client().build()
+                .createConversation(
+                        URI.create(server.baseUrl()),
+                        ConversationParameters.channel("19:chan", "tenant-1", Activity.message("first post")));
+
+        assertThat(created.activityId()).isEqualTo("7");
+        assertThat(created.reference().serviceUrl()).isEqualTo(URI.create(server.baseUrl()));
+        assertThat(created.reference().isThread()).isTrue();
+        server.verify(postRequestedFor(urlEqualTo("/v3/conversations"))
+                .withRequestBody(
+                        equalToJson("{\"isGroup\":true,\"bot\":{\"id\":\"28:app-id\"},\"tenantId\":\"tenant-1\","
+                                + "\"channelData\":{\"tenant\":{\"id\":\"tenant-1\"},\"channel\":{\"id\":\"19:chan\"}},"
+                                + "\"activity\":{\"type\":\"message\",\"text\":\"first post\"}}")));
+    }
+
+    @Test
+    void aCreateThatReturnsNoIdIsAnError() {
+        server.stubFor(post(urlEqualTo("/v3/conversations"))
+                .willReturn(aResponse().withStatus(200).withBody("{}")));
+
+        assertThatThrownBy(() -> client().build()
+                        .createConversation(URI.create(server.baseUrl()), ConversationParameters.personal("29:u", "t")))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("no conversation id");
+    }
+
+    @Test
+    void aCreateThatIsRefusedIsAConnectorException() {
+        server.stubFor(post(urlEqualTo("/v3/conversations"))
+                .willReturn(aResponse().withStatus(403).withBody("{\"error\":{\"code\":\"Forbidden\"}}")));
+
+        assertThatThrownBy(() -> client().build()
+                        .createConversation(URI.create(server.baseUrl()), ConversationParameters.personal("29:u", "t")))
+                .isInstanceOf(ConnectorException.class)
+                .satisfies(e -> assertThat(((ConnectorException) e).errorCode()).isEqualTo("Forbidden"));
+    }
+
+    @Test
+    void cardResponseValidatesForABotAndWrapsAsAnExecuteAnswer() {
+        ConnectorClient connector = client().build();
+
+        InvokeResponse response = connector.cardResponse(Cards.card().text("replaced"));
+
+        assertThat(response.status()).isEqualTo(200);
+        assertThat(Json.str(response.body(), "type")).isEqualTo(InvokeResponse.ADAPTIVE_CARD_TYPE);
+        assertThat(Json.str(Json.at(response.body(), "value"), "type")).isEqualTo("AdaptiveCard");
     }
 }

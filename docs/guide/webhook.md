@@ -138,7 +138,8 @@ default.
 
 | Option | Default | Notes |
 |---|---|---|
-| `httpClient(HttpClient)` | A new client with the connect timeout below | Share your application's if it has one |
+| `transport(HttpTransport)` | The JDK `HttpClient`, with the connect timeout below | One method to implement over OkHttp, Ktor or any other client; see [the bot guide](./bot#bring-your-own-http-client) |
+| `httpClient(HttpClient)` | | A configured JDK client, wrapped as the transport above |
 | `cardWriter(CardWriter)` | Discovered via `ServiceLoader` | Names the JSON binding explicitly; see [JSON binding](./json-binding) |
 | `validation(ValidationMode)` | `ENFORCE` | |
 | `rateLimit(RateLimitMode)` | `BLOCK` | |
@@ -147,7 +148,7 @@ default.
 | `initialBackoff(Duration)` | `500ms` | Ceiling before the first retry, doubling after |
 | `maxBackoff(Duration)` | `30s` | A longer `Retry-After` ends the retrying with an exception |
 | `requestTimeout(Duration)` | `10s` | |
-| `connectTimeout(Duration)` | `10s` | Ignored when you pass your own `HttpClient` |
+| `connectTimeout(Duration)` | `10s` | Ignored when you pass your own transport |
 | `maxPayloadBytes(int)` | `28 × 1024` | Raising it loses messages; see above |
 | `allowPlainHttp()` | off | Development only; see [the local stub cookbook](../cookbook/local-stub) |
 

@@ -22,7 +22,7 @@ features:
   - title: Rules that were measured, not copied
     details: Every validator rule was run against a real tenant. Two that came from Microsoft's documentation turned out to be false and were deleted; the schema ceiling turned out to be 1.5, not 1.6.
   - title: Zero runtime dependencies
-    details: The model binds to no JSON library and the webhook client speaks JDK HttpClient. You bring Jackson or kotlinx.serialization; a kotlinx-only application never sees Jackson.
+    details: The model binds to no JSON library and the clients speak JDK HttpClient unless you hand them yours. You bring Jackson or kotlinx.serialization; a kotlinx-only application never sees Jackson.
   - title: Java and Kotlin, one JSON
     details: A builder DSL for Java and a type-safe DSL for Kotlin, generated from the same schema. That they emit the same JSON is a test, and the snippets on this site are that test.
 ---

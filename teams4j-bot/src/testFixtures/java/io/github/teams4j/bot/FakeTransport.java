@@ -13,21 +13,21 @@ import io.github.teams4j.http.HttpExchange;
 import io.github.teams4j.http.HttpTransport;
 
 /** A transport that answers from a table and remembers what it was asked, so no socket is involved. */
-final class FakeTransport implements HttpTransport {
+public final class FakeTransport implements HttpTransport {
 
-    final List<HttpExchange.Request> requests = new ArrayList<>();
+    public final List<HttpExchange.Request> requests = new ArrayList<>();
     private final Map<URI, Supplier<HttpExchange.Response>> routes = new LinkedHashMap<>();
 
-    FakeTransport on(URI uri, Supplier<HttpExchange.Response> response) {
+    public FakeTransport on(URI uri, Supplier<HttpExchange.Response> response) {
         routes.put(uri, response);
         return this;
     }
 
-    FakeTransport on(String uri, int status, String body) {
+    public FakeTransport on(String uri, int status, String body) {
         return on(URI.create(uri), () -> json(status, body));
     }
 
-    static HttpExchange.Response json(int status, String body) {
+    public static HttpExchange.Response json(int status, String body) {
         return new HttpExchange.Response(status, Map.of("Content-Type", List.of("application/json")), body);
     }
 

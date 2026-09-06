@@ -1,0 +1,13 @@
+spring:
+  main:
+    banner-mode: off
+
+teams4j:
+  bot:
+    # No app id, no bot beans, and the application still starts: leave it unset in a profile that
+    # has no bot. Credentials come from the environment; never commit them.
+    app-id: ${TEAMS_BOT_APP_ID:}
+    app-secret: ${TEAMS_BOT_APP_SECRET:}
+    # Only for a single-tenant registration, which is what the Developer Portal creates by default.
+    tenant-id: ${TEAMS_BOT_TENANT_ID:}
+    # path: /api/messages   -- the default; the registration's messaging endpoint URL ends in this

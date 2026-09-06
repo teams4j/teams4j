@@ -4,10 +4,13 @@ import io.github.teams4j.bot.Activity
 import io.github.teams4j.bot.ActivityReceiver
 import io.github.teams4j.bot.BotTokenVerifier
 import io.github.teams4j.bot.ConnectorClient
+import io.github.teams4j.bot.ConversationParameters
 import io.github.teams4j.bot.ConversationReference
+import io.github.teams4j.bot.ConversationResourceResponse
 import io.github.teams4j.bot.ResourceResponse
 import io.github.teams4j.bot.VerifiedToken
 import kotlinx.coroutines.future.await
+import java.net.URI
 
 /*
  * Suspending forms of the bot module's calls: the `...Async` future awaited, so the waiting happens
@@ -48,6 +51,12 @@ public suspend fun ConnectorClient.deleteActivityAwait(
 ) {
     deleteActivityAsync(to, activityId).await()
 }
+
+/** [ConnectorClient.createConversation] from a coroutine. */
+public suspend fun ConnectorClient.createConversationAwait(
+    serviceUrl: URI,
+    parameters: ConversationParameters,
+): ConversationResourceResponse = createConversationAsync(serviceUrl, parameters).await()
 
 /** [BotTokenVerifier.verify] from a coroutine. */
 public suspend fun BotTokenVerifier.verifyAwait(

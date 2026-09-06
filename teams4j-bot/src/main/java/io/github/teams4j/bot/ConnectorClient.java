@@ -53,6 +53,7 @@ public final class ConnectorClient {
 
     private static final System.Logger LOG = System.getLogger(ConnectorClient.class.getName());
 
+    private final BotCredentials credentials;
     private final HttpTransport transport;
     private final JsonCodec codec;
     private final CardWriter cardWriter;
@@ -64,6 +65,7 @@ public final class ConnectorClient {
     private final TeamsProfileValidator validator = TeamsProfileValidator.forBot();
 
     private ConnectorClient(Builder b) {
+        this.credentials = b.credentials;
         this.transport = b.transport != null
                 ? b.transport
                 : HttpTransport.jdk(
@@ -107,6 +109,16 @@ public final class ConnectorClient {
     /** Builds and wraps, as {@link #cardAttachment(AdaptiveCard)}. */
     public Attachment cardAttachment(CardBuilder<?> card) {
         return cardAttachment(Objects.requireNonNull(card, "card").build());
+    }
+
+    /** The {@code Action.Execute} answer that replaces the card, validated the same way. */
+    public InvokeResponse cardResponse(AdaptiveCard card) {
+        return InvokeResponse.adaptiveCard(cardJson(card));
+    }
+
+    /** Builds and wraps, as {@link #cardResponse(AdaptiveCard)}. */
+    public InvokeResponse cardResponse(CardBuilder<?> card) {
+        return cardResponse(Objects.requireNonNull(card, "card").build());
     }
 
     private CardValue cardJson(AdaptiveCard card) {
@@ -160,6 +172,18 @@ public final class ConnectorClient {
         Retrying.block(deleteActivityAsync(to, activityId), "deleteActivity");
     }
 
+    /**
+     * Creates a conversation the bot has no reference to, or finds the existing one: a one-to-one
+     * chat with a user, or a new post in a channel. The proactive half of messaging.
+     *
+     * @param serviceUrl the Connector the user's tenant lives on, taken from any activity that
+     *     tenant sent -- Teams routes a tenant to one region, so the one seen at install is right
+     * @param parameters see {@link ConversationParameters#personal} and {@link ConversationParameters#channel}
+     */
+    public ConversationResourceResponse createConversation(URI serviceUrl, ConversationParameters parameters) {
+        return Retrying.block(createConversationAsync(serviceUrl, parameters), "createConversation");
+    }
+
     // ---- asynchronous ----------------------------------------------------------------------
 
     public CompletableFuture<ResourceResponse> sendActivityAsync(ConversationReference to, Activity activity) {
@@ -186,6 +210,28 @@ public final class ConnectorClient {
 
     public CompletableFuture<ResourceResponse> deleteActivityAsync(ConversationReference to, String activityId) {
         return call("deleteActivity", "DELETE", activitiesUri(to, activityId, false), null);
+    }
+
+    public CompletableFuture<ConversationResourceResponse> createConversationAsync(
+            URI serviceUrl, ConversationParameters parameters) {
+        URI base = ConversationReference.normalise(Objects.requireNonNull(serviceUrl, "serviceUrl"));
+        URI uri = URI.create(base + "/v3/conversations");
+        String body = codec.write(Objects.requireNonNull(parameters, "parameters")
+                .withBot(ChannelAccount.of(credentials.botId()))
+                .toJson());
+        return Retrying.run(retryPolicy, delayer, "createConversation", attempt -> exchange("POST", uri, body, false))
+                .thenApply(outcome -> {
+                    CardValue json = safeRead(succeeded("createConversation", outcome));
+                    String id = Json.str(json, "id");
+                    if (id == null) {
+                        throw new IllegalStateException("createConversation returned no conversation id: "
+                                + outcome.response().body());
+                    }
+                    String returnedServiceUrl = Json.str(json, "serviceUrl");
+                    ConversationReference reference = ConversationReference.of(
+                            returnedServiceUrl != null ? returnedServiceUrl : base.toString(), id);
+                    return new ConversationResourceResponse(id, Json.str(json, "activityId"), reference);
+                });
     }
 
     // ---- plumbing --------------------------------------------------------------------------
@@ -240,10 +286,16 @@ public final class ConnectorClient {
     }
 
     private ResourceResponse complete(String operation, Retrying.Outcome outcome) {
+        String body = succeeded(operation, outcome);
+        return new ResourceResponse(body.isBlank() ? null : Json.str(safeRead(body), "id"));
+    }
+
+    /** The body of a 2xx; anything else is the exception for it. */
+    private String succeeded(String operation, Retrying.Outcome outcome) {
         HttpExchange.Response response = outcome.response();
         int status = response.statusCode();
         if (status >= 200 && status < 300) {
-            return new ResourceResponse(response.body().isBlank() ? null : Json.str(safeRead(response.body()), "id"));
+            return response.body();
         }
         String errorCode = Json.str(Json.at(safeRead(response.body()), "error"), "code");
         if (status == 403 && BotNotInConversationException.ERROR_CODE.equals(errorCode)) {

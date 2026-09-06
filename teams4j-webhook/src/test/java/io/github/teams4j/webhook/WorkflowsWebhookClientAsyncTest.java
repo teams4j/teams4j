@@ -35,6 +35,8 @@ import org.junit.jupiter.api.Test;
 import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.dsl.Actions;
 import io.github.teams4j.cards.dsl.Cards;
+import io.github.teams4j.http.HttpExchange;
+import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.teams.profile.TeamsLimits;
 
 /**
@@ -443,7 +445,7 @@ class WorkflowsWebhookClientAsyncTest {
      * left the whole suite green.
      *
      * <p>So these take the blocking seams away instead of recording them: the client's two ways to
-     * block, {@code Sleeper} and {@code HttpClient.send}, both throw here.
+     * block, {@code Sleeper} and waiting on the transport's future, both throw here.
      * {@link TheAsynchronousPathNeverBlocks#theBlockingPathTripsTheHttpGuard()} and
      * {@link TheAsynchronousPathNeverBlocks#theBlockingPathTripsTheSleepGuard()} are the controls.
      */
@@ -453,7 +455,7 @@ class WorkflowsWebhookClientAsyncTest {
         /** A client whose every blocking seam fails the test instead of waiting. */
         private WorkflowsWebhookClient.Builder refusingToBlock(AtomicLong nanos, List<Duration> waits) {
             return sleepIsForbidden(nanos)
-                    .httpClient(new RefusesToSendBlocking(java.net.http.HttpClient.newHttpClient()))
+                    .transport(new RefusesToBeWaitedOn(HttpTransport.jdk(java.net.http.HttpClient.newHttpClient())))
                     .delayer(duration -> {
                         waits.add(duration);
                         nanos.addAndGet(duration.toNanos());
@@ -512,7 +514,7 @@ class WorkflowsWebhookClientAsyncTest {
         }
 
         /**
-         * First control: the blocking path reaches {@code HttpClient.send} on its very first send.
+         * First control: the blocking path waits on the transport's future on its very first send.
          * If that guard were toothless this would pass, and the test above would prove nothing.
          */
         @Test
@@ -523,7 +525,7 @@ class WorkflowsWebhookClientAsyncTest {
 
             assertThatThrownBy(() -> client.send(card()))
                     .isInstanceOf(AssertionError.class)
-                    .hasMessageContaining("blocked in HttpClient.send");
+                    .hasMessageContaining("blocked in CompletableFuture.get");
         }
 
         /** Second control, for the other seam: the blocking path sleeps its pace, and must trip. */
@@ -555,81 +557,53 @@ class WorkflowsWebhookClientAsyncTest {
             int requests) {}
 
     /**
-     * A real client with its blocking send taken away. Delegating rather than stubbing keeps the
-     * asynchronous send going over the wire; only {@link #send} is replaced, because reaching it
-     * from the asynchronous driver is the regression this catches.
+     * A real transport whose futures refuse to be waited on. Delegating rather than stubbing keeps
+     * the asynchronous send going over the wire; only {@code get} and {@code join} throw, because
+     * reaching either from the asynchronous driver is the regression this catches.
      */
-    private static final class RefusesToSendBlocking extends java.net.http.HttpClient {
+    private static final class RefusesToBeWaitedOn implements HttpTransport {
 
-        private final java.net.http.HttpClient delegate;
+        private final HttpTransport delegate;
 
-        RefusesToSendBlocking(java.net.http.HttpClient delegate) {
+        RefusesToBeWaitedOn(HttpTransport delegate) {
             this.delegate = delegate;
         }
 
         @Override
-        public <T> java.net.http.HttpResponse<T> send(
-                java.net.http.HttpRequest request, java.net.http.HttpResponse.BodyHandler<T> handler) {
-            throw new AssertionError("the asynchronous path blocked in HttpClient.send");
-        }
+        @SuppressWarnings("FutureReturnValueIgnored")
+        public CompletableFuture<HttpExchange.Response> send(HttpExchange.Request request) {
+            // Futures derived from this one (whenComplete and friends) are plain: the base class
+            // makes them, so only waiting on the one handed out trips the guard.
+            CompletableFuture<HttpExchange.Response> guarded = new CompletableFuture<>() {
+                @Override
+                public HttpExchange.Response join() {
+                    throw new AssertionError("the asynchronous path blocked in CompletableFuture.join");
+                }
 
-        @Override
-        public <T> CompletableFuture<java.net.http.HttpResponse<T>> sendAsync(
-                java.net.http.HttpRequest request, java.net.http.HttpResponse.BodyHandler<T> handler) {
-            return delegate.sendAsync(request, handler);
-        }
+                @Override
+                public HttpExchange.Response get() {
+                    throw new AssertionError("the asynchronous path blocked in CompletableFuture.get");
+                }
 
-        @Override
-        public <T> CompletableFuture<java.net.http.HttpResponse<T>> sendAsync(
-                java.net.http.HttpRequest request,
-                java.net.http.HttpResponse.BodyHandler<T> handler,
-                java.net.http.HttpResponse.PushPromiseHandler<T> pushPromiseHandler) {
-            return delegate.sendAsync(request, handler, pushPromiseHandler);
-        }
-
-        @Override
-        public java.util.Optional<java.net.CookieHandler> cookieHandler() {
-            return delegate.cookieHandler();
-        }
-
-        @Override
-        public java.util.Optional<Duration> connectTimeout() {
-            return delegate.connectTimeout();
-        }
-
-        @Override
-        public Redirect followRedirects() {
-            return delegate.followRedirects();
-        }
-
-        @Override
-        public java.util.Optional<java.net.ProxySelector> proxy() {
-            return delegate.proxy();
-        }
-
-        @Override
-        public javax.net.ssl.SSLContext sslContext() {
-            return delegate.sslContext();
-        }
-
-        @Override
-        public javax.net.ssl.SSLParameters sslParameters() {
-            return delegate.sslParameters();
-        }
-
-        @Override
-        public java.util.Optional<java.net.Authenticator> authenticator() {
-            return delegate.authenticator();
-        }
-
-        @Override
-        public Version version() {
-            return delegate.version();
-        }
-
-        @Override
-        public java.util.Optional<java.util.concurrent.Executor> executor() {
-            return delegate.executor();
+                @Override
+                public HttpExchange.Response get(long timeout, TimeUnit unit) {
+                    throw new AssertionError("the asynchronous path blocked in CompletableFuture.get");
+                }
+            };
+            CompletableFuture<HttpExchange.Response> real = delegate.send(request);
+            real.whenComplete((response, failure) -> {
+                if (failure != null) {
+                    guarded.completeExceptionally(failure);
+                } else {
+                    guarded.complete(response);
+                }
+            });
+            guarded.whenComplete((response, failure) -> {
+                if (guarded.isCancelled()) {
+                    real.cancel(true);
+                }
+            });
+            return guarded;
         }
     }
 }

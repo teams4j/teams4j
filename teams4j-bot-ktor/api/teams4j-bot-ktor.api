@@ -1,0 +1,5 @@
+public final class io/github/teams4j/bot/ktor/TeamsBotRoutingKt {
+	public static final fun teamsBot (Lio/ktor/server/routing/Route;Lio/github/teams4j/bot/ActivityReceiver;Ljava/lang/String;Lio/github/teams4j/cards/JsonCodec;Lkotlin/jvm/functions/Function2;)Lio/ktor/server/routing/Route;
+	public static synthetic fun teamsBot$default (Lio/ktor/server/routing/Route;Lio/github/teams4j/bot/ActivityReceiver;Ljava/lang/String;Lio/github/teams4j/cards/JsonCodec;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/ktor/server/routing/Route;
+}
+

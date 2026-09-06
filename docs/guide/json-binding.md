@@ -23,8 +23,8 @@ val out = io.github.teams4j.cards.kotlinx.CardJson.encode(card)
 | `teams4j-cards` | **none** |
 | `teams4j-teams-profile` | `teams4j-cards` only |
 | `teams4j-http` | **none** |
-| `teams4j-webhook` | **none** (the JDK `HttpClient`, plus a `CardWriter` found at runtime) |
-| `teams4j-bot` | **none** (the JDK `HttpClient`, plus a `CardWriter` and a `JsonCodec` found at runtime) |
+| `teams4j-webhook` | **none** (the JDK `HttpClient` by default, plus a `CardWriter` found at runtime) |
+| `teams4j-bot` | **none** (the JDK `HttpClient` by default, plus a `CardWriter` and a `JsonCodec` found at runtime) |
 | `teams4j-cards-jackson` | `jackson-databind` |
 | `teams4j-cards-kotlinx` | `kotlinx-serialization-json` |
 

@@ -4,17 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.Signature;
-import java.security.interfaces.RSAPublicKey;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
@@ -22,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import io.github.teams4j.cards.jackson.JacksonJsonCodec;
 
 /**
- * Tokens signed here with a real RSA key, and a key set served from a table: every check the
- * verifier makes, exercised on the real signature path with no network.
+ * Tokens signed with a real RSA key ({@link TestTokens}), and a key set served from a table: every
+ * check the verifier makes, exercised on the real signature path with no network.
  */
 class BotTokenVerifierTest {
 
@@ -41,13 +35,7 @@ class BotTokenVerifierTest {
     private String jwks = jwks(jwk("k1", k1));
 
     private static KeyPair rsa() {
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            return generator.generateKeyPair();
-        } catch (GeneralSecurityException e) {
-            throw new IllegalStateException(e);
-        }
+        return TestTokens.rsa();
     }
 
     private BotTokenVerifier verifier() {
@@ -87,44 +75,23 @@ class BotTokenVerifierTest {
     }
 
     private static String token(String kid, KeyPair key, String claims) throws Exception {
-        return tokenWithHeader("{\"alg\":\"RS256\",\"typ\":\"JWT\",\"kid\":\"" + kid + "\"}", key, claims);
+        return TestTokens.token(kid, key, claims);
     }
 
     private static String tokenWithHeader(String header, KeyPair key, String claims) throws Exception {
-        Base64.Encoder b64 = Base64.getUrlEncoder().withoutPadding();
-        String signed = b64.encodeToString(header.getBytes(StandardCharsets.UTF_8)) + "."
-                + b64.encodeToString(claims.getBytes(StandardCharsets.UTF_8));
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initSign(key.getPrivate());
-        signature.update(signed.getBytes(StandardCharsets.US_ASCII));
-        return "Bearer " + signed + "." + b64.encodeToString(signature.sign());
+        return TestTokens.tokenWithHeader(header, key, claims);
     }
 
     private static String jwk(String kid, KeyPair key) {
-        RSAPublicKey pub = (RSAPublicKey) key.getPublic();
-        Base64.Encoder b64 = Base64.getUrlEncoder().withoutPadding();
-        return "{\"kty\":\"RSA\",\"use\":\"sig\",\"kid\":\"" + kid + "\",\"n\":\""
-                + b64.encodeToString(unsigned(pub.getModulus().toByteArray())) + "\",\"e\":\""
-                + b64.encodeToString(unsigned(pub.getPublicExponent().toByteArray())) + "\"}";
-    }
-
-    /** BigInteger.toByteArray carries a sign byte; JWK wants the magnitude. */
-    private static byte[] unsigned(byte[] twosComplement) {
-        if (twosComplement.length > 1 && twosComplement[0] == 0) {
-            byte[] out = new byte[twosComplement.length - 1];
-            System.arraycopy(twosComplement, 1, out, 0, out.length);
-            return out;
-        }
-        return twosComplement;
+        return TestTokens.jwk(kid, key);
     }
 
     private static String jwks(String... keys) {
-        return "{\"keys\":[" + String.join(",", keys) + "]}";
+        return TestTokens.jwks(keys);
     }
 
     private static String claimsFor(String iss, String aud, long nbf, long exp, String serviceUrl) {
-        return "{\"iss\":\"" + iss + "\",\"aud\":\"" + aud + "\",\"serviceurl\":\"" + serviceUrl + "\",\"nbf\":" + nbf
-                + ",\"exp\":" + exp + "}";
+        return TestTokens.claimsFor(iss, aud, nbf, exp, serviceUrl);
     }
 
     @Test

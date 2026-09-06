@@ -31,6 +31,8 @@ include(":teams4j-webhook-spring-boot-starter")
 // L1 - Bot Framework: Activity model, Connector client, inbound token verification
 include(":teams4j-bot")
 include(":teams4j-bot-kotlin")
+include(":teams4j-bot-spring-boot-starter")
+include(":teams4j-bot-ktor")
 
 // BOM that aligns module versions
 include(":teams4j-bom")

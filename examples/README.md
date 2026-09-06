@@ -23,6 +23,16 @@ export TEAMS_WEBHOOK_URL='https://...'      # never commit this: the URL *is* wr
 ./gradlew :spring-boot:run -PbootVersion=4.1.1
 ```
 
+The two bot examples need a bot registration instead of a webhook URL, and a tunnel to your machine
+for Teams to reach the endpoint. Credentials go through the environment only:
+
+```bash
+export TEAMS_BOT_APP_ID=... TEAMS_BOT_APP_SECRET=... TEAMS_BOT_TENANT_ID=...   # tenant id for single-tenant only
+
+./gradlew :bot-spring-boot:run       # http://localhost:8080/api/messages
+./gradlew :bot-ktor:run              # http://localhost:3978/api/messages
+```
+
 Create the webhook URL from the Teams channel via
 **⋯ → Workflows → "Post to a channel when a webhook request is received"**.
 
@@ -44,6 +54,8 @@ TEAMS_WEBHOOK_URL='http://127.0.0.1:8099/hook' TEAMS_WEBHOOK_ALLOW_PLAIN_HTTP=tr
 | [`java-plain`](java-plain) | No framework. Two dependencies, one of which exists only to pick a binding | `teams4j-cards-jackson` |
 | [`kotlin-coroutines`](kotlin-coroutines) | Coroutine `sendAwait` + the type-safe DSL. **No Jackson anywhere** | `teams4j-cards-kotlinx` |
 | [`spring-boot`](spring-boot) | The starter. One property is the whole configuration | brought in by the starter |
+| [`bot-spring-boot`](bot-spring-boot) | A bot on the bot starter: one `ActivityHandler` bean, the endpoint comes with it | brought in by the starter |
+| [`bot-ktor`](bot-ktor) | The same bot as a Ktor route, suspending all the way. **No Jackson anywhere** | `teams4j-cards-kotlinx` |
 
 `teams4j-webhook` does not bring a JSON binding — you pick it. Leave it out and the client
 fails when you construct it, naming the artifact to add. `kotlin-coroutines` pins that choice

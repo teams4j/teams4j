@@ -18,6 +18,8 @@ dependencies {
         api(project(":teams4j-webhook-spring-boot-starter"))
         api(project(":teams4j-bot"))
         api(project(":teams4j-bot-kotlin"))
+        api(project(":teams4j-bot-spring-boot-starter"))
+        api(project(":teams4j-bot-ktor"))
     }
 }
 

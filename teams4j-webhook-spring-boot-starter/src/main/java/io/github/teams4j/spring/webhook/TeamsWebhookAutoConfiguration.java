@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.jackson.JacksonCardWriter;
+import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.webhook.WorkflowsWebhookClient;
 
 /**
@@ -28,7 +29,8 @@ import io.github.teams4j.webhook.WorkflowsWebhookClient;
  * <p>The client appears only once {@code teams4j.webhook.url} is set to something; blank counts as
  * unset, and {@link OnWebhookUrlCondition} says why that is not {@code @ConditionalOnProperty}.
  * Declaring a {@code WorkflowsWebhookClient} bean replaces this one entirely, which is how to reach
- * settings the properties do not cover, such as a shared {@code HttpClient}.
+ * settings the properties do not cover. An {@link HttpTransport} bean, when there is one, is picked
+ * up on its own: that is how a shared HTTP client reaches every teams4j client at once.
  *
  * <h2>Choosing the JSON binding</h2>
  *
@@ -61,7 +63,9 @@ public class TeamsWebhookAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public WorkflowsWebhookClient workflowsWebhookClient(
-            TeamsWebhookProperties properties, ObjectProvider<CardWriter> cardWriter) {
+            TeamsWebhookProperties properties,
+            ObjectProvider<CardWriter> cardWriter,
+            ObjectProvider<HttpTransport> transport) {
         // Non-null because of the condition above. Checked rather than assumed, so removing that
         // condition fails here with a sentence instead of at the first send.
         URI url = Objects.requireNonNull(properties.getUrl(), "teams4j.webhook.url");
@@ -79,6 +83,7 @@ public class TeamsWebhookAutoConfiguration {
         }
         // Without a bean the client falls back to discovery, as a plain-Java consumer does.
         cardWriter.ifAvailable(builder::cardWriter);
+        transport.ifAvailable(builder::transport);
         return builder.build();
     }
 }

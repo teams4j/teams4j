@@ -4,7 +4,7 @@ plugins {
     id("teams4j.no-runtime-dependency-conventions")
 }
 
-description = "Microsoft Teams Workflows webhook client (JDK HttpClient, rate limiting, retries)"
+description = "Microsoft Teams Workflows webhook client (rate limiting, retries, pluggable HTTP transport)"
 
 dependencies {
     api(project(":teams4j-cards"))
@@ -14,7 +14,8 @@ dependencies {
     // envelope itself and hands the card to whichever CardWriter the consumer put on the
     // classpath -- teams4j-cards-jackson or teams4j-cards-kotlinx. Depending on one here would
     // put Jackson in the graph of a consumer who already has kotlinx.serialization.
-    // HTTP is the JDK HttpClient only; no third-party HTTP dependency.
+    // HTTP goes through teams4j-http's HttpTransport, the JDK HttpClient by default; no third-party
+    // HTTP dependency, and a consumer with another client implements the one-method interface.
 
     // Annotations only, and only at compile time: WebhookMessage carries them so that a consumer
     // who serialises the envelope with their own mapper gets the documented shape. The JVM ignores

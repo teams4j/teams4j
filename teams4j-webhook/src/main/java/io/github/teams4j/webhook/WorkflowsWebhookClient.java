@@ -3,16 +3,16 @@ package io.github.teams4j.webhook;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,6 +26,8 @@ import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.WebhookAction;
 import io.github.teams4j.cards.dsl.CardBuilder;
+import io.github.teams4j.http.HttpExchange;
+import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.http.RetryPolicy;
 import io.github.teams4j.teams.profile.Severity;
 import io.github.teams4j.teams.profile.TeamsLimits;
@@ -56,11 +58,12 @@ import io.github.teams4j.webhook.internal.TokenBucket;
  *   <li>429 and 5xx are retried with backoff, honouring {@code Retry-After}
  * </ul>
  *
- * <p>No third-party runtime dependency: HTTP is the JDK's {@link HttpClient} and the JSON binding
- * is the consumer's to choose. Put {@code teams4j-cards-jackson} or {@code teams4j-cards-kotlinx}
- * on the classpath and {@link CardWriter#discover()} finds it, or name one with
- * {@link Builder#cardWriter(CardWriter)}. With neither, the client fails at construction naming the
- * artifacts to add, rather than at the first send.
+ * <p>No third-party runtime dependency: HTTP goes through {@link HttpTransport}, by default the
+ * JDK's {@link HttpClient}, and the JSON binding is the consumer's to choose. Put
+ * {@code teams4j-cards-jackson} or {@code teams4j-cards-kotlinx} on the classpath and
+ * {@link CardWriter#discover()} finds it, or name one with {@link Builder#cardWriter(CardWriter)}.
+ * With neither, the client fails at construction naming the artifacts to add, rather than at the
+ * first send.
  *
  * <p>{@link #send(AdaptiveCard)} blocks; {@link #sendAsync(AdaptiveCard)} does the same work
  * without holding a thread, waiting on a scheduler. Both run off the same {@link RetryPolicy} and
@@ -68,10 +71,10 @@ import io.github.teams4j.webhook.internal.TokenBucket;
  *
  * <p>Prefer the blocking form: on a virtual thread none of what it waits for costs a carrier.
  * Measured on Java 21 under a one-carrier scheduler — the pacing and backoff sleeps unmount
- * (JEP 444), the limiter computes rather than blocks, and blocking {@code HttpClient.send} unmounts
- * over TLS as well as plain http. Eight concurrent sends against a 300ms endpoint finished in about
- * 300ms on one carrier, with no {@code jdk.VirtualThreadPinned} event. {@code sendAsync} is for
- * callers with no virtual thread to spend — a coroutine, or a WebFlux event loop.
+ * (JEP 444), the limiter computes rather than blocks, and waiting on the JDK client's response
+ * unmounts over TLS as well as plain http. Eight concurrent sends against a 300ms endpoint finished
+ * in about 300ms on one carrier, with no {@code jdk.VirtualThreadPinned} event. {@code sendAsync} is
+ * for callers with no virtual thread to spend — a coroutine, or a WebFlux event loop.
  *
  * <p>Immutable and safe to share, and sharing is the point: the rate limiter lives on the instance,
  * so a client per call paces nothing. It paces blocking and asynchronous sends against each other.
@@ -88,7 +91,7 @@ public final class WorkflowsWebhookClient {
             List.of("webhook.office.com", "outlook.office.com", "outlook.office365.com");
 
     private final URI url;
-    private final HttpClient httpClient;
+    private final HttpTransport transport;
     private final EnvelopeWriter envelopeWriter;
     private final TeamsProfileValidator validator;
     private final ValidationMode validationMode;
@@ -102,9 +105,11 @@ public final class WorkflowsWebhookClient {
 
     private WorkflowsWebhookClient(Builder builder) {
         this.url = builder.url;
-        this.httpClient = builder.httpClient != null
-                ? builder.httpClient
-                : HttpClient.newBuilder().connectTimeout(builder.connectTimeout).build();
+        this.transport = builder.transport != null
+                ? builder.transport
+                : HttpTransport.jdk(HttpClient.newBuilder()
+                        .connectTimeout(builder.connectTimeout)
+                        .build());
         this.envelopeWriter =
                 new EnvelopeWriter(builder.cardWriter != null ? builder.cardWriter : CardWriter.discover());
         this.validator = TeamsProfileValidator.forWebhook();
@@ -183,8 +188,8 @@ public final class WorkflowsWebhookClient {
      * <p>Cancelling the future stops the retry loop and cancels what it is waiting on, a request in
      * flight included; one already delivered stays delivered.
      *
-     * <p>Continuations run on whichever thread completed the send — an {@link HttpClient} thread or
-     * the scheduler that timed the last wait. Neither is yours to occupy, so hand real work to an
+     * <p>Continuations run on whichever thread completed the send — the transport's, or the
+     * scheduler that timed the last wait. Neither is yours to occupy, so hand real work to an
      * executor with the {@code *Async} forms.
      */
     public CompletableFuture<WebhookResponse> sendAsync(WebhookMessage message) {
@@ -252,14 +257,14 @@ public final class WorkflowsWebhookClient {
      * twice, because only the waiting differs.
      */
     private WebhookResponse post(String body) {
-        HttpRequest request = request(measured(body));
+        HttpExchange.Request request = request(measured(body));
 
         for (int attempt = 1; ; attempt++) {
             sleep(rateLimitDelay());
 
-            HttpResponse<String> response;
+            HttpExchange.Response response;
             try {
-                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+                response = exchange(request, attempt);
             } catch (IOException e) {
                 RetryPolicy.Decision decision = retryPolicy.decideAfterTransportFailure(attempt);
                 if (decision instanceof RetryPolicy.Decision.Retry retry) {
@@ -268,15 +273,12 @@ public final class WorkflowsWebhookClient {
                 }
                 throw new WebhookTransportException(
                         "the webhook request failed after " + attempt + " attempts", e, attempt);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new WebhookTransportException("interrupted while sending to the webhook", e, attempt);
             }
 
             RetryPolicy.Decision decision = retryPolicy.decide(
                     attempt,
                     response.statusCode(),
-                    response.headers().firstValue("Retry-After").orElse(null));
+                    response.header("Retry-After").orElse(null));
             if (decision instanceof RetryPolicy.Decision.Deliver) {
                 return new WebhookResponse(response.statusCode(), response.body(), attempt);
             }
@@ -289,8 +291,34 @@ public final class WorkflowsWebhookClient {
         }
     }
 
+    /**
+     * One attempt on the blocking path: the transport's future, waited on. {@code get} rather than
+     * {@code join} so an interrupt is honoured, and the request in flight is cancelled with it.
+     * Only an {@link IOException} comes out as such, for the retry decision; a runtime failure of
+     * the transport is rethrown as it is, and any other checked cause ends the send.
+     */
+    private HttpExchange.Response exchange(HttpExchange.Request request, int attempt) throws IOException {
+        CompletableFuture<HttpExchange.Response> inFlight = transport.send(request);
+        try {
+            return inFlight.get();
+        } catch (InterruptedException e) {
+            inFlight.cancel(true);
+            Thread.currentThread().interrupt();
+            throw new WebhookTransportException("interrupted while sending to the webhook", e, attempt);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            if (cause instanceof IOException io) {
+                throw io;
+            }
+            if (cause instanceof RuntimeException runtime) {
+                throw runtime;
+            }
+            throw new WebhookTransportException("the webhook request failed", cause, attempt);
+        }
+    }
+
     private CompletableFuture<WebhookResponse> postAsync(String body) {
-        byte[] payload;
+        String payload;
         try {
             payload = measured(body);
         } catch (PayloadTooLargeException e) {
@@ -299,23 +327,20 @@ public final class WorkflowsWebhookClient {
         return new AsyncSend(request(payload)).start();
     }
 
-    /** The body as bytes, refused here rather than at the far end if it is over the limit. */
-    private byte[] measured(String body) {
-        byte[] payload = body.getBytes(StandardCharsets.UTF_8);
-        if (payload.length > maxPayloadBytes) {
-            throw new PayloadTooLargeException(payload.length, maxPayloadBytes);
+    /** The body, refused here rather than at the far end if its UTF-8 form is over the limit. */
+    private String measured(String body) {
+        int size = body.getBytes(StandardCharsets.UTF_8).length;
+        if (size > maxPayloadBytes) {
+            throw new PayloadTooLargeException(size, maxPayloadBytes);
         }
-        return payload;
+        return body;
     }
 
-    private HttpRequest request(byte[] payload) {
-        return HttpRequest.newBuilder(url)
-                // No charset parameter: application/json has none registered, and RFC 8259
-                // already requires the UTF-8 the body was encoded as.
-                .header("Content-Type", "application/json")
-                .timeout(requestTimeout)
-                .POST(HttpRequest.BodyPublishers.ofByteArray(payload))
-                .build();
+    private HttpExchange.Request request(String payload) {
+        // No charset parameter: application/json has none registered, and RFC 8259 already
+        // requires the UTF-8 the transport encodes the body as.
+        return new HttpExchange.Request(
+                "POST", url, Map.of("Content-Type", "application/json"), payload, requestTimeout);
     }
 
     /**
@@ -331,7 +356,7 @@ public final class WorkflowsWebhookClient {
      */
     private final class AsyncSend {
 
-        private final HttpRequest request;
+        private final HttpExchange.Request request;
         private final CompletableFuture<WebhookResponse> result = new CompletableFuture<>();
 
         /** Whatever is being waited on, so cancelling the result can cancel that too. */
@@ -340,7 +365,7 @@ public final class WorkflowsWebhookClient {
         // The future `whenComplete` derives is dropped on purpose: this listener runs only once
         // `result` has completed, and all it does is cancel whatever that completion orphaned.
         @SuppressWarnings("FutureReturnValueIgnored")
-        AsyncSend(HttpRequest request) {
+        AsyncSend(HttpExchange.Request request) {
             this.request = request;
             result.whenComplete((response, failure) -> {
                 if (result.isCancelled()) {
@@ -370,22 +395,20 @@ public final class WorkflowsWebhookClient {
         }
 
         private void exchange(int attempt) {
-            waitOn(
-                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8)),
-                    (response, failure) -> {
-                        if (response != null) {
-                            onResponse(attempt, response);
-                        } else {
-                            onFailure(attempt, failure);
-                        }
-                    });
+            waitOn(transport.send(request), (response, failure) -> {
+                if (response != null) {
+                    onResponse(attempt, response);
+                } else {
+                    onFailure(attempt, failure);
+                }
+            });
         }
 
-        private void onResponse(int attempt, HttpResponse<String> response) {
+        private void onResponse(int attempt, HttpExchange.Response response) {
             RetryPolicy.Decision decision = retryPolicy.decide(
                     attempt,
                     response.statusCode(),
-                    response.headers().firstValue("Retry-After").orElse(null));
+                    response.header("Retry-After").orElse(null));
             if (decision instanceof RetryPolicy.Decision.Deliver) {
                 result.complete(new WebhookResponse(response.statusCode(), response.body(), attempt));
             } else if (decision instanceof RetryPolicy.Decision.Retry retry) {
@@ -430,7 +453,7 @@ public final class WorkflowsWebhookClient {
          *
          * <p>The future {@code whenComplete} derives is dropped, which is safe only because the
          * catch below makes it carry nothing: {@code next} drives the retry loop, and a runtime
-         * exception escaping it -- from the retry policy, or from {@code sendAsync} refusing a
+         * exception escaping it -- from the retry policy, or from the transport refusing a
          * request outright -- would otherwise complete that dropped future and leave {@code result}
          * pending for ever, hanging the caller with no error to see. Completing {@code result} is
          * the same answer {@link #attempt} already gives when the rate limiter refuses.
@@ -522,7 +545,7 @@ public final class WorkflowsWebhookClient {
         private final URI url;
         // Unset until build() substitutes the default; both setters reject null, so null here
         // means "not configured" and nothing else.
-        private @Nullable HttpClient httpClient;
+        private @Nullable HttpTransport transport;
         private @Nullable CardWriter cardWriter;
         private ValidationMode validationMode = ValidationMode.ENFORCE;
         private RateLimitMode rateLimitMode = RateLimitMode.BLOCK;
@@ -547,10 +570,19 @@ public final class WorkflowsWebhookClient {
             this.url = Objects.requireNonNull(url, "url");
         }
 
-        /** Supplies the HTTP client. By default one is created with {@link #connectTimeout}. */
-        public Builder httpClient(HttpClient httpClient) {
-            this.httpClient = Objects.requireNonNull(httpClient, "httpClient");
+        /**
+         * Supplies the HTTP transport. By default the JDK client, created with
+         * {@link #connectTimeout}; an application with a shared OkHttp or Ktor pool implements
+         * {@link HttpTransport} over it once and passes it here.
+         */
+        public Builder transport(HttpTransport transport) {
+            this.transport = Objects.requireNonNull(transport, "transport");
             return this;
+        }
+
+        /** The JDK client to use, wrapped as a transport. */
+        public Builder httpClient(HttpClient httpClient) {
+            return transport(HttpTransport.jdk(Objects.requireNonNull(httpClient, "httpClient")));
         }
 
         /**
@@ -615,7 +647,7 @@ public final class WorkflowsWebhookClient {
             return this;
         }
 
-        /** Connection timeout for the default HTTP client. Defaults to 10s. */
+        /** Connection timeout for the default transport. Defaults to 10s; ignored with your own. */
         public Builder connectTimeout(Duration connectTimeout) {
             this.connectTimeout = Objects.requireNonNull(connectTimeout, "connectTimeout");
             return this;

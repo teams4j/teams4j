@@ -25,3 +25,5 @@ dependencyResolutionManagement {
 include(":java-plain")
 include(":kotlin-coroutines")
 include(":spring-boot")
+include(":bot-spring-boot")
+include(":bot-ktor")

@@ -4,9 +4,9 @@
 that Teams posts **activities** to -- messages, `Action.Submit` payloads, the event that it was
 installed -- and it answers through the **Bot Connector**, which can post to a conversation, reply in
 a thread, and edit what it already sent. The module gives you the activity model, the verification of
-what arrives, and the client for what goes back. It hosts no endpoint and belongs to no framework:
-a Spring controller, a Ktor route or a servlet passes the header and the body in and gets an
-`Activity` out.
+what arrives, and the client for what goes back. The core belongs to no framework: a Spring
+controller, a Ktor route or a servlet passes the header and the body in and gets an `Activity`
+out. The [Spring Boot starter](#spring-boot) and the [Ktor route](#ktor) host the endpoint for you.
 
 ```java
 BotCredentials credentials = BotCredentials.of(appId, appSecret);
@@ -35,6 +35,10 @@ redelivers on anything else.
 implementation("io.github.teams4j:teams4j-bot")
 implementation("io.github.teams4j:teams4j-cards-jackson")   // or teams4j-cards-kotlinx; see JSON binding
 implementation("io.github.teams4j:teams4j-bot-kotlin")      // coroutines, optional
+
+// or one of the hosted endpoints, which bring the above with them
+implementation("io.github.teams4j:teams4j-bot-spring-boot-starter")   // Spring Boot, with the Jackson binding
+implementation("io.github.teams4j:teams4j-bot-ktor")                   // Ktor, binding of your choice
 ```
 
 Like the webhook client, the module has **no runtime dependency**: HTTP is the JDK client behind a
@@ -144,6 +148,86 @@ connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().t
 Tokens from elsewhere -- MSAL, a sidecar, a certificate flow -- go in through `Builder.tokenProvider`.
 `BotCredentials.toString()` omits the secret.
 
+## Answering an invoke
+
+An `invoke` activity -- `Action.Execute`, a task module, a message extension -- is synchronous:
+Teams waits on the HTTP response for the answer, so a bare `200` is not enough. `InvokeResponse` is
+that answer, the HTTP status and body. For `Action.Execute` (`activity.name()` is
+`adaptiveCard/action`) Teams expects `200` with a body whose own `statusCode` carries the outcome,
+and three helpers build those:
+
+| Helper | Teams shows |
+|---|---|
+| `connector.cardResponse(card)` | The card, in place of the one the button was on. Validated like `cardActivity` |
+| `InvokeResponse.message(text)` | A transient message; the card stays |
+| `InvokeResponse.error(statusCode, code, message)` | An error on the card |
+
+`InvokeResponse.ok(body)` and `InvokeResponse.status(code)` cover every other invoke. Return one
+from your handler (below) for an invoke and null for everything else.
+
+## Starting a conversation
+
+A bot posts only to conversations it knows a `ConversationReference` for, and a user the bot has
+never heard from has none. `createConversation` asks the Connector for one:
+
+```java
+ConversationResourceResponse chat = connector.createConversation(
+        serviceUrl, ConversationParameters.personal(userId, tenantId));
+connector.sendActivity(chat.reference(), connector.cardActivity(card));
+```
+
+`personal(userId, tenantId)` opens the one-to-one chat with a user, or finds the existing one;
+Teams requires the tenant. Both values come from any activity that user or tenant sent:
+`from().id()` and `tenantId()`. `channel(channelId, tenantId, activity)` starts a new post in a
+channel, and needs the first activity up front; the returned reference addresses that post's thread.
+The `serviceUrl` is the one seen at install: Teams routes a tenant to one region.
+
+## Hosting the endpoint
+
+`ActivityEndpoint` is the messaging endpoint minus the framework: header and body in, status and
+body out. It answers `401` when the request is not from the Bot Framework (the reason is logged,
+never sent), `400` for a body that is not JSON, `200` with an empty body for every activity your
+`ActivityHandler` accepts, and the `InvokeResponse`'s own status and body for an invoke. A servlet
+is a few lines around it, and so are the two adapters that ship.
+
+### Spring Boot
+
+```kotlin
+implementation("io.github.teams4j:teams4j-bot-spring-boot-starter")
+implementation("org.springframework.boot:spring-boot-starter-web")
+```
+
+```yaml
+teams4j:
+  bot:
+    app-id: ${TEAMS_BOT_APP_ID}
+    app-secret: ${TEAMS_BOT_APP_SECRET}
+    tenant-id: ${TEAMS_BOT_TENANT_ID:}   # single-tenant registrations only
+```
+
+The starter registers `BotCredentials`, `BotTokenVerifier`, `ActivityReceiver`, `ConnectorClient`
+and `ActivityEndpoint`, and -- in a Spring MVC application that declares an `ActivityHandler` bean --
+the controller on `teams4j.bot.path` (`/api/messages`). The handler bean is the application:
+
+<<< ../../examples/bot-spring-boot/src/main/java/example/bot/EchoBotApplication.java
+
+Every bean gives way to one of your own, and an `HttpTransport` bean is picked up by every teams4j
+client in the context. The properties are listed on the [Spring Boot page](./spring-boot#bots).
+
+### Ktor
+
+```kotlin
+implementation("io.github.teams4j:teams4j-bot-ktor")
+runtimeOnly("io.github.teams4j:teams4j-cards-kotlinx")   // or teams4j-cards-jackson
+```
+
+`Route.teamsBot` is the same endpoint as a route, and the handler suspends:
+
+<<< ../../examples/bot-ktor/src/main/kotlin/example/EchoBot.kt
+
+The module depends on `ktor-server-core` alone, so the engine stays your choice. Ktor 3.0 is the
+lower bound; CI also tests the newest 3.x.
+
 ## Exceptions
 
 All unchecked, all extending `BotException`.
@@ -177,10 +261,4 @@ resolution over an extension, so a `suspend fun send` would be silently shadowed
 
 ## Not here yet
 
-- **`invoke` activities** (`Action.Execute`, task modules, message extensions) need a response
-  *body*, not just a `200`; the model reads them (`type`, `name`, `value`) but nothing shapes the
-  answer for you.
-- **Framework adapters**: a Spring Boot starter and a Ktor plugin around `ActivityReceiver`. The
-  core is framework-neutral so that these can be thin.
-- **Proactive conversation creation** (`POST /v3/conversations`) for messaging a user the bot has not
-  met, and **Microsoft Graph** messaging.
+- **Microsoft Graph** messaging, for what neither a webhook nor a bot covers.

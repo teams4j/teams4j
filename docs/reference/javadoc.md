@@ -16,6 +16,8 @@ ships, the links below resolve to nothing; build the jars locally instead (see t
 | `teams4j-webhook-spring-boot-starter` | [javadoc.io/doc/io.github.teams4j/teams4j-webhook-spring-boot-starter](https://javadoc.io/doc/io.github.teams4j/teams4j-webhook-spring-boot-starter) |
 | `teams4j-bot` | [javadoc.io/doc/io.github.teams4j/teams4j-bot](https://javadoc.io/doc/io.github.teams4j/teams4j-bot) |
 | `teams4j-bot-kotlin` | [javadoc.io/doc/io.github.teams4j/teams4j-bot-kotlin](https://javadoc.io/doc/io.github.teams4j/teams4j-bot-kotlin) |
+| `teams4j-bot-spring-boot-starter` | [javadoc.io/doc/io.github.teams4j/teams4j-bot-spring-boot-starter](https://javadoc.io/doc/io.github.teams4j/teams4j-bot-spring-boot-starter) |
+| `teams4j-bot-ktor` | [javadoc.io/doc/io.github.teams4j/teams4j-bot-ktor](https://javadoc.io/doc/io.github.teams4j/teams4j-bot-ktor) |
 
 ## Where to start reading
 

@@ -22,17 +22,26 @@ Nothing else. The Gradle wrapper brings its own Gradle.
 
 `build` is what CI runs, so if it passes locally the build job will too.
 
-### The starter, against both Spring Boot lines
+### The starters, against both Spring Boot lines
 
-One starter artifact supports Boot 3.5.x and 4.1.x. CI runs the starter's tests against
-both; locally you pick one:
+Each starter artifact supports Boot 3.5.x and 4.1.x. CI runs both starters' tests against
+both lines; locally you pick one:
 
 ```bash
-./gradlew :teams4j-webhook-spring-boot-starter:test -PbootLine=4   # default is 3
+./gradlew :teams4j-webhook-spring-boot-starter:test :teams4j-bot-spring-boot-starter:test -PbootLine=4   # default is 3
 ```
 
 If a change makes that matrix fail, the answer might be to split the artifact per Boot line
 rather than to patch the test.
+
+### Ktor, against the newest 3.x
+
+`teams4j-bot-ktor` compiles and tests against the Ktor baseline in the catalog; CI also runs its
+tests with the newest 3.x on the classpath, the way `-PjacksonLine=latest` probes Jackson:
+
+```bash
+./gradlew :teams4j-bot-ktor:test -PktorLine=latest
+```
 
 ### The examples
 

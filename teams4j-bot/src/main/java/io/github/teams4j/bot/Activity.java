@@ -151,6 +151,11 @@ public record Activity(
         return ActivityTypes.CONVERSATION_UPDATE.equalsIgnoreCase(type);
     }
 
+    /** Whether Teams is waiting on the HTTP response for an answer; see {@link InvokeResponse}. */
+    public boolean isInvoke() {
+        return ActivityTypes.INVOKE.equalsIgnoreCase(type);
+    }
+
     /**
      * Whether this is the {@code conversationUpdate} that added the bot itself, i.e. the install
      * event. The only moment Teams hands over the {@link #conversationReference()} to store.

@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -15,6 +18,8 @@ import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.dsl.Cards;
 import io.github.teams4j.cards.jackson.JacksonCardWriter;
+import io.github.teams4j.http.HttpExchange;
+import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.teams.profile.ValidationMode;
 import io.github.teams4j.webhook.RateLimitMode;
 import io.github.teams4j.webhook.WebhookMessage;
@@ -185,6 +190,33 @@ class TeamsWebhookAutoConfigurationTest {
         runner.withPropertyValues("teams4j.webhook.url=" + URL).run(context -> assertThat(
                         context.getBean(TeamsWebhookProperties.class).isAllowPlainHttp())
                 .isFalse());
+    }
+
+    /**
+     * The Spring answer for a shared HTTP client: one {@code HttpTransport} bean, and every teams4j
+     * client in the context sends through it without anyone re-declaring the client beans.
+     */
+    @Test
+    void anHttpTransportBeanIsUsedForTheSends() {
+        runner.withUserConfiguration(OwnTransport.class)
+                .withPropertyValues("teams4j.webhook.url=" + URL)
+                .run(context -> {
+                    context.getBean(WorkflowsWebhookClient.class).send(card());
+                    assertThat(context.getBean(OwnTransport.class).sends.get()).isEqualTo(1);
+                });
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class OwnTransport {
+        final AtomicInteger sends = new AtomicInteger();
+
+        @Bean
+        HttpTransport httpTransport() {
+            return request -> {
+                sends.incrementAndGet();
+                return CompletableFuture.completedFuture(new HttpExchange.Response(202, Map.of(), ""));
+            };
+        }
     }
 
     @Configuration(proxyBeanMethods = false)
