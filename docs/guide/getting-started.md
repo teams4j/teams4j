@@ -1,14 +1,8 @@
 # Getting started
 
-teams4j does one thing well in 0.1.0: it builds an Adaptive Card that Microsoft Teams will actually
-render, and posts it to a Teams channel through a Workflows webhook. This page gets you from nothing
-to a card in a channel.
-
-::: warning Pre-release
-0.1.0 is not on Maven Central yet. The coordinates below become valid with the release. Until then,
-clone the repository, run `./gradlew publishToMavenLocal`, and add `mavenLocal()` to your
-repositories.
-:::
+The shortest path through teams4j: build an Adaptive Card that Microsoft Teams will actually render,
+and post it to a Teams channel through a Workflows webhook. This page gets you from nothing to a card
+in a channel; a bot that also receives messages has [its own guide](./bot).
 
 ## Requirements
 

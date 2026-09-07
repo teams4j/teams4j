@@ -53,8 +53,11 @@ artifacts installed first:
 
 ```bash
 ./gradlew publishToMavenLocal
-cd examples && ./gradlew build
+cd examples && ./gradlew build -Pteams4jVersion="$(../gradlew -q -p .. printVersion)"
 ```
+
+Without the property the examples resolve the released version from Central, which is what a
+reader gets and not what you just changed.
 
 `examples/README.md` covers running them, including how to point the Spring example at a
 loopback stub when you have no Teams channel to hand.
@@ -63,7 +66,8 @@ loopback stub when you have no Teams channel to hand.
 
 [teams4j-smoke](https://github.com/teams4j/teams4j-smoke) is a second consumer build, outside this
 repository, that sends real cards to a real tenant. It resolves the published artifacts from
-`mavenLocal` like the examples do, and it is not in CI because it needs a channel. **A change to the
+Central, or from `mavenLocal` with `-Pteams4jVersion`, like the examples do, and it is not in CI
+because it needs a channel. **A change to the
 public API, the DSL, a module's coordinates or the Kotlin baseline has to be carried into it in the
 same sitting**, or it rots silently: nothing here compiles it. `cd ../teams4j-smoke && ./gradlew build`
 after `publishToMavenLocal` is the check.
@@ -167,7 +171,7 @@ What the build enforces beyond formatting:
 - **The public ABI is guarded twice.** Kotlin modules dump theirs to committed `api/*.api`
   files — after an intended API change, run `./gradlew apiDump` and read the diff before
   committing it. Java modules are compared against the previous release with japicmp:
-  `./gradlew check -PapiBaseline=<last release>`, dormant until a first release exists.
+  `./gradlew check -PapiBaseline=<last release>` (`0.1.0` is the first baseline).
 - **Comments are in English.** This is a public project; the working language of the code is
   English regardless of the language a discussion happens in.
 

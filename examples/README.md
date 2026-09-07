@@ -10,11 +10,15 @@ testcontainers-java lay their examples out the same way.)
 
 ## Running them
 
-Until 0.1.0 is on Central, publish once from the parent directory first.
+The examples resolve the released teams4j from Central. To run them against the tree you are
+editing instead, publish it locally and add `-Pteams4jVersion="$(../gradlew -q -p .. printVersion)"`
+to each command below.
 
 ```bash
 cd .. && ./gradlew publishToMavenLocal && cd examples
+```
 
+```bash
 export TEAMS_WEBHOOK_URL='https://...'      # never commit this: the URL *is* write access to the channel
 
 ./gradlew :java-plain:run
@@ -68,5 +72,5 @@ down with a check:
 ## CI builds these examples
 
 The `examples` job in `.github/workflows/ci.yml` runs `publishToMavenLocal` and then this
-build. A broken example turns the build red — code in the documentation that does not run is
+build with `-Pteams4jVersion` set to what was just published. A broken example turns the build red — code in the documentation that does not run is
 the worst possible failure, because that documentation is what decides adoption.

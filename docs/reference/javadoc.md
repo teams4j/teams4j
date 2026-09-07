@@ -1,7 +1,9 @@
 # API documentation
 
-The Javadoc and the Kotlin API are published with each release and browsable on javadoc.io. Until 0.1.0
-ships, the links below resolve to nothing; build the jars locally instead (see the bottom of this page).
+The Javadoc is published with each release and browsable on javadoc.io, which fetches a jar the first
+time anyone asks for it, so a link can take a minute on its first visit. The Kotlin modules ship an
+empty Javadoc jar in 0.1.0 (Dokka is not wired in yet); for those, the sources jar and the committed
+`api/*.api` dumps are the reference.
 
 | Module | API documentation |
 |---|---|
