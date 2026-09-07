@@ -169,8 +169,7 @@ failure to retry. The documentation on `TokenBucket`, `RateLimitMode` and
 
 `teams4j-bot` against a bot registered in the Teams Developer Portal, installed into a team through
 *Preview in Teams*, with the endpoint reached through a Cloudflare quick tunnel. Every step of the
-smoke table passed; the one not exercised is a channel `@mention`, because the test app's bot scope
-did not include Team (a unit test covers the tag stripping).
+smoke table passed.
 
 | Observed | Consequence in the library |
 |---|---|
@@ -183,6 +182,7 @@ did not include Team (a unit test covers the tag stripping).
 | Removing the app from a *channel* changes nothing: the bot stays a team member and posts keep landing. Removing it from the *team* (Manage team → Apps) delivers `installationUpdate` and the next post is `403 {"error":{"code":"BotNotInConversationRoster",…}}` | `BotNotInConversationException` fired from that body, not retried |
 | Text containing `{…}` sent as a plain message lost the braces in the client | The smoke sends JSON in backticks; not a library concern |
 | `POST /v3/conversations` for a user the bot already chats with returns the existing `a:…` conversation, not a new one | `createConversation` doubles as "find my chat with this user" |
+| A channel `@mention` reaches the bot only when the app's bot scope includes `team` *and* the bot is not marked notification-only in the Developer Portal; with both, the message carries a `mention` entity and `<at>…</at>` in the text | `textWithoutMentions()` gave the bare command; the two manifest settings are the first thing to check when a mention never arrives |
 
 ## What Teams adds to a card
 
