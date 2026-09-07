@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/teams4j/teams4j/actions/workflows/ci.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/teams4j/teams4j/badge)](https://scorecard.dev/viewer/?uri=github.com/teams4j/teams4j)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.teams4j/teams4j-cards)](https://central.sonatype.com/namespace/io.github.teams4j)
 
 Adaptive Cards and Microsoft Teams for the JVM. Build a card in Java or Kotlin, check it against
 what Teams actually renders, and post it to a channel through a Workflows webhook.
@@ -52,8 +53,8 @@ connector.replyToActivity(activity.conversationReference(), activity.id(),
 
 ## Getting started
 
-Java 17+. 0.1.0 is not on Maven Central yet; until then, `./gradlew publishToMavenLocal` from a
-clone and `mavenLocal()` in your build.
+Java 17+. Every module is on Maven Central under `io.github.teams4j`; the BOM
+(`teams4j-bom`) aligns their versions.
 
 ```kotlin
 // Spring Boot: one dependency, one property (teams4j.webhook.url)

@@ -22,7 +22,9 @@ leaked CI secret cannot publish anything. CI builds and tests; it never publishe
 The version is not in any file. It comes from the nearest `vX.Y.Z` tag (root `build.gradle.kts`,
 `com.palantir.git-version`): on the tag with a clean tree it is `0.1.0`; one commit later, or with
 uncommitted changes, it is `0.1.1-SNAPSHOT`. `./gradlew printVersion` shows it. So a release is a
-tag, and there is no release commit and no "back to SNAPSHOT" commit.
+tag, and there is no release commit and no "back to SNAPSHOT" commit. Untracked files count as
+uncommitted changes (`git status --porcelain` must print nothing), so a stray note in the tree turns
+the release into a SNAPSHOT: move it out before tagging.
 
 ## Rehearsal
 
@@ -42,7 +44,7 @@ writes the useful part to `build/jreleaser/trace.log`.
 ## Release
 
 ```bash
-# 0. from 0.2.0 on: the public ABI must not have broken against the previous release
+# 0. the public ABI must not have broken against the previous release (0.1.0 is the first baseline)
 ./gradlew check -PapiBaseline=<previous version>
 
 # 1. version: a tag on a clean tree. Uncommitted changes make it 0.1.1-SNAPSHOT, which Central rejects.

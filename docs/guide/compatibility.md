@@ -20,8 +20,7 @@ row lists only what the `starter-boot-matrix` CI job runs.
 
 ## Modules and status
 
-**0.1.0 has not shipped yet.** The rows marked `0.1.0` are complete and are what that release
-contains. The bot modules were run against a real tenant on 2026-09-05; [Measurements](../reference/measurements#the-bot-2026-09-05)
+The rows marked `0.1.0` shipped in that release. The bot modules were run against a real tenant on 2026-09-05; [Measurements](../reference/measurements#the-bot-2026-09-05)
 has what was seen.
 
 | Module | What it does | Status |
