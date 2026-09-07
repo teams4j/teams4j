@@ -44,6 +44,7 @@ public record Activity(
         @Nullable CardValue raw) {
 
     private static final Pattern AT_TAG = Pattern.compile("<at>.*?</at>", Pattern.DOTALL);
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     public Activity {
         attachments = attachments == null ? null : List.copyOf(attachments);
@@ -52,7 +53,7 @@ public record Activity(
         membersRemoved = membersRemoved == null ? null : List.copyOf(membersRemoved);
     }
 
-    /** A plain-text message. */
+    /** A text message. Teams renders it as markdown, its default when {@code textFormat} is unset. */
     public static Activity message(String text) {
         return builder()
                 .type(ActivityTypes.MESSAGE)
@@ -157,6 +158,14 @@ public record Activity(
     }
 
     /**
+     * Whether the user sent this as a targeted (ephemeral) message -- {@code recipient.isTargeted}
+     * -- in which case the reply should go through {@link ConnectorClient#sendTargetedActivity}.
+     */
+    public boolean isTargeted() {
+        return recipient != null && Boolean.TRUE.equals(recipient.isTargeted());
+    }
+
+    /**
      * Whether this is the {@code conversationUpdate} that added the bot itself, i.e. the install
      * event. The only moment Teams hands over the {@link #conversationReference()} to store.
      *
@@ -199,10 +208,11 @@ public record Activity(
     }
 
     /**
-     * The text with every {@code @mention} removed and trimmed: a user addressing the bot in a
-     * channel writes {@code <at>Bot</at> do something}, and a command parser wants {@code do
-     * something}. Any {@code <at>…</at>} tag goes too, so a mention Teams sent without an entity
-     * does not survive.
+     * The text with every {@code @mention} removed, runs of whitespace collapsed to one space, and
+     * trimmed: a user addressing the bot in a channel writes {@code <at>Bot</at>  do something}, and
+     * a command parser wants {@code do something}, splittable on a single space. Any
+     * {@code <at>…</at>} tag goes too, so a mention Teams sent without an entity does not survive.
+     * {@link #text()} keeps the original, line breaks included.
      */
     public @Nullable String textWithoutMentions() {
         if (text == null) {
@@ -214,7 +224,10 @@ public record Activity(
                 stripped = stripped.replace(mention.text(), "");
             }
         }
-        return AT_TAG.matcher(stripped).replaceAll("").trim();
+        return WHITESPACE
+                .matcher(AT_TAG.matcher(stripped).replaceAll(""))
+                .replaceAll(" ")
+                .trim();
     }
 
     /**

@@ -63,7 +63,11 @@ class ActivityTest {
         });
         assertThat(a.mentions())
                 .containsExactly(new Mention(new ChannelAccount("28:app-id", "Bot", null), "<at>Bot</at>"));
-        assertThat(a.textWithoutMentions()).isEqualTo("connect  brand-x");
+        assertThat(a.textWithoutMentions())
+                .as("the double space the mention left is collapsed")
+                .isEqualTo("connect brand-x");
+        assertThat(a.text()).isEqualTo("<at>Bot</at> connect  brand-x");
+        assertThat(a.isTargeted()).isFalse();
         // The clientInfo entity has no component of its own and is still there.
         assertThat(a.entities()).hasSize(2);
         assertThat(Json.str(Objects.requireNonNull(a.entities()).get(1), "platform"))
@@ -146,6 +150,20 @@ class ActivityTest {
         Activity a = Activity.parse(codec, "{\"type\":\"message\",\"text\":\" <at>Bot</at>  status \"}");
 
         assertThat(a.textWithoutMentions()).isEqualTo("status");
+    }
+
+    @Test
+    void aTargetedRequestIsFlaggedOnTheRecipient() {
+        Activity a = Activity.parse(
+                codec,
+                "{\"type\":\"message\",\"text\":\"status\",\"recipient\":{\"id\":\"28:app-id\",\"isTargeted\":true}}");
+
+        assertThat(a.isTargeted()).isTrue();
+        assertThat(Objects.requireNonNull(a.recipient()).isTargeted()).isTrue();
+        assertThat(codec.write(a.toJson())).as("the flag survives a round trip").contains("\"isTargeted\":true");
+        assertThat(Activity.parse(codec, "{\"type\":\"message\",\"recipient\":{\"id\":\"28:app-id\"}}")
+                        .isTargeted())
+                .isFalse();
     }
 
     @Test

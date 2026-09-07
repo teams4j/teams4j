@@ -82,7 +82,8 @@ bot actually asks:
 | `isBotAdded(botId)` | Is this the `conversationUpdate` that installed me? `BotCredentials.botId()` is the id to pass |
 | `conversationReference()` | Where do I post back? Null when Teams sent no `serviceUrl` or conversation id: ignore the activity |
 | `tenantId()` | Which tenant? Teams puts it in `conversation.tenantId` *or* `channelData.tenant.id`, depending on the activity |
-| `textWithoutMentions()` | What did the user type, without the `<at>Bot</at>` in front? |
+| `textWithoutMentions()` | What did the user type, without the `<at>Bot</at>` in front? Whitespace is collapsed to single spaces, so a command parser can split on one; `text()` keeps the original |
+| `isTargeted()` | Did the user send this through a targeted (ephemeral) message? Then answer with `sendTargetedActivity` |
 | `mentions()` | Who was mentioned |
 | `value()` | The `data` of the `Action.Submit` that was pressed, as a `CardValue` |
 
@@ -134,7 +135,8 @@ connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().t
 - **Token**: acquired with the `client_credentials` grant and cached until a minute before expiry. A
   `401` refreshes it once and repeats the request.
 - **Retries**: `429` and `5xx` are retried with exponential backoff and full jitter, `Retry-After`
-  honoured (3 attempts by default). The Connector really does return `429`, unlike the webhook.
+  honoured (3 attempts by default). The Connector is documented as returning `429`, which the webhook
+  never did in measurement; the policy is the same either way.
 - **`403 BotNotInConversationRoster`** is `BotNotInConversationException`, a subclass of
   `ConnectorException`, so it can be caught on its own. Not retried.
 
@@ -146,7 +148,9 @@ connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().t
 | `BotCredentials.singleTenant(appId, secret, tenantId)` | Single-tenant | `login.microsoftonline.com/{tenantId}` |
 
 Tokens from elsewhere -- MSAL, a sidecar, a certificate flow -- go in through `Builder.tokenProvider`.
-`BotCredentials.toString()` omits the secret.
+`BotCredentials.toString()` omits the secret. There is no "unconfigured" mode: a blank app id is
+refused at construction, so an environment without a bot should not build the client at all, which is
+what the Spring Boot starter does when `teams4j.bot.app-id` is unset.
 
 ## Answering an invoke
 
@@ -187,6 +191,14 @@ body out. It answers `401` when the request is not from the Bot Framework (the r
 never sent), `400` for a body that is not JSON, `200` with an empty body for every activity your
 `ActivityHandler` accepts, and the `InvokeResponse`'s own status and body for an invoke. A servlet
 is a few lines around it, and so are the two adapters.
+
+::: warning Answer first, work after
+Teams redelivers an activity whose endpoint has not answered within about 15 seconds, and the
+handler's return *is* the answer. A handler that queries a database and makes Connector calls can
+take seconds, so hand that work to an executor or a coroutine scope you own and return null at once;
+only an invoke has to finish before the response. The smoke bot does exactly this: `200`, then the
+work.
+:::
 
 ### Spring Boot
 
