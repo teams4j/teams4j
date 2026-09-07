@@ -1,8 +1,12 @@
 # teams4j
 
-[![CI](https://github.com/teams4j/teams4j/actions/workflows/ci.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/teams4j/teams4j/badge)](https://scorecard.dev/viewer/?uri=github.com/teams4j/teams4j)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.teams4j/teams4j-cards)](https://central.sonatype.com/namespace/io.github.teams4j)
+[![javadoc](https://javadoc.io/badge2/io.github.teams4j/teams4j-cards/javadoc.svg)](https://javadoc.io/doc/io.github.teams4j/teams4j-cards)
+[![License](https://img.shields.io/github/license/teams4j/teams4j)](LICENSE)
+
+[![CI](https://github.com/teams4j/teams4j/actions/workflows/ci.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/teams4j/teams4j/actions/workflows/codeql.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/teams4j/teams4j/badge)](https://scorecard.dev/viewer/?uri=github.com/teams4j/teams4j)
 
 Adaptive Cards and Microsoft Teams for the JVM. Build a card in Java or Kotlin, check it against
 what Teams actually renders, and post it to a channel through a Workflows webhook.
