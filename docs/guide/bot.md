@@ -292,8 +292,9 @@ ConnectorClient connector = ConnectorClient.builder(appId).tokenProvider(TokenPr
 or, on the starter, `teams4j.bot.allow-anonymous=true` with no `app-secret`. The app id is whatever
 the Playground's `bot.id` is, `00000000-0000-0000-0000-00000000000011` unless you have a
 `.m365agentsplayground.yml`. The Playground is plain HTTP, and its Node server drops a connection
-that asks to upgrade to HTTP/2, which the JDK client does on plain HTTP by default; the client
-teams4j builds in this mode speaks HTTP/1.1, and an `HttpTransport` of your own must too. Then:
+that asks to upgrade to HTTP/2, which the JDK client does on plain HTTP by default; teams4j's JDK
+transport therefore speaks HTTP/1.1 to any plain-HTTP address, and an `HttpTransport` of your own
+must too. Then:
 
 ```bash
 npx -y @microsoft/m365agentsplayground -e http://localhost:3978/api/messages -c msteams
@@ -308,6 +309,16 @@ dialog or SSO, and what it reports as `serviceUrl`, ids and tenant is mock data.
 [measurements](../reference/measurements) was taken against a tenant, and a bot should be seen in
 Teams before it ships. Never leave `allowAnonymous` or `TokenProvider.none()` on where the endpoint
 is reachable from the internet.
+
+Given `--client-id`, `--client-secret` and `--tenant-id`, the Playground authenticates instead, the
+way the old Emulator did: it mints an Entra token for your app id (no `serviceurl` claim, which the
+verifier does not demand of an Entra issuer) and checks the token your bot sends back. That is the
+ordinary configuration -- `builder(credentials)` and no anonymous mode -- against the same local
+address. Read from the Playground's code and covered by unit tests, not yet exercised against a
+registration.
+
+The examples build carries a headless run of all this, `:playground-e2e`, opt-in because it needs
+Node: `./gradlew :playground-e2e:test -PplaygroundE2e`. A weekly workflow runs it.
 
 ## Exceptions
 

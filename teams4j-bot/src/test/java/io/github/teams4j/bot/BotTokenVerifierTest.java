@@ -238,6 +238,30 @@ class BotTokenVerifierTest {
         assertThat(verifier().verify(token("k1", k1), null).serviceUrl()).isEqualTo(SERVICE_URL);
     }
 
+    /** The Emulator and the Playground mint Entra tokens for the app id with no {@code serviceurl}; the Bot Framework never omits it. */
+    @Test
+    void anEntraTokenMayLackTheServiceUrlClaimButABotFrameworkTokenMayNot() throws Exception {
+        BotTokenVerifier verifier = verifier();
+        long nbf = now.get().getEpochSecond();
+        String entraWithoutClaim = token(
+                "k2",
+                k2,
+                "{\"iss\":\"" + ENTRA_V2 + "\",\"aud\":\"" + APP_ID + "\",\"tid\":\"" + TENANT + "\",\"nbf\":" + nbf
+                        + ",\"exp\":" + (nbf + 3600) + "}");
+        String botFrameworkWithoutClaim = token(
+                "k1",
+                k1,
+                "{\"iss\":\"https://api.botframework.com\",\"aud\":\"" + APP_ID + "\",\"nbf\":" + nbf + ",\"exp\":"
+                        + (nbf + 3600) + "}");
+
+        assertThat(verifier.verify(entraWithoutClaim, SERVICE_URL).serviceUrl()).isNull();
+        assertThatThrownBy(() -> verifier.verify(botFrameworkWithoutClaim, SERVICE_URL))
+                .hasMessageContaining("serviceurl");
+        assertThatThrownBy(() -> verifier.verify(entraToken(ENTRA_V2, TENANT), "https://smba.trafficmanager.net/emea/"))
+                .as("an Entra token that does name a Connector is held to it")
+                .hasMessageContaining("serviceurl");
+    }
+
     @Test
     void theHeaderItselfIsChecked() throws Exception {
         BotTokenVerifier verifier = verifier();

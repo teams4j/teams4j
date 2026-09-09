@@ -53,6 +53,13 @@ A browser opens on `http://localhost:56150`. Say something, press the button, an
 Activity → Add application** for the install event. What it cannot show is in the
 [bot guide](https://teams4j.github.io/teams4j/guide/bot#local-development-the-agents-playground).
 
+The same three round trips run headless in `:playground-e2e`, which starts the Spring bot in-process
+and the Playground through `npx`, then reads what the Playground recorded. Opt-in, since it needs Node:
+
+```bash
+./gradlew :playground-e2e:test -PplaygroundE2e
+```
+
 Create the webhook URL from the Teams channel via
 **⋯ → Workflows → "Post to a channel when a webhook request is received"**.
 

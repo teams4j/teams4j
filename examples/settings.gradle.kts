@@ -27,3 +27,5 @@ include(":kotlin-coroutines")
 include(":spring-boot")
 include(":bot-spring-boot")
 include(":bot-ktor")
+// Opt-in: the Spring bot against a real Agents Playground, headless. `-PplaygroundE2e` runs it.
+include(":playground-e2e")

@@ -1,0 +1,57 @@
+name: Agents Playground e2e
+
+# The Spring bot example against a real Microsoft 365 Agents Playground, headless
+# (examples/playground-e2e). The Playground's routes are undocumented and the package is fetched
+# from npm, so this stays out of the PR path: once a week, and on demand. A failure after a
+# Playground release is something to read about before it is something to fix.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: playground-e2e
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Playground round trips
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version is derived from the nearest release tag; a shallow clone has none.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
+      - name: Publish the artifacts the examples resolve
+        run: ./gradlew publishToMavenLocal
+
+      - name: Read the published version
+        run: echo "TEAMS4J_VERSION=$(./gradlew -q printVersion)" >> "$GITHUB_ENV"
+
+      - name: Run the bot against the Playground
+        working-directory: ./examples
+        run: ./gradlew :playground-e2e:test -PplaygroundE2e --stacktrace -Pteams4jVersion="$TEAMS4J_VERSION"

@@ -196,7 +196,8 @@ The same Ktor example against the [Microsoft 365 Agents Playground](../guide/bot
 |---|---|
 | No `Authorization` header on any request, and the mock Connector wants none back | `allowAnonymous()` on the verifier and `TokenProvider.none()` on the client, the development-only pair |
 | The bot is `00000000-…-11`, the `bot.id` of its config, in `recipient` *and* in `membersAdded`: no `28:` prefix anywhere | `isBotAdded` now matches the bare id as well as `28:<id>`, so `connector.botId()` works against both |
-| `serviceUrl` is `http://localhost:56150/_connector`, plain HTTP. The JDK client's first request asked to upgrade to HTTP/2 (`Upgrade: h2c`) and the Node server closed the socket; three attempts, three resets | The client teams4j builds for `TokenProvider.none()` speaks HTTP/1.1. A transport of your own must too |
+| `serviceUrl` is `http://localhost:56150/_connector`, plain HTTP. The JDK client's first request asked to upgrade to HTTP/2 (`Upgrade: h2c`) and the Node server closed the socket; three attempts, three resets | teams4j's JDK transport speaks HTTP/1.1 to any plain-HTTP address. A transport of your own must too |
+| In authenticated mode (`--client-id …`) the Playground mints an Entra token for the app id with no `serviceurl` claim, and the verifier refused it for that | An Entra issuer is no longer required to carry `serviceurl`; the Bot Framework still is. From the Playground's code, not run against a registration |
 | Channel messages look like Teams': `conversation.id` is `team-id;messageid=<id>`, `channelData.team` and `.channel` are filled, the mention arrives as an entity plus `<at>Test Bot</at>` | Nothing to change; `withoutMessageId()` and `textWithoutMentions()` behave as in the tenant |
 | An `Action.Execute` invoke carries `value` like a submit does | The examples check `isInvoke()` before `value()`; the order was wrong before and the Playground showed it |
 

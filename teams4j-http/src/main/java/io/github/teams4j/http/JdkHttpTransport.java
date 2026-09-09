@@ -19,6 +19,12 @@ final class JdkHttpTransport implements HttpTransport {
     @Override
     public CompletableFuture<HttpExchange.Response> send(HttpExchange.Request request) {
         HttpRequest.Builder builder = HttpRequest.newBuilder(request.uri()).timeout(request.timeout());
+        if ("http".equalsIgnoreCase(request.uri().getScheme())) {
+            // On plain HTTP the client would ask to upgrade to HTTP/2 (h2c), and a Node server -- the
+            // Agents Playground, most local stubs -- answers that by closing the socket. Over HTTPS the
+            // version is negotiated in the handshake and nothing changes.
+            builder.version(HttpClient.Version.HTTP_1_1);
+        }
         request.headers().forEach(builder::header);
         String body = request.body();
         builder.method(

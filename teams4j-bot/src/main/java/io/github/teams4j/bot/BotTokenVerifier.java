@@ -242,7 +242,12 @@ public final class BotTokenVerifier {
             throw new TokenVerificationException("token tenant does not match its issuer");
         }
         String claimedServiceUrl = Json.str(claims, "serviceurl");
-        if (serviceUrl != null && !sameServiceUrl(claimedServiceUrl, serviceUrl)) {
+        // The Bot Framework binds every token to one Connector. An Entra token -- the Emulator's, the
+        // Playground's in authenticated mode -- carries no such claim; one that does is still compared.
+        boolean claimRequired = issuerTenant == null;
+        if (serviceUrl != null
+                && (claimedServiceUrl != null || claimRequired)
+                && !sameServiceUrl(claimedServiceUrl, serviceUrl)) {
             throw new TokenVerificationException("token serviceurl does not match the activity");
         }
         return new VerifiedToken(appId, claimedServiceUrl, issuer, expiresAt, claims);

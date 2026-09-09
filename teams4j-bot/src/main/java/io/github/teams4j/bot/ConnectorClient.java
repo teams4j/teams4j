@@ -69,17 +69,10 @@ public final class ConnectorClient {
     private ConnectorClient(Builder b) {
         this.botId = "28:" + b.appId;
         this.anonymous = b.tokens instanceof TokenProvider.NoToken;
-        if (b.transport != null) {
-            this.transport = b.transport;
-        } else {
-            HttpClient.Builder http = HttpClient.newBuilder().connectTimeout(b.connectTimeout);
-            if (anonymous) {
-                // The emulator is plain HTTP, and the JDK client's h2c upgrade attempt on plain HTTP is
-                // answered by Node with a closed socket. The real Connector is HTTPS and negotiates.
-                http.version(HttpClient.Version.HTTP_1_1);
-            }
-            this.transport = HttpTransport.jdk(http.build());
-        }
+        this.transport = b.transport != null
+                ? b.transport
+                : HttpTransport.jdk(
+                        HttpClient.newBuilder().connectTimeout(b.connectTimeout).build());
         this.codec = b.codec != null ? b.codec : JsonCodec.discover();
         this.cardWriter = b.cardWriter != null ? b.cardWriter : CardWriter.discover();
         if (b.tokens != null) {
