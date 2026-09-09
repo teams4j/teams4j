@@ -39,7 +39,7 @@ class ActivityEndpointTest {
         BotTokenVerifier verifier = BotTokenVerifier.builder(APP_ID)
                 .transport(transport)
                 .jsonCodec(new JacksonJsonCodec())
-                .openIdMetadata(METADATA)
+                .issuer(TestTokens.ISSUER, METADATA)
                 .build();
         return new ActivityEndpoint(new ActivityReceiver(verifier, new JacksonJsonCodec()), new JacksonJsonCodec());
     }

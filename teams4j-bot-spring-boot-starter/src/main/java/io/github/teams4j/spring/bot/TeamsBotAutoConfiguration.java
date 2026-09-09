@@ -95,10 +95,13 @@ public class TeamsBotAutoConfiguration {
             TeamsBotProperties properties,
             ObjectProvider<JsonCodec> codec,
             ObjectProvider<HttpTransport> transport) {
-        BotTokenVerifier.Builder builder = BotTokenVerifier.builder(credentials.appId())
+        BotTokenVerifier.Builder builder = BotTokenVerifier.builder(credentials)
                 .clockSkew(properties.getClockSkew())
                 .keyCacheTtl(properties.getKeyCacheTtl())
                 .requestTimeout(properties.getRequestTimeout());
+        if (properties.isAllowAnonymous()) {
+            builder.allowAnonymous();
+        }
         codec.ifAvailable(builder::jsonCodec);
         transport.ifAvailable(builder::transport);
         return builder.build();

@@ -1,0 +1,91 @@
+name: Activity Protocol spec drift
+
+# The TypeSpec under teams4j-bot/src/test/resources/spec is a copy of microsoft/Agents at a pinned
+# commit (see MANIFEST.md there). Dependabot cannot track a copied file, so this compares the copy
+# with upstream main once a week and opens, or updates, one issue when they differ.
+
+on:
+  schedule:
+    - cron: '30 6 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: spec-drift
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    name: Compare with upstream
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # opens the drift issue, or refreshes the open one's body
+
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Fetch upstream and diff
+        id: diff
+        env:
+          UPSTREAM: https://raw.githubusercontent.com/microsoft/Agents/main/specs/typespec
+          LOCAL: teams4j-bot/src/test/resources/spec
+        run: |
+          set -euo pipefail
+          mkdir -p upstream
+          changed=false
+          : > spec.diff
+          for f in activity.tsp channelapi.tsp tokenservice.tsp; do
+            curl --fail --silent --show-error --location --output "upstream/$f" "$UPSTREAM/$f"
+            if ! diff -u --label "vendored/$f" --label "upstream/$f" "$LOCAL/$f" "upstream/$f" >> spec.diff; then
+              changed=true
+              echo "$f differs" >> stat.txt
+            fi
+          done
+          upstream_sha="$(curl --fail --silent --show-error --location \
+            -H 'Accept: application/vnd.github.sha' \
+            https://api.github.com/repos/microsoft/Agents/commits/main)"
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          if [ "$changed" = false ]; then
+            exit 0
+          fi
+          {
+            echo "The vendored Activity Protocol TypeSpec differs from \`microsoft/Agents\` main at \`$upstream_sha\`."
+            echo
+            echo '```'
+            cat stat.txt
+            echo '```'
+            echo
+            echo '<details><summary>Diff</summary>'
+            echo
+            echo '```diff'
+            head -c 60000 spec.diff
+            echo '```'
+            echo '</details>'
+            echo
+            echo 'To refresh: copy the three files, update the commit and date in `MANIFEST.md`, run'
+            echo '`./gradlew :teams4j-bot:test` and account for every new field in `ActivityProtocolSpecTest`.'
+          } > body.md
+
+      - name: Open or update the issue
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: 'Activity Protocol spec drifted from upstream'
+        run: |
+          set -euo pipefail
+          number="$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number // empty')"
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file body.md
+          else
+            gh issue create --title "$TITLE" --body-file body.md
+          fi

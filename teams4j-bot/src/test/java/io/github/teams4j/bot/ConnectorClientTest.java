@@ -6,6 +6,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -355,5 +357,92 @@ class ConnectorClientTest {
         assertThat(response.status()).isEqualTo(200);
         assertThat(Json.str(response.body(), "type")).isEqualTo(InvokeResponse.ADAPTIVE_CARD_TYPE);
         assertThat(Json.str(Json.at(response.body(), "value"), "type")).isEqualTo("AdaptiveCard");
+    }
+
+    private static final String CONVERSATION_PATH = "/v3/conversations/19%3Aabc%40thread.tacv2%3Bmessageid%3D1693";
+
+    @Test
+    void pagesThroughTheMembersFollowingTheContinuationToken() {
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/pagedmembers"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("{\"continuationToken\":\"p 2\",\"members\":[{\"id\":\"29:1\",\"name\":\"Ann\","
+                                + "\"objectId\":\"aad-1\",\"givenName\":\"Ann\",\"surname\":\"Lee\","
+                                + "\"email\":\"ann@x.test\",\"userPrincipalName\":\"ann@x.test\","
+                                + "\"userRole\":\"owner\",\"tenantId\":\"tenant-1\"}]}")));
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/pagedmembers?continuationToken=p%202"))
+                .willReturn(aResponse().withStatus(200).withBody("{\"members\":[{\"id\":\"29:2\"}]}")));
+        ConnectorClient client = client().build();
+
+        PagedMembers first = client.getPagedMembers(where(), null);
+        assertThat(first.hasMore()).isTrue();
+        assertThat(first.continuationToken()).isEqualTo("p 2");
+        assertThat(first.members()).hasSize(1);
+        TeamsChannelAccount ann = first.members().get(0);
+        assertThat(ann.aadObjectId()).as("objectId is read as aadObjectId").isEqualTo("aad-1");
+        assertThat(ann.userRole()).isEqualTo("owner");
+        assertThat(ann.email()).isEqualTo("ann@x.test");
+        assertThat(ann.channelAccount()).isEqualTo(new ChannelAccount("29:1", "Ann", "aad-1", null));
+
+        PagedMembers second = client.getPagedMembers(where(), first.continuationToken());
+        assertThat(second.hasMore()).isFalse();
+
+        assertThat(client.getMembers(where()))
+                .extracting(TeamsChannelAccount::id)
+                .containsExactly("29:1", "29:2");
+        server.verify(getRequestedFor(urlEqualTo(CONVERSATION_PATH + "/pagedmembers"))
+                .withHeader("Authorization", equalTo("Bearer t1")));
+    }
+
+    @Test
+    void looksUpOneMemberAndA404IsAConnectorException() {
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/members/29%3A1"))
+                .willReturn(aResponse().withStatus(200).withBody("{\"id\":\"29:1\",\"aadObjectId\":\"aad-1\"}")));
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/members/29%3A9"))
+                .willReturn(aResponse()
+                        .withStatus(404)
+                        .withBody("{\"error\":{\"code\":\"MemberNotFoundInConversation\"}}")));
+        ConnectorClient client = client().build();
+
+        assertThat(client.getMember(where(), "29:1").aadObjectId()).isEqualTo("aad-1");
+        assertThatThrownBy(() -> client.getMember(where(), "29:9"))
+                .isInstanceOfSatisfying(ConnectorException.class, e -> {
+                    assertThat(e.statusCode()).isEqualTo(404);
+                    assertThat(e.errorCode()).isEqualTo("MemberNotFoundInConversation");
+                });
+    }
+
+    @Test
+    void describesATeamAndListsItsChannels() {
+        server.stubFor(get(urlEqualTo("/v3/teams/19%3Ateam%40thread.tacv2"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("{\"id\":\"19:team@thread.tacv2\",\"name\":\"Ops\",\"aadGroupId\":\"g-1\","
+                                + "\"channelCount\":3,\"memberCount\":12,\"type\":\"standard\"}")));
+        server.stubFor(get(urlEqualTo("/v3/teams/19%3Ateam%40thread.tacv2/conversations"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("{\"conversations\":[{\"id\":\"19:team@thread.tacv2\"},"
+                                + "{\"id\":\"19:chan@thread.tacv2\",\"name\":\"alerts\",\"type\":\"standard\"}]}")));
+        ConnectorClient client = client().build();
+        URI serviceUrl = URI.create(server.baseUrl() + "/");
+
+        TeamDetails team = client.getTeamDetails(serviceUrl, "19:team@thread.tacv2");
+        assertThat(team).isEqualTo(new TeamDetails("19:team@thread.tacv2", "Ops", "g-1", 3L, 12L, "standard"));
+
+        assertThat(client.getTeamChannels(serviceUrl, "19:team@thread.tacv2"))
+                .containsExactly(
+                        new TeamsChannelData.ChannelInfo("19:team@thread.tacv2", null, null),
+                        new TeamsChannelData.ChannelInfo("19:chan@thread.tacv2", "alerts", "standard"));
+    }
+
+    @Test
+    void aLookupThatReturnsNoJsonIsAnError() {
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/pagedmembers"))
+                .willReturn(aResponse().withStatus(200).withBody("nope")));
+
+        assertThatThrownBy(() -> client().build().getPagedMembers(where(), null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("did not return JSON");
     }
 }

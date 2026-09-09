@@ -25,6 +25,11 @@ class BotTokenVerifierTest {
     private static final String SERVICE_URL = "https://smba.trafficmanager.net/apac/";
     private static final URI METADATA = URI.create("https://login.example/openid");
     private static final URI JWKS = URI.create("https://login.example/keys");
+    private static final URI ENTRA_JWKS = URI.create("https://entra.example/keys");
+    private static final String TENANT = "11111111-1111-1111-1111-111111111111";
+    private static final String OTHER_TENANT = "22222222-2222-2222-2222-222222222222";
+    private static final String ENTRA_V2 = "https://login.microsoftonline.com/" + TENANT + "/v2.0";
+    private static final String ENTRA_V1 = "https://sts.windows.net/" + TENANT + "/";
 
     private static final KeyPair k1 = rsa();
     private static final KeyPair k2 = rsa();
@@ -39,12 +44,20 @@ class BotTokenVerifierTest {
     }
 
     private BotTokenVerifier verifier() {
+        return builder(BotTokenVerifier.builder(APP_ID)).build();
+    }
+
+    /** The Bot Framework's keys are k1 at a stub; Entra's are k2 at another, so the two sets are told apart. */
+    private BotTokenVerifier.Builder builder(BotTokenVerifier.Builder builder) {
         transport.on(METADATA, () -> FakeTransport.json(200, "{\"jwks_uri\":\"" + JWKS + "\"}"));
         transport.on(JWKS, () -> FakeTransport.json(200, jwks));
-        return BotTokenVerifier.builder(APP_ID)
-                .transport(transport)
+        transport.on(
+                BotTokenVerifier.ENTRA_OPENID_METADATA,
+                () -> FakeTransport.json(200, "{\"jwks_uri\":\"" + ENTRA_JWKS + "\"}"));
+        transport.on(ENTRA_JWKS, () -> FakeTransport.json(200, jwks(jwk("k2", k2))));
+        return builder.transport(transport)
                 .jsonCodec(new JacksonJsonCodec())
-                .openIdMetadata(METADATA)
+                .issuer(TestTokens.ISSUER, METADATA)
                 .clock(new Clock() {
                     @Override
                     public Instant instant() {
@@ -60,8 +73,7 @@ class BotTokenVerifierTest {
                     public Clock withZone(java.time.ZoneId zone) {
                         return this;
                     }
-                })
-                .build();
+                });
     }
 
     /** A token as the Bot Framework would issue it for this bot, valid for an hour. */
@@ -92,6 +104,16 @@ class BotTokenVerifierTest {
 
     private static String claimsFor(String iss, String aud, long nbf, long exp, String serviceUrl) {
         return TestTokens.claimsFor(iss, aud, nbf, exp, serviceUrl);
+    }
+
+    /** An Entra-issued token for this bot: the issuer names a tenant, and {@code tid} repeats it. */
+    private String entraToken(String iss, String tid) throws Exception {
+        long nbf = now.get().getEpochSecond();
+        return token(
+                "k2",
+                k2,
+                "{\"iss\":\"" + iss + "\",\"aud\":\"" + APP_ID + "\",\"tid\":\"" + tid + "\",\"serviceurl\":\""
+                        + SERVICE_URL + "\",\"nbf\":" + nbf + ",\"exp\":" + (nbf + 3600) + "}");
     }
 
     @Test
@@ -271,5 +293,116 @@ class BotTokenVerifierTest {
                 .hasMessageContaining("serviceurl");
         assertThatThrownBy(() -> receiver.receive(token("k1", k1), "not json"))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void anEntraTokenForTheBotsTenantVerifiesThroughEntrasKeys() throws Exception {
+        BotTokenVerifier verifier = builder(BotTokenVerifier.builder(BotCredentials.singleTenant(APP_ID, "s", TENANT)))
+                .build();
+
+        assertThat(verifier.verify(entraToken(ENTRA_V2, TENANT), SERVICE_URL).issuer())
+                .isEqualTo(ENTRA_V2);
+        assertThat(verifier.verify(entraToken(ENTRA_V1, TENANT), SERVICE_URL).issuer())
+                .isEqualTo(ENTRA_V1);
+        assertThat(transport.requests)
+                .as("Entra's metadata and keys, once, and nothing from the Bot Framework")
+                .extracting(r -> r.uri())
+                .containsExactly(BotTokenVerifier.ENTRA_OPENID_METADATA, ENTRA_JWKS);
+    }
+
+    @Test
+    void microsoftsOwnTenantsAreAcceptedWithoutConfiguration() throws Exception {
+        String firstParty =
+                "https://login.microsoftonline.com/" + BotTokenVerifier.FIRST_PARTY_TENANTS.get(0) + "/v2.0";
+
+        assertThat(verifier()
+                        .verify(entraToken(firstParty, BotTokenVerifier.FIRST_PARTY_TENANTS.get(0)), SERVICE_URL)
+                        .issuer())
+                .isEqualTo(firstParty);
+    }
+
+    @Test
+    void anEntraTokenIsBoundToItsIssuersTenant() throws Exception {
+        BotTokenVerifier verifier =
+                builder(BotTokenVerifier.builder(APP_ID).tenantId(TENANT)).build();
+
+        assertThatThrownBy(() -> verifier.verify(entraToken(ENTRA_V2, OTHER_TENANT), SERVICE_URL))
+                .isInstanceOf(TokenVerificationException.class)
+                .hasMessageContaining("tenant does not match");
+        // The tenant's issuer is accepted in either case of the GUID; the claim is compared the same way.
+        verifier.verify(
+                entraToken(ENTRA_V2.toUpperCase(java.util.Locale.ROOT), TENANT.toUpperCase(java.util.Locale.ROOT)),
+                SERVICE_URL);
+    }
+
+    @Test
+    void anotherTenantsIssuerIsRefusedBeforeAnyFetch() throws Exception {
+        BotTokenVerifier verifier =
+                builder(BotTokenVerifier.builder(APP_ID).tenantId(TENANT)).build();
+        String elsewhere = "https://login.microsoftonline.com/" + OTHER_TENANT + "/v2.0";
+
+        assertThatThrownBy(() -> verifier.verify(entraToken(elsewhere, OTHER_TENANT), SERVICE_URL))
+                .isInstanceOf(TokenVerificationException.class)
+                .hasMessageContaining("issuer is not accepted");
+        assertThat(transport.requests).isEmpty();
+    }
+
+    @Test
+    void eachIssuerHasItsOwnKeySet() throws Exception {
+        BotTokenVerifier verifier =
+                builder(BotTokenVerifier.builder(APP_ID).tenantId(TENANT)).build();
+
+        verifier.verify(token("k1", k1), SERVICE_URL);
+        verifier.verify(entraToken(ENTRA_V2, TENANT), SERVICE_URL);
+        // k2 is Entra's key, not the Bot Framework's: refreshing the Bot Framework set does not find it.
+        assertThatThrownBy(() -> verifier.verify(token("k2", k2), SERVICE_URL))
+                .hasMessageContaining("key id is unknown");
+
+        assertThat(transport.requests)
+                .extracting(r -> r.uri())
+                .containsExactly(METADATA, JWKS, BotTokenVerifier.ENTRA_OPENID_METADATA, ENTRA_JWKS, METADATA, JWKS);
+    }
+
+    @Test
+    void theDefaultIssuersAreTheBotFrameworkAndEntraForTheTenants() {
+        assertThat(BotTokenVerifier.defaultIssuers(null))
+                .containsEntry(BotTokenVerifier.BOT_FRAMEWORK_ISSUER, BotTokenVerifier.BOT_FRAMEWORK_OPENID_METADATA)
+                .hasSize(1 + 2 * BotTokenVerifier.FIRST_PARTY_TENANTS.size());
+        assertThat(BotTokenVerifier.defaultIssuers(TENANT))
+                .containsEntry(ENTRA_V1, BotTokenVerifier.ENTRA_OPENID_METADATA)
+                .containsEntry(ENTRA_V2, BotTokenVerifier.ENTRA_OPENID_METADATA)
+                .hasSize(3 + 2 * BotTokenVerifier.FIRST_PARTY_TENANTS.size());
+        assertThatThrownBy(() -> BotTokenVerifier.builder(APP_ID)
+                        .issuers(java.util.Map.of())
+                        .build())
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void withoutAnonymousAccessAMissingHeaderIsRefused() {
+        assertThatThrownBy(() -> verifier().verify(null, SERVICE_URL)).hasMessageContaining("no Authorization");
+        assertThatThrownBy(() -> verifier().verify("  ", SERVICE_URL)).hasMessageContaining("no Authorization");
+    }
+
+    @Test
+    void anonymousAccessExcusesAMissingHeaderAndNothingElse() throws Exception {
+        BotTokenVerifier verifier =
+                builder(BotTokenVerifier.builder(APP_ID).allowAnonymous()).build();
+
+        VerifiedToken anonymous = verifier.verify(null, SERVICE_URL);
+        assertThat(anonymous.isAnonymous()).isTrue();
+        assertThat(anonymous.appId()).isEqualTo(APP_ID);
+        assertThat(anonymous.serviceUrl()).isNull();
+        assertThat(verifier.verify("", SERVICE_URL).isAnonymous()).isTrue();
+
+        // A header that is there is checked in full.
+        assertThatThrownBy(() -> verifier.verify("Bearer a.b.c", SERVICE_URL)).hasMessageContaining("malformed");
+        assertThatThrownBy(() -> verifier.verify(token("k1", k2), SERVICE_URL)).hasMessageContaining("signature");
+        assertThat(verifier.verify(token("k1", k1), SERVICE_URL).isAnonymous()).isFalse();
+
+        ActivityReceiver receiver = new ActivityReceiver(verifier, new JacksonJsonCodec());
+        assertThat(receiver.receive(null, "{\"type\":\"message\",\"text\":\"hi\"}")
+                        .text())
+                .isEqualTo("hi");
     }
 }

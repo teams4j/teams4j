@@ -49,7 +49,7 @@ class TeamsBotRoutingTest {
                 .builder(appId)
                 .transport(transport)
                 .jsonCodec(codec)
-                .openIdMetadata(metadata)
+                .issuer(TestTokens.ISSUER, metadata)
                 .build()
         return ActivityReceiver(verifier, codec)
     }

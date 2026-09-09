@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -184,6 +185,48 @@ public final class ConnectorClient {
         return Retrying.block(createConversationAsync(serviceUrl, parameters), "createConversation");
     }
 
+    // ---- blocking lookups ------------------------------------------------------------------
+
+    /**
+     * One page of the conversation's members. For a channel conversation that is the team's roster.
+     * Needs no Graph permission: the bot is in the conversation, so it may see who else is.
+     *
+     * @param continuationToken the previous page's {@link PagedMembers#continuationToken()}; null for the first
+     */
+    public PagedMembers getPagedMembers(ConversationReference to, @Nullable String continuationToken) {
+        return Retrying.block(getPagedMembersAsync(to, continuationToken), "getPagedMembers");
+    }
+
+    /** Every member, all pages followed. A large team is many calls; prefer paging when the count is unknown. */
+    public List<TeamsChannelAccount> getMembers(ConversationReference to) {
+        return Retrying.block(getMembersAsync(to), "getMembers");
+    }
+
+    /**
+     * One member, with what Teams knows about them: name, email, principal name, role.
+     *
+     * @param userId the {@code from.id} of an activity, or an Entra object id
+     * @throws ConnectorException with status 404 when the user is not in the conversation
+     */
+    public TeamsChannelAccount getMember(ConversationReference to, String userId) {
+        return Retrying.block(getMemberAsync(to, userId), "getMember");
+    }
+
+    /**
+     * The team behind a channel conversation.
+     *
+     * @param serviceUrl the Connector, from any activity of the team
+     * @param teamId {@code channelData.team.id} of any activity from one of its channels
+     */
+    public TeamDetails getTeamDetails(URI serviceUrl, String teamId) {
+        return Retrying.block(getTeamDetailsAsync(serviceUrl, teamId), "getTeamDetails");
+    }
+
+    /** The team's channels. The General channel's id is the team's own. */
+    public List<TeamsChannelData.ChannelInfo> getTeamChannels(URI serviceUrl, String teamId) {
+        return Retrying.block(getTeamChannelsAsync(serviceUrl, teamId), "getTeamChannels");
+    }
+
     // ---- asynchronous ----------------------------------------------------------------------
 
     public CompletableFuture<ResourceResponse> sendActivityAsync(ConversationReference to, Activity activity) {
@@ -234,7 +277,92 @@ public final class ConnectorClient {
                 });
     }
 
+    public CompletableFuture<PagedMembers> getPagedMembersAsync(
+            ConversationReference to, @Nullable String continuationToken) {
+        StringBuilder path = new StringBuilder(conversationUri(to)).append("/pagedmembers");
+        if (continuationToken != null && !continuationToken.isBlank()) {
+            path.append("?continuationToken=").append(segment(continuationToken));
+        }
+        return get("getPagedMembers", URI.create(path.toString())).thenApply(json -> {
+            List<TeamsChannelAccount> members = new ArrayList<>();
+            for (CardValue element : Json.list(json, "members")) {
+                TeamsChannelAccount member = TeamsChannelAccount.fromJson(element);
+                if (member != null) {
+                    members.add(member);
+                }
+            }
+            return new PagedMembers(members, Json.str(json, "continuationToken"));
+        });
+    }
+
+    public CompletableFuture<List<TeamsChannelAccount>> getMembersAsync(ConversationReference to) {
+        Objects.requireNonNull(to, "to");
+        return collect(to, null, new ArrayList<>());
+    }
+
+    private CompletableFuture<List<TeamsChannelAccount>> collect(
+            ConversationReference to, @Nullable String continuationToken, List<TeamsChannelAccount> into) {
+        return getPagedMembersAsync(to, continuationToken).thenCompose(page -> {
+            into.addAll(page.members());
+            return page.hasMore()
+                    ? collect(to, page.continuationToken(), into)
+                    : CompletableFuture.completedFuture(List.copyOf(into));
+        });
+    }
+
+    public CompletableFuture<TeamsChannelAccount> getMemberAsync(ConversationReference to, String userId) {
+        URI uri = URI.create(conversationUri(to) + "/members/" + segment(Objects.requireNonNull(userId, "userId")));
+        return get("getMember", uri).thenApply(json -> {
+            TeamsChannelAccount member = TeamsChannelAccount.fromJson(json);
+            if (member == null) {
+                throw new IllegalStateException("getMember returned no member: " + json);
+            }
+            return member;
+        });
+    }
+
+    public CompletableFuture<TeamDetails> getTeamDetailsAsync(URI serviceUrl, String teamId) {
+        return get("getTeamDetails", teamUri(serviceUrl, teamId, "")).thenApply(TeamDetails::fromJson);
+    }
+
+    public CompletableFuture<List<TeamsChannelData.ChannelInfo>> getTeamChannelsAsync(URI serviceUrl, String teamId) {
+        return get("getTeamChannels", teamUri(serviceUrl, teamId, "/conversations"))
+                .thenApply(json -> {
+                    List<TeamsChannelData.ChannelInfo> channels = new ArrayList<>();
+                    for (CardValue element : Json.list(json, "conversations")) {
+                        TeamsChannelData.ChannelInfo channel = TeamsChannelData.ChannelInfo.fromJson(element);
+                        if (channel != null) {
+                            channels.add(channel);
+                        }
+                    }
+                    return List.copyOf(channels);
+                });
+    }
+
     // ---- plumbing --------------------------------------------------------------------------
+
+    private static String conversationUri(ConversationReference to) {
+        Objects.requireNonNull(to, "to");
+        return to.serviceUrl() + "/v3/conversations/" + segment(to.conversationId());
+    }
+
+    private static URI teamUri(URI serviceUrl, String teamId, String suffix) {
+        URI base = ConversationReference.normalise(Objects.requireNonNull(serviceUrl, "serviceUrl"));
+        return URI.create(base + "/v3/teams/" + segment(Objects.requireNonNull(teamId, "teamId")) + suffix);
+    }
+
+    /** A GET whose 2xx body is JSON; anything else is the exception for it. */
+    private CompletableFuture<CardValue> get(String operation, URI uri) {
+        return Retrying.run(retryPolicy, delayer, operation, attempt -> exchange("GET", uri, null, false))
+                .thenApply(outcome -> {
+                    String body = succeeded(operation, outcome);
+                    CardValue json = safeRead(body);
+                    if (json == null) {
+                        throw new IllegalStateException(operation + " did not return JSON: " + body);
+                    }
+                    return json;
+                });
+    }
 
     private static URI activitiesUri(ConversationReference to, @Nullable String activityId, boolean targeted) {
         Objects.requireNonNull(to, "to");

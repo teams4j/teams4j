@@ -1,5 +1,6 @@
 package io.github.teams4j.bot;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,9 @@ public record InvokeResponse(int status, @Nullable CardValue body) {
     /** The {@code type} of an {@code Action.Execute} response carrying an error. */
     public static final String ERROR_TYPE = "application/vnd.microsoft.error";
 
+    /** The {@code type} of an {@code application/search} response. */
+    public static final String SEARCH_RESPONSE_TYPE = "application/vnd.microsoft.search.searchResponse";
+
     /** {@code 200} with no body: the invoke was accepted and nothing is shown. */
     public static InvokeResponse ok() {
         return new InvokeResponse(200, null);
@@ -42,6 +46,28 @@ public record InvokeResponse(int status, @Nullable CardValue body) {
     /** A bare status with no body. */
     public static InvokeResponse status(int status) {
         return new InvokeResponse(status, null);
+    }
+
+    /** {@code 501}: the answer to an invoke the bot does not handle, which is what Teams expects for one. */
+    public static InvokeResponse notImplemented() {
+        return status(501);
+    }
+
+    /**
+     * The answer to an {@code application/search}: the choices matching what was typed.
+     *
+     * @param total how many match in all, when more than are returned; Teams pages with {@code skip}
+     */
+    public static InvokeResponse searchResults(List<SearchInvokeValue.Result> results, @Nullable Long total) {
+        Objects.requireNonNull(results, "results");
+        Json.ObjectBuilder value = new Json.ObjectBuilder()
+                .put(
+                        "results",
+                        results.stream().map(SearchInvokeValue.Result::toJson).toList());
+        if (total != null) {
+            value.put("totalResultCount", CardValue.of(total));
+        }
+        return ok(executeBody(200, SEARCH_RESPONSE_TYPE, value.build()));
     }
 
     /**

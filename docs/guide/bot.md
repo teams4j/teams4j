@@ -52,21 +52,29 @@ already have -- the same `CardWriter` for cards, plus a `JsonCodec` for the JSON
 ### Verifying the request
 
 Every request Teams makes carries a bearer token. `BotTokenVerifier` checks that it is an RS256 JWT
-signed by a key from the Bot Framework's published set, issued by an accepted issuer, addressed to
-your app id, inside its validity window, and -- when the activity is given -- that its `serviceurl`
-claim matches the activity's `serviceUrl`, so a token for one Connector cannot drive replies to
-another. Keys are fetched from the OpenID metadata document and cached (12 hours); a token naming
-a key id the cache lacks refreshes the set once, which is how rotation is followed.
+issued by an accepted issuer, signed by a key from that issuer's published set, addressed to your app
+id, inside its validity window, and -- when the activity is given -- that its `serviceurl` claim
+matches the activity's `serviceUrl`, so a token for one Connector cannot drive replies to another.
+
+Two kinds of issuer are accepted by default. The **Bot Framework** (`https://api.botframework.com`)
+signs what Azure Bot Service delivers, which is every request from Teams. **Microsoft Entra** signs
+tokens minted for your app directly, which is what the Agents SDK's tooling and agent-to-agent calls
+send; its issuers are accepted for your registration's own tenant and for the Microsoft tenants
+behind Teams, and an Entra token's `tid` must be the tenant its issuer names. Each issuer's keys are
+fetched from its OpenID metadata document and cached (12 hours); a token naming a key id the cache
+lacks refreshes that set once, which is how rotation is followed. `builder(credentials)` passes the
+tenant along; `builder(appId)` with no `tenantId` is right for a multi-tenant registration.
 
 Fail closed: the builder refuses a blank app id, and every failure is a `TokenVerificationException`
 whose message names the check. **Log the message, return a bare `401`.**
 
 | Option | Default | Why |
 |---|---|---|
-| `issuers` | `https://api.botframework.com`, `https://login.botframework.com` | The issuers of channel-to-bot tokens |
+| `tenantId` | — | Adds your tenant's Entra issuers. Set by `builder(credentials)` |
+| `issuers` | `defaultIssuers(tenantId)` | Each accepted `iss` with the metadata document naming its keys. Replace for another cloud; `issuer(iss, uri)` adds one, or points one at a stub in tests |
 | `clockSkew` | 5 min | Tolerance on `exp` and `nbf` |
 | `keyCacheTtl` | 12 h | How long a fetched key set is trusted |
-| `openIdMetadata` | `login.botframework.com/v1/.well-known/openidconfiguration` | Point it at a stub in tests |
+| `allowAnonymous` | off | **Development only.** A request with no `Authorization` header passes, as `VerifiedToken.isAnonymous()`; a header that is present is still verified. For a local emulator such as the Agents Playground |
 
 `ActivityReceiver` is the two steps in one call: parse the body, verify the header against it. Parse
 first, because the `serviceUrl` check needs the activity.
@@ -86,6 +94,9 @@ bot actually asks:
 | `isTargeted()` | Did the user send this through a targeted (ephemeral) message? Then answer with `sendTargetedActivity` |
 | `mentions()` | Who was mentioned |
 | `value()` | The `data` of the `Action.Submit` that was pressed, as a `CardValue` |
+| `teamsChannelData()` | The `channelData` as Teams fills it: `team()`, `channel()`, `tenantId()`, `meetingId()`, and on a `conversationUpdate` the `eventType()` -- `channelCreated`, `teamRenamed` and so on |
+| `reactionsAdded()` / `reactionsRemoved()` | On a `messageReaction`: what was pressed on the message `replyToId()` names |
+| `isEvent()` | A `meetingStart`, `meetingEnd` or read receipt; `name()` says which, `value()` carries the details |
 
 ::: tip Store the conversation reference
 A bot may post only to conversations it is a member of, and the install event is the one time Teams
@@ -113,6 +124,27 @@ is the one to store for unrelated posts later.
 Each returns a `ResourceResponse` whose `id()` is what the update and reply calls take. Every call
 has an `…Async` form returning a `CompletableFuture`, and `teams4j-bot-kotlin` adds `…Await`
 suspending forms.
+
+Beyond text and cards, `Activity.builder()` carries what Teams reads on a message: `summary` (the
+notification text for a message that is a card), `importance("high")` (marked important in Teams),
+`attachmentLayout("carousel")` for several cards, `expiration`, and
+`teamsChannelData(TeamsChannelData.alert())` to raise a toast for a proactive message.
+
+### Looking up
+
+The Connector also answers questions about the conversation the bot is in. No Graph permission or
+admin consent is involved: being in the conversation is the permission.
+
+| Call | Connector operation | Returns |
+|---|---|---|
+| `getPagedMembers(where, continuationToken)` | `GET …/pagedmembers` | One page of `TeamsChannelAccount`s -- name, email, principal name, role -- and the token for the next |
+| `getMembers(where)` | the same, every page | The whole roster |
+| `getMember(where, userId)` | `GET …/members/{userId}` | One member; a `ConnectorException` with status 404 if they are not in the conversation |
+| `getTeamDetails(serviceUrl, teamId)` | `GET /v3/teams/{teamId}` | Name, Entra group id, member and channel counts |
+| `getTeamChannels(serviceUrl, teamId)` | `GET /v3/teams/{teamId}/conversations` | The channels; the General channel's id is the team's |
+
+`where` is the `conversationReference()` of any activity; for a channel that is the team's roster.
+`teamId` is `teamsChannelData().team().id()` of any activity from one of the team's channels.
 
 ### Cards
 
@@ -154,10 +186,24 @@ what the Spring Boot starter does when `teams4j.bot.app-id` is unset.
 
 ## Answering an invoke
 
-An `invoke` activity -- `Action.Execute`, a task module, a message extension -- is synchronous:
+An `invoke` activity -- `Action.Execute`, a dialog, a message extension, a tab -- is synchronous:
 the answer is the HTTP response itself, so a bare `200` is not enough. `InvokeResponse` is that
-answer, status and body. For `Action.Execute` (`activity.name()` is `adaptiveCard/action`) Teams
-expects `200` with a body whose own `statusCode` carries the outcome; three helpers build those:
+answer, status and body. `activity.isInvoke(name)` with the names in `InvokeNames` tells them apart;
+each has a request record that reads `activity.value()`, and a builder for the answer Teams expects.
+An invoke the bot does not handle gets `InvokeResponse.notImplemented()`, a `501`.
+
+| Invoke (`InvokeNames`) | Request | Answer |
+|---|---|---|
+| `ADAPTIVE_CARD_ACTION` | `AdaptiveCardInvokeValue`: `verb()`, `data()` | `connector.cardResponse(card)`, `InvokeResponse.message(text)`, `InvokeResponse.error(…)` |
+| `APPLICATION_SEARCH` | `SearchInvokeValue`: `queryText()`, `top()`, `dataset()` | `InvokeResponse.searchResults(results, total)` |
+| `TASK_FETCH`, `TASK_SUBMIT` | `TaskModuleRequest`: `data(key)`, `isSubmit(activity)` | `TaskModuleResponse.show(TaskModuleTaskInfo.card(card))`, `.message(text)`, `.close()` |
+| `COMPOSE_EXTENSION_QUERY` | `MessagingExtensionQuery`: `commandId()`, `parameter(name)`, `isInitialRun()` | `MessagingExtensionResponse.results(attachments)`, `.message(text)`, `.auth(…)`, `.config(…)` |
+| `COMPOSE_EXTENSION_FETCH_TASK`, `…_SUBMIT_ACTION` | `MessagingExtensionAction`: `commandId()`, `data(key)`, `botMessagePreviewAction()` | `MessagingExtensionResponse.showDialog(task)`, `.results(…)`, `.botMessagePreview(card)` |
+| `COMPOSE_EXTENSION_QUERY_LINK` | `AppBasedLinkQuery`: `url()` | `MessagingExtensionResponse.results(…)` |
+| `TAB_FETCH`, `TAB_SUBMIT` | `TabRequest`: `tabEntityId()`, `data()` | `TabResponse.cards(cards)`, `.auth(…)` |
+| `MESSAGE_SUBMIT_ACTION` | `FeedbackSubmission`: `reaction()`, `feedbackText()` | `InvokeResponse.ok()` |
+
+For `Action.Execute` Teams expects `200` with a body whose own `statusCode` carries the outcome:
 
 | Helper | Teams shows |
 |---|---|
@@ -165,7 +211,12 @@ expects `200` with a body whose own `statusCode` carries the outcome; three help
 | `InvokeResponse.message(text)` | A transient message; the card stays |
 | `InvokeResponse.error(statusCode, code, message)` | An error on the card |
 
-`InvokeResponse.ok(body)` and `InvokeResponse.status(code)` cover every other invoke.
+A message extension result is a `MessagingExtensionAttachment`: the card inserted when picked, and
+a preview for the result list, e.g. `MessagingExtensionAttachment.adaptiveCard(card).withThumbnailPreview(title, text)`.
+A dialog is a `TaskModuleTaskInfo`, `card(card)` or `url(url)`, sized with `withSize("medium")` or
+`withSize(width, height)`. `InvokeResponse.ok(body)` and `InvokeResponse.status(code)` remain for
+anything not covered; SSO invokes (`SIGNIN_TOKEN_EXCHANGE`, `SIGNIN_VERIFY_STATE`) and file consent
+are named but have no model yet.
 
 ## Starting a conversation
 

@@ -29,7 +29,7 @@ import io.ktor.server.routing.routing
  */
 fun main() {
     val credentials = credentials()
-    val receiver = ActivityReceiver(BotTokenVerifier.builder(credentials.appId()).build())
+    val receiver = ActivityReceiver(BotTokenVerifier.builder(credentials).build())
     val connector = ConnectorClient.builder(credentials).build()
 
     embeddedServer(Netty, port = 3978) {

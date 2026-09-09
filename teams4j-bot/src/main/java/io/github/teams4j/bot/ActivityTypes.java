@@ -20,8 +20,17 @@ public final class ActivityTypes {
     /** A message the bot sent was edited, deleted or restored by the user. */
     public static final String MESSAGE_UPDATE = "messageUpdate";
 
+    /** A message was deleted; {@code channelData.eventType} says how. */
+    public static final String MESSAGE_DELETE = "messageDelete";
+
     /** The bot was uninstalled. */
     public static final String INSTALLATION_UPDATE = "installationUpdate";
+
+    /**
+     * Something happened that is not a message: a meeting started or ended, a read receipt. {@code name}
+     * says what, e.g. {@code application/vnd.microsoft.meetingStart}, and {@code value} carries the details.
+     */
+    public static final String EVENT = "event";
 
     /** Typing indicator, which a bot may send while working. */
     public static final String TYPING = "typing";

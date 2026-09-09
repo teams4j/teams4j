@@ -60,6 +60,13 @@ public class TeamsBotProperties {
     /** How long a fetched signing key set is trusted before a routine refresh. */
     private Duration keyCacheTtl = Duration.ofHours(12);
 
+    /**
+     * Development only. Accept a request with no {@code Authorization} header, as a local emulator
+     * such as the Agents Playground sends; a header that is present is still verified. Never where
+     * the endpoint is reachable from the internet.
+     */
+    private boolean allowAnonymous = false;
+
     public @Nullable String getAppId() {
         return appId;
     }
@@ -154,5 +161,13 @@ public class TeamsBotProperties {
 
     public void setKeyCacheTtl(Duration keyCacheTtl) {
         this.keyCacheTtl = keyCacheTtl;
+    }
+
+    public boolean isAllowAnonymous() {
+        return allowAnonymous;
+    }
+
+    public void setAllowAnonymous(boolean allowAnonymous) {
+        this.allowAnonymous = allowAnonymous;
     }
 }

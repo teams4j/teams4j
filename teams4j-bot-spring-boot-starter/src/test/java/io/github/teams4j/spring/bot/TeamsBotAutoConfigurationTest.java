@@ -139,6 +139,7 @@ class TeamsBotAutoConfigurationTest {
             assertThat(properties.getConnectTimeout()).isEqualTo(Duration.ofSeconds(5));
             assertThat(properties.getClockSkew()).isEqualTo(Duration.ofMinutes(5));
             assertThat(properties.getKeyCacheTtl()).isEqualTo(Duration.ofHours(12));
+            assertThat(properties.isAllowAnonymous()).isFalse();
         });
     }
 

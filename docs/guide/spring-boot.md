@@ -128,7 +128,7 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 |---|---|---|
 | `app-id` | — | **Required** for the bot to exist. The Microsoft App ID; also the audience inbound tokens must carry |
 | `app-secret` | — | Required once `app-id` is set. Inject it as a secret |
-| `tenant-id` | — | The home tenant of a single-tenant registration, which the Developer Portal creates by default. Unset for multi-tenant |
+| `tenant-id` | — | The home tenant of a single-tenant registration, which the Developer Portal creates by default. Also adds its Entra issuers to the token verifier. Unset for multi-tenant |
 | `path` | `/api/messages` | Where the endpoint listens |
 | `validation` | `enforce` | For outbound cards, as in the webhook starter |
 | `max-attempts` | `3` | Connector calls, `429` and `5xx` |
@@ -138,6 +138,7 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 | `connect-timeout` | `5s` | Ignored when an `HttpTransport` bean is present |
 | `clock-skew` | `5m` | Tolerance on inbound tokens' `exp` and `nbf` |
 | `key-cache-ttl` | `12h` | How long a fetched signing key set is trusted |
+| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header, for a local emulator such as the Agents Playground |
 
 ## In tests
 

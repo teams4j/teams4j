@@ -150,7 +150,7 @@ class TeamsBotEndpointTest {
             // needs a stub declares the verifier bean, which the auto-configuration then backs off.
             return BotTokenVerifier.builder(APP_ID)
                     .transport(transport)
-                    .openIdMetadata(URI.create("https://login.example/openid"))
+                    .issuer(TestTokens.ISSUER, URI.create("https://login.example/openid"))
                     .build();
         }
 

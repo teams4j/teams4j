@@ -214,4 +214,87 @@ class ActivityTest {
         assertThat(a.attachments()).isNull();
         assertThat(a.mentions()).isEmpty();
     }
+
+    @Test
+    void aReactionNamesTheMessageAndWhatWasAdded() {
+        Activity a = Activity.parse(codec, """
+                {"type":"messageReaction","replyToId":"1693900000000",
+                 "reactionsAdded":[{"type":"like"}],"reactionsRemoved":[{"type":"heart"},{"type":"laugh"}]}
+                """);
+
+        assertThat(a.isMessageReaction()).isTrue();
+        assertThat(a.replyToId()).isEqualTo("1693900000000");
+        assertThat(a.reactionsAdded()).containsExactly(new MessageReaction("like"));
+        assertThat(a.reactionsRemoved()).extracting(MessageReaction::type).containsExactly("heart", "laugh");
+        assertThat(Activity.parse(codec, "{\"type\":\"message\"}").reactionsAdded())
+                .isNull();
+    }
+
+    @Test
+    void channelDataReadsAsWhatTeamsPutsThere() {
+        Activity a = Activity.parse(codec, """
+                {"type":"conversationUpdate",
+                 "channelData":{
+                   "eventType":"channelCreated",
+                   "team":{"id":"19:team@thread.tacv2","name":"Ops","aadGroupId":"group-1"},
+                   "channel":{"id":"19:chan@thread.tacv2","name":"alerts","type":"standard"},
+                   "tenant":{"id":"tenant-1"},
+                   "settings":{"selectedChannel":{"id":"19:chan@thread.tacv2"}}}}
+                """);
+
+        TeamsChannelData data = Objects.requireNonNull(a.teamsChannelData());
+        assertThat(data.eventType()).isEqualTo("channelCreated");
+        assertThat(data.team()).isEqualTo(new TeamsChannelData.TeamInfo("19:team@thread.tacv2", "Ops", "group-1"));
+        assertThat(data.channel())
+                .isEqualTo(new TeamsChannelData.ChannelInfo("19:chan@thread.tacv2", "alerts", "standard"));
+        assertThat(data.tenantId()).isEqualTo("tenant-1");
+        assertThat(data.meetingId()).isNull();
+        assertThat(data.notification()).isNull();
+        assertThat(Json.at(data.raw(), "settings"))
+                .as("the rest stays reachable")
+                .isNotNull();
+        assertThat(a.tenantId()).isEqualTo("tenant-1");
+
+        assertThat(Activity.parse(codec, "{\"type\":\"message\"}").teamsChannelData())
+                .isNull();
+    }
+
+    @Test
+    void anOutboundMessageCanAlertAndBeMarkedImportant() {
+        Activity a = Activity.message("Deploy failed").toBuilder()
+                .summary("Deploy failed")
+                .importance("high")
+                .attachmentLayout("carousel")
+                .expiration("2026-09-10T00:00:00Z")
+                .teamsChannelData(TeamsChannelData.alert())
+                .build();
+
+        CardValue json = a.toJson();
+        assertThat(Json.str(json, "summary")).isEqualTo("Deploy failed");
+        assertThat(Json.str(json, "importance")).isEqualTo("high");
+        assertThat(Json.str(json, "attachmentLayout")).isEqualTo("carousel");
+        assertThat(Json.str(json, "expiration")).isEqualTo("2026-09-10T00:00:00Z");
+        assertThat(Json.bool(Json.at(Json.at(json, "channelData"), "notification"), "alert"))
+                .isTrue();
+
+        Activity again = Activity.fromJson(codec.read(codec.write(json)));
+        assertThat(again.toBuilder().build()).isEqualTo(a);
+        assertThat(Objects.requireNonNull(again.teamsChannelData()).notification())
+                .isEqualTo(TeamsChannelData.NotificationInfo.ALERT);
+    }
+
+    @Test
+    void anEventSaysWhatHappenedInItsName() {
+        Activity a = Activity.parse(codec, """
+                {"type":"event","name":"application/vnd.microsoft.meetingStart",
+                 "value":{"id":"m-1","title":"Standup","startTime":"2026-09-09T00:00:00Z"},
+                 "channelData":{"meeting":{"id":"m-1"},"tenant":{"id":"tenant-1"}}}
+                """);
+
+        assertThat(a.isEvent()).isTrue();
+        assertThat(a.isMessage()).isFalse();
+        assertThat(a.name()).isEqualTo("application/vnd.microsoft.meetingStart");
+        assertThat(Json.str(a.value(), "title")).isEqualTo("Standup");
+        assertThat(Objects.requireNonNull(a.teamsChannelData()).meetingId()).isEqualTo("m-1");
+    }
 }
