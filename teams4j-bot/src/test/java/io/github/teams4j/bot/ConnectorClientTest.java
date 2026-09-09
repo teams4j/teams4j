@@ -198,6 +198,38 @@ class ConnectorClientTest {
         assertThat(tokensIssued).hasValue(2);
     }
 
+    /** The emulator's Connector wants no token; the real one answers 401, once, with a hint. */
+    @Test
+    void withoutATokenNoHeaderGoesOutAndA401IsNotRetried() {
+        server.stubFor(post(urlEqualTo(ACTIVITIES))
+                .willReturn(aResponse().withStatus(201).withBody("{\"id\":\"ok\"}")));
+        ConnectorClient anonymous = ConnectorClient.builder("app-id")
+                .tokenProvider(TokenProvider.none())
+                .build();
+
+        assertThat(anonymous.botId()).isEqualTo("28:app-id");
+        assertThat(anonymous.sendActivity(where(), Activity.message("hi")).id()).isEqualTo("ok");
+        server.verify(postRequestedFor(urlEqualTo(ACTIVITIES)).withoutHeader("Authorization"));
+
+        server.resetAll();
+        server.stubFor(post(urlEqualTo(ACTIVITIES))
+                .willReturn(aResponse().withStatus(401).withBody("nope")));
+        assertThatThrownBy(() -> anonymous.sendActivity(where(), Activity.message("hi")))
+                .isInstanceOf(ConnectorException.class)
+                .hasMessageContaining("TokenProvider.none()");
+        assertThat(server.findAll(postRequestedFor(urlEqualTo(ACTIVITIES))))
+                .as("no refresh to try")
+                .hasSize(1);
+    }
+
+    @Test
+    void anAppIdAloneNeedsATokenProvider() {
+        assertThatThrownBy(() -> ConnectorClient.builder("app-id").build())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("tokenProvider");
+        assertThatThrownBy(() -> ConnectorClient.builder(" ")).isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     void aSecond401IsTheAnswer() {
         server.stubFor(post(urlEqualTo(ACTIVITIES))

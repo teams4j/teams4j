@@ -184,6 +184,22 @@ smoke table passed.
 | `POST /v3/conversations` for a user the bot already chats with returns the existing `a:…` conversation, not a new one | `createConversation` doubles as "find my chat with this user" |
 | A channel `@mention` reaches the bot only when the app's bot scope includes `team` *and* the bot is not marked notification-only in the Developer Portal; with both, the message carries a `mention` entity and `<at>…</at>` in the text | `textWithoutMentions()` gave the bare command; the two manifest settings are the first thing to check when a mention never arrives |
 
+### The Agents Playground (2026-09-09)
+
+The same Ktor example against the [Microsoft 365 Agents Playground](../guide/bot#local-development-the-agents-playground)
+0.2.28 on channel `msteams`, driven through the routes its own UI uses, every exchange recorded with
+`--enable-events-recording`. Install, message, card, `Action.Submit`, channel `@mention` and
+`messageReaction` all round-tripped; the recorded inbound activities are the fixtures of
+`PlaygroundFixturesTest`. Where it differs from the tenant:
+
+| Observed | Consequence in the library |
+|---|---|
+| No `Authorization` header on any request, and the mock Connector wants none back | `allowAnonymous()` on the verifier and `TokenProvider.none()` on the client, the development-only pair |
+| The bot is `00000000-…-11`, the `bot.id` of its config, in `recipient` *and* in `membersAdded`: no `28:` prefix anywhere | `isBotAdded` now matches the bare id as well as `28:<id>`, so `connector.botId()` works against both |
+| `serviceUrl` is `http://localhost:56150/_connector`, plain HTTP. The JDK client's first request asked to upgrade to HTTP/2 (`Upgrade: h2c`) and the Node server closed the socket; three attempts, three resets | The client teams4j builds for `TokenProvider.none()` speaks HTTP/1.1. A transport of your own must too |
+| Channel messages look like Teams': `conversation.id` is `team-id;messageid=<id>`, `channelData.team` and `.channel` are filled, the mention arrives as an entity plus `<at>Test Bot</at>` | Nothing to change; `withoutMessageId()` and `textWithoutMentions()` behave as in the tenant |
+| An `Action.Execute` invoke carries `value` like a submit does | The examples check `isInvoke()` before `value()`; the order was wrong before and the Playground showed it |
+
 ## What Teams adds to a card
 
 Observed while running the probes, and worth knowing before you compare the channel with your JSON:

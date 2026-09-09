@@ -1,0 +1,34 @@
+{
+  "type": "conversationUpdate",
+  "id": "7a0375f2-96b3-49d1-93f2-36991daf533e",
+  "from": {
+    "id": "user-id-0",
+    "aadObjectId": "00000000-0000-0000-0000-0000000000020"
+  },
+  "timestamp": "2026-09-09T14:48:16.003Z",
+  "serviceUrl": "http://localhost:56150/_connector",
+  "conversation": {
+    "conversationType": "personal",
+    "tenantId": "00000000-0000-0000-0000-0000000000001",
+    "id": "0e19cc28-21fa-496d-b0d2-0f954b1efcdd"
+  },
+  "recipient": {
+    "id": "00000000-0000-0000-0000-00000000000011",
+    "name": "Test Bot"
+  },
+  "membersAdded": [
+    {
+      "id": "user-id-0",
+      "aadObjectId": "00000000-0000-0000-0000-0000000000020"
+    },
+    {
+      "id": "00000000-0000-0000-0000-00000000000011"
+    }
+  ],
+  "channelData": {
+    "tenant": {
+      "id": "00000000-0000-0000-0000-0000000000001"
+    }
+  },
+  "channelId": "msteams"
+}

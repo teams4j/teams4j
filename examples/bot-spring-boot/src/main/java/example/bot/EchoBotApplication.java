@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 
 import io.github.teams4j.bot.Activity;
 import io.github.teams4j.bot.ActivityHandler;
-import io.github.teams4j.bot.BotCredentials;
 import io.github.teams4j.bot.ConnectorClient;
 import io.github.teams4j.bot.ConversationReference;
 import io.github.teams4j.bot.InvokeResponse;
@@ -30,6 +29,10 @@ import io.github.teams4j.cards.dsl.Cards;
  * in Teams, and say something. The bot echoes it in a card with a button; pressing the button
  * comes back as an {@code Action.Submit}, which the bot answers in the thread.
  *
+ * <p>Or skip the tunnel and the tenant: with {@code TEAMS_BOT_ALLOW_ANONYMOUS=true} and no secret,
+ * the Agents Playground ({@code agentsplayground -e http://localhost:8080/api/messages -c msteams})
+ * talks to it on this machine. Development only.
+ *
  * <p>Without {@code teams4j.bot.app-id} nothing is registered and the application still starts.
  */
 @SpringBootApplication
@@ -43,23 +46,24 @@ public class EchoBotApplication {
 
     /** The one bean an application writes. Return null for {@code 200}; return an InvokeResponse to an invoke. */
     @Bean
-    ActivityHandler echo(ConnectorClient connector, BotCredentials credentials) {
+    ActivityHandler echo(ConnectorClient connector) {
         return activity -> {
             ConversationReference where = activity.conversationReference();
             if (where == null) {
                 return null; // nothing to answer to
             }
-            if (activity.isBotAdded(credentials.botId())) {
+            if (activity.isBotAdded(connector.botId())) {
                 // The one moment Teams hands over where to post; a real bot stores `where` here.
                 connector.sendActivity(where, Activity.message("Hello! Say something and I will echo it."));
+            } else if (activity.isInvoke()) {
+                // Before the value check: an Action.Execute invoke carries a value too, and wants its answer here.
+                return InvokeResponse.message("Received " + activity.name());
             } else if (activity.value() != null) {
                 connector.replyToActivity(where, activity.id(), Activity.message("You pressed: " + activity.value()));
             } else if (activity.isMessage()) {
                 connector.replyToActivity(where, activity.id(), connector.cardActivity(Cards.card()
                         .text("You said: " + activity.textWithoutMentions())
                         .action(Actions.submit("Press me", Map.of("pressed", true)))));
-            } else if (activity.isInvoke()) {
-                return InvokeResponse.message("Received " + activity.name());
             } else {
                 log.info("ignoring a {} activity", activity.type());
             }

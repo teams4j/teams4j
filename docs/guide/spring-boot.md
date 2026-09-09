@@ -111,7 +111,10 @@ teams4j:
 
 **Without `teams4j.bot.app-id` no bot beans are created**, for the reason the webhook starter has:
 an application with the starter on its classpath and no bot configured must still start. An app id
-without a secret fails startup; that is a misconfiguration, and startup is where to learn it.
+without a secret fails startup; that is a misconfiguration, and startup is where to learn it. The one
+exception is `allow-anonymous`, the [local emulator mode](./bot#local-development-the-agents-playground):
+with it on and no secret, there are no `BotCredentials`, the verifier lets a request without a token
+through, and the `ConnectorClient` sends none.
 
 With the app id set, the context holds `BotCredentials`, `BotTokenVerifier`, `ActivityReceiver`,
 `ConnectorClient` and `ActivityEndpoint`, each replaceable by a bean of your own. In a Spring MVC
@@ -127,7 +130,7 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 | Property | Default | Description |
 |---|---|---|
 | `app-id` | — | **Required** for the bot to exist. The Microsoft App ID; also the audience inbound tokens must carry |
-| `app-secret` | — | Required once `app-id` is set. Inject it as a secret |
+| `app-secret` | — | Required once `app-id` is set, unless `allow-anonymous` is on. Inject it as a secret |
 | `tenant-id` | — | The home tenant of a single-tenant registration, which the Developer Portal creates by default. Also adds its Entra issuers to the token verifier. Unset for multi-tenant |
 | `path` | `/api/messages` | Where the endpoint listens |
 | `validation` | `enforce` | For outbound cards, as in the webhook starter |
@@ -138,7 +141,7 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 | `connect-timeout` | `5s` | Ignored when an `HttpTransport` bean is present |
 | `clock-skew` | `5m` | Tolerance on inbound tokens' `exp` and `nbf` |
 | `key-cache-ttl` | `12h` | How long a fetched signing key set is trusted |
-| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header, for a local emulator such as the Agents Playground |
+| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header, for a local emulator such as the Agents Playground; with no `app-secret`, send none either |
 
 ## In tests
 

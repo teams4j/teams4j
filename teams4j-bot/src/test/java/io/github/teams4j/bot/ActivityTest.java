@@ -129,6 +129,11 @@ class ActivityTest {
         Activity userJoined =
                 Activity.parse(codec, "{\"type\":\"conversationUpdate\",\"membersAdded\":[{\"id\":\"29:1abc\"}]}");
         assertThat(userJoined.isBotAdded("28:app-id")).isFalse();
+        Activity playground =
+                Activity.parse(codec, "{\"type\":\"conversationUpdate\",\"membersAdded\":[{\"id\":\"app-id\"}]}");
+        assertThat(playground.isBotAdded("28:app-id"))
+                .as("the Agents Playground names the bot by the bare app id")
+                .isTrue();
         assertThat(Activity.parse(codec, CHANNEL_MESSAGE).isBotAdded("28:app-id"))
                 .as("a message is never an install")
                 .isFalse();

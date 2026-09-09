@@ -179,10 +179,13 @@ connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().t
 | `BotCredentials.of(appId, secret)` | Multi-tenant | `login.microsoftonline.com/botframework.com` |
 | `BotCredentials.singleTenant(appId, secret, tenantId)` | Single-tenant | `login.microsoftonline.com/{tenantId}` |
 
-Tokens from elsewhere -- MSAL, a sidecar, a certificate flow -- go in through `Builder.tokenProvider`.
-`BotCredentials.toString()` omits the secret. There is no "unconfigured" mode: a blank app id is
-refused at construction, so an environment without a bot should not build the client at all, which is
-what the Spring Boot starter does when `teams4j.bot.app-id` is unset.
+Tokens from elsewhere -- MSAL, a sidecar, a certificate flow -- go in through `Builder.tokenProvider`,
+on `ConnectorClient.builder(appId)` when there is no secret to mint from. `BotCredentials.toString()`
+omits the secret. There is no "unconfigured" mode: a blank app id is refused at construction, so an
+environment without a bot should not build the client at all, which is what the Spring Boot starter
+does when `teams4j.bot.app-id` is unset. `TokenProvider.none()` sends no token at all, for the
+[local emulator](#local-development-the-agents-playground) and nothing else. `connector.botId()` is
+the `28:<appId>` either way.
 
 ## Answering an invoke
 
@@ -272,6 +275,39 @@ runtimeOnly("io.github.teams4j:teams4j-cards-kotlinx")   // or teams4j-cards-jac
 <<< ../../examples/bot-ktor/src/main/kotlin/example/EchoBot.kt
 
 The module depends on `ktor-server-core` alone, so the engine stays your choice.
+
+### Local development: the Agents Playground
+
+The [Microsoft 365 Agents Playground](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/debug-your-agents-playground)
+(formerly the Teams App Test Tool) is a Teams client and a Bot Connector in one local process: it
+posts activities to your endpoint and renders what you send back, with no tunnel, no tenant and no
+registration. It sends **no token**, and expects none, so the bot needs its development-only mode on
+both sides:
+
+```java
+BotTokenVerifier verifier = BotTokenVerifier.builder(appId).allowAnonymous().build();
+ConnectorClient connector = ConnectorClient.builder(appId).tokenProvider(TokenProvider.none()).build();
+```
+
+or, on the starter, `teams4j.bot.allow-anonymous=true` with no `app-secret`. The app id is whatever
+the Playground's `bot.id` is, `00000000-0000-0000-0000-00000000000011` unless you have a
+`.m365agentsplayground.yml`. The Playground is plain HTTP, and its Node server drops a connection
+that asks to upgrade to HTTP/2, which the JDK client does on plain HTTP by default; the client
+teams4j builds in this mode speaks HTTP/1.1, and an `HttpTransport` of your own must too. Then:
+
+```bash
+npx -y @microsoft/m365agentsplayground -e http://localhost:3978/api/messages -c msteams
+```
+
+`-c msteams` matters: the default `emulator` channel lacks the Teams-specific mock activities
+(installation, channel and team `conversationUpdate`s). Both examples run this way; see
+[examples/README](https://github.com/teams4j/teams4j/tree/main/examples#without-a-tunnel-the-agents-playground).
+
+What it is not: Teams. It renders Adaptive Cards only, knows no typing indicator, message extension,
+dialog or SSO, and what it reports as `serviceUrl`, ids and tenant is mock data. Everything in
+[measurements](../reference/measurements) was taken against a tenant, and a bot should be seen in
+Teams before it ships. Never leave `allowAnonymous` or `TokenProvider.none()` on where the endpoint
+is reachable from the internet.
 
 ## Exceptions
 

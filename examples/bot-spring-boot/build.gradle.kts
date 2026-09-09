@@ -20,7 +20,7 @@ application {
 
 tasks.named<JavaExec>("run") {
     // Credentials come from the environment only. See application.yml.
-    for (name in listOf("TEAMS_BOT_APP_ID", "TEAMS_BOT_APP_SECRET", "TEAMS_BOT_TENANT_ID")) {
+    for (name in listOf("TEAMS_BOT_APP_ID", "TEAMS_BOT_APP_SECRET", "TEAMS_BOT_TENANT_ID", "TEAMS_BOT_ALLOW_ANONYMOUS")) {
         environment(name, providers.environmentVariable(name).getOrElse(""))
     }
 }

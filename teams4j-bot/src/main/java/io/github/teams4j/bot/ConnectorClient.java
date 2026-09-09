@@ -54,11 +54,12 @@ public final class ConnectorClient {
 
     private static final System.Logger LOG = System.getLogger(ConnectorClient.class.getName());
 
-    private final BotCredentials credentials;
+    private final String botId;
     private final HttpTransport transport;
     private final JsonCodec codec;
     private final CardWriter cardWriter;
     private final TokenProvider tokens;
+    private final boolean anonymous;
     private final RetryPolicy retryPolicy;
     private final Retrying.Delayer delayer;
     private final Duration requestTimeout;
@@ -66,24 +67,59 @@ public final class ConnectorClient {
     private final TeamsProfileValidator validator = TeamsProfileValidator.forBot();
 
     private ConnectorClient(Builder b) {
-        this.credentials = b.credentials;
-        this.transport = b.transport != null
-                ? b.transport
-                : HttpTransport.jdk(
-                        HttpClient.newBuilder().connectTimeout(b.connectTimeout).build());
+        this.botId = "28:" + b.appId;
+        this.anonymous = b.tokens instanceof TokenProvider.NoToken;
+        if (b.transport != null) {
+            this.transport = b.transport;
+        } else {
+            HttpClient.Builder http = HttpClient.newBuilder().connectTimeout(b.connectTimeout);
+            if (anonymous) {
+                // The emulator is plain HTTP, and the JDK client's h2c upgrade attempt on plain HTTP is
+                // answered by Node with a closed socket. The real Connector is HTTPS and negotiates.
+                http.version(HttpClient.Version.HTTP_1_1);
+            }
+            this.transport = HttpTransport.jdk(http.build());
+        }
         this.codec = b.codec != null ? b.codec : JsonCodec.discover();
         this.cardWriter = b.cardWriter != null ? b.cardWriter : CardWriter.discover();
-        this.tokens = b.tokens != null
-                ? b.tokens
-                : new ClientCredentialsTokenProvider(b.credentials, transport, codec, b.clock, b.requestTimeout);
+        if (b.tokens != null) {
+            this.tokens = b.tokens;
+        } else if (b.credentials != null) {
+            this.tokens =
+                    new ClientCredentialsTokenProvider(b.credentials, transport, codec, b.clock, b.requestTimeout);
+        } else {
+            throw new IllegalStateException(
+                    "a ConnectorClient built from an app id alone needs a tokenProvider: there are no credentials to"
+                            + " mint tokens from. TokenProvider.none() is the choice for a local emulator");
+        }
+        if (anonymous) {
+            LOG.log(System.Logger.Level.WARNING, "teams4j: the Connector client sends no token. Development only.");
+        }
         this.retryPolicy = new RetryPolicy(b.maxAttempts, b.initialBackoff, b.maxBackoff, b.random, b.clock);
         this.delayer = b.delayer;
         this.requestTimeout = b.requestTimeout;
         this.validationMode = b.validation;
     }
 
+    /** Starts a client that mints its own tokens from the registration. */
     public static Builder builder(BotCredentials credentials) {
-        return new Builder(credentials);
+        Objects.requireNonNull(credentials, "credentials");
+        return new Builder(credentials.appId(), credentials);
+    }
+
+    /**
+     * Starts a client whose tokens come from elsewhere: {@link Builder#tokenProvider} is then
+     * required, and {@link TokenProvider#none()} is the one for a local emulator.
+     *
+     * @param appId the bot's Microsoft App ID, from which {@link #botId()} follows
+     */
+    public static Builder builder(String appId) {
+        return new Builder(appId, null);
+    }
+
+    /** The bot's own channel account id, {@code 28:<appId>}: how it appears in {@code recipient} and {@code membersAdded}. */
+    public String botId() {
+        return botId;
     }
 
     // ---- cards -------------------------------------------------------------------------------
@@ -260,7 +296,7 @@ public final class ConnectorClient {
         URI base = ConversationReference.normalise(Objects.requireNonNull(serviceUrl, "serviceUrl"));
         URI uri = URI.create(base + "/v3/conversations");
         String body = codec.write(Objects.requireNonNull(parameters, "parameters")
-                .withBot(ChannelAccount.of(credentials.botId()))
+                .withBot(ChannelAccount.of(botId))
                 .toJson());
         return Retrying.run(retryPolicy, delayer, "createConversation", attempt -> exchange("POST", uri, body, false))
                 .thenApply(outcome -> {
@@ -391,12 +427,14 @@ public final class ConnectorClient {
                 .thenApply(outcome -> complete(operation, outcome));
     }
 
-    /** One attempt: token, request, and on a 401 one refresh and one more request. */
+    /** One attempt: token, request, and on a 401 one refresh and one more request. No token, no header, no refresh. */
     private CompletableFuture<HttpExchange.Response> exchange(
             String method, URI uri, @Nullable String body, boolean refreshed) {
         return tokens.accessToken().thenCompose(token -> {
             Map<String, String> headers = new LinkedHashMap<>();
-            headers.put("Authorization", "Bearer " + token);
+            if (!anonymous) {
+                headers.put("Authorization", "Bearer " + token);
+            }
             headers.put("Accept", "application/json");
             if (body != null) {
                 headers.put("Content-Type", "application/json");
@@ -404,7 +442,7 @@ public final class ConnectorClient {
             return transport
                     .send(new HttpExchange.Request(method, uri, headers, body, requestTimeout))
                     .thenCompose(response -> {
-                        if (response.statusCode() == 401 && !refreshed) {
+                        if (response.statusCode() == 401 && !refreshed && !anonymous) {
                             tokens.invalidate();
                             return exchange(method, uri, body, true);
                         }
@@ -430,7 +468,9 @@ public final class ConnectorClient {
             throw new BotNotInConversationException(operation, response.body(), outcome.attempts());
         }
         String body = response.body();
-        if (status == 401) {
+        if (status == 401 && anonymous) {
+            body = body + " -- this client sends no token (TokenProvider.none()) and this Connector wants one.";
+        } else if (status == 401) {
             // The token endpoint issued a token and the Connector refused it: almost always a single-tenant
             // registration whose token came from the shared authority, or the other way round.
             body = body + " -- the token was issued but not accepted. A single-tenant registration needs its"
@@ -449,7 +489,8 @@ public final class ConnectorClient {
 
     /** Configures a {@link ConnectorClient}. Every setting but the credentials has a working default. */
     public static final class Builder {
-        private final BotCredentials credentials;
+        private final String appId;
+        private final @Nullable BotCredentials credentials;
         private @Nullable HttpTransport transport;
         private @Nullable JsonCodec codec;
         private @Nullable CardWriter cardWriter;
@@ -464,8 +505,12 @@ public final class ConnectorClient {
         private DoubleSupplier random = () -> ThreadLocalRandom.current().nextDouble();
         private Retrying.Delayer delayer = Retrying.SCHEDULER;
 
-        private Builder(BotCredentials credentials) {
-            this.credentials = Objects.requireNonNull(credentials, "credentials");
+        private Builder(String appId, @Nullable BotCredentials credentials) {
+            this.appId = Objects.requireNonNull(appId, "appId");
+            if (appId.isBlank()) {
+                throw new IllegalArgumentException("appId must not be blank");
+            }
+            this.credentials = credentials;
         }
 
         /** The HTTP client. By default the JDK's, created with {@link #connectTimeout}. */

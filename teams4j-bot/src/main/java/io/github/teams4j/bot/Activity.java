@@ -235,8 +235,10 @@ public record Activity(
         if (!isConversationUpdate() || membersAdded == null) {
             return false;
         }
-        String prefixed = botId.startsWith("28:") ? botId : "28:" + botId;
-        return membersAdded.stream().anyMatch(m -> botId.equals(m.id()) || prefixed.equals(m.id()));
+        // Teams names the bot 28:<appId>; the Agents Playground names it by the bare app id. Either way in.
+        String bare = botId.startsWith("28:") ? botId.substring(3) : botId;
+        String prefixed = "28:" + bare;
+        return membersAdded.stream().anyMatch(m -> bare.equals(m.id()) || prefixed.equals(m.id()));
     }
 
     /**

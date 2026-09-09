@@ -1,0 +1,40 @@
+{
+  "type": "message",
+  "text": "hello playground",
+  "id": "42ff684f-0796-4de3-b21a-5667261a60ea",
+  "from": {
+    "id": "user-id-0",
+    "name": "Alex Wilber",
+    "aadObjectId": "00000000-0000-0000-0000-0000000000020"
+  },
+  "timestamp": "2026-09-09T14:57:37.208Z",
+  "localTimestamp": "2026-09-09T23:57:37.208+09:00",
+  "localTimezone": "Asia/Seoul",
+  "serviceUrl": "http://localhost:56150/_connector",
+  "conversation": {
+    "conversationType": "personal",
+    "tenantId": "00000000-0000-0000-0000-0000000000001",
+    "id": "0e19cc28-21fa-496d-b0d2-0f954b1efcdd"
+  },
+  "recipient": {
+    "id": "00000000-0000-0000-0000-00000000000011",
+    "name": "Test Bot"
+  },
+  "textFormat": "plain",
+  "locale": "en-US",
+  "entities": [
+    {
+      "type": "clientInfo",
+      "locale": "en-US",
+      "country": "US",
+      "platform": "Web",
+      "timezone": "Asia/Seoul"
+    }
+  ],
+  "channelData": {
+    "tenant": {
+      "id": "00000000-0000-0000-0000-0000000000001"
+    }
+  },
+  "channelId": "msteams"
+}

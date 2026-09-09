@@ -82,8 +82,51 @@ class TeamsBotAutoConfigurationTest {
         runner.withPropertyValues("teams4j.bot.app-id=app-id").run(context -> {
             assertThat(context).hasFailed();
             assertThat(context.getStartupFailure())
-                    .hasRootCauseMessage("teams4j.bot.app-secret is required once teams4j.bot.app-id is set");
+                    .rootCause()
+                    .hasMessageStartingWith("teams4j.bot.app-secret is required once teams4j.bot.app-id is set");
         });
+    }
+
+    /** The one exception: the local emulator wants no token either way, so no secret is needed. */
+    @Test
+    void allowAnonymousWithoutASecretIsTheEmulatorModeAndSendsNoToken() {
+        runner.withPropertyValues("teams4j.bot.app-id=app-id", "teams4j.bot.allow-anonymous=true")
+                .withUserConfiguration(OwnTransport.class)
+                .run(context -> {
+                    assertThat(context)
+                            .hasNotFailed()
+                            .doesNotHaveBean(BotCredentials.class)
+                            .hasSingleBean(BotTokenVerifier.class)
+                            .hasSingleBean(ConnectorClient.class);
+                    ConnectorClient connector = context.getBean(ConnectorClient.class);
+                    assertThat(connector.botId()).isEqualTo("28:app-id");
+                    connector.sendActivity(
+                            ConversationReference.of("http://localhost:56150/_connector", "personal-chat-id"),
+                            Activity.message("hi"));
+                    OwnTransport transport = context.getBean(OwnTransport.class);
+                    assertThat(transport.requests.get()).as("no token request").isEqualTo(1);
+                    assertThat(transport.lastHeaders).doesNotContainKey("Authorization");
+                    assertThat(context.getBean(BotTokenVerifier.class)
+                                    .verify(null, null)
+                                    .isAnonymous())
+                            .isTrue();
+                });
+    }
+
+    /** With a secret as well, the credentials are back and so is the token; only the verifier relaxes. */
+    @Test
+    void allowAnonymousWithASecretKeepsTheCredentials() {
+        runner.withPropertyValues(CREDENTIALS)
+                .withPropertyValues("teams4j.bot.allow-anonymous=true")
+                .withUserConfiguration(OwnTransport.class)
+                .run(context -> {
+                    assertThat(context).hasSingleBean(BotCredentials.class);
+                    context.getBean(ConnectorClient.class)
+                            .sendActivity(
+                                    ConversationReference.of("https://smba.example/apac", "a:1"),
+                                    Activity.message("hi"));
+                    assertThat(context.getBean(OwnTransport.class).lastHeaders).containsKey("Authorization");
+                });
     }
 
     @Test
@@ -203,11 +246,13 @@ class TeamsBotAutoConfigurationTest {
     @Configuration(proxyBeanMethods = false)
     static class OwnTransport {
         final AtomicInteger requests = new AtomicInteger();
+        volatile Map<String, String> lastHeaders = Map.of();
 
         @Bean
         HttpTransport httpTransport() {
             return request -> {
                 requests.incrementAndGet();
+                lastHeaders = request.headers();
                 String body = request.uri().getPath().contains("/oauth2/")
                         ? "{\"access_token\":\"t\",\"expires_in\":3600}"
                         : "{\"id\":\"sent\"}";

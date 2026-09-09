@@ -1,0 +1,56 @@
+{
+  "type": "message",
+  "text": "<at>Test Bot</at> hi from the channel",
+  "id": "725da2a8-2258-4b60-af49-0f1616ef0f7c",
+  "from": {
+    "id": "user-id-0",
+    "name": "Alex Wilber",
+    "aadObjectId": "00000000-0000-0000-0000-0000000000020"
+  },
+  "timestamp": "2026-09-09T14:58:42.519Z",
+  "localTimestamp": "2026-09-09T23:58:42.519+09:00",
+  "localTimezone": "Asia/Seoul",
+  "serviceUrl": "http://localhost:56150/_connector",
+  "conversation": {
+    "isGroup": true,
+    "conversationType": "channel",
+    "tenantId": "00000000-0000-0000-0000-0000000000001",
+    "id": "team-id;messageid=1788965922519"
+  },
+  "recipient": {
+    "id": "00000000-0000-0000-0000-00000000000011",
+    "name": "Test Bot"
+  },
+  "textFormat": "plain",
+  "locale": "en-US",
+  "entities": [
+    {
+      "type": "mention",
+      "mentioned": {
+        "id": "00000000-0000-0000-0000-00000000000011",
+        "name": "Test Bot"
+      },
+      "text": "<at>Test Bot</at>"
+    },
+    {
+      "type": "clientInfo",
+      "locale": "en-US",
+      "country": "US",
+      "timezone": "Asia/Seoul"
+    }
+  ],
+  "channelData": {
+    "teamsChannelId": "team-id",
+    "teamsTeamId": "team-id",
+    "tenant": {
+      "id": "00000000-0000-0000-0000-0000000000001"
+    },
+    "team": {
+      "id": "team-id"
+    },
+    "channel": {
+      "id": "team-id"
+    }
+  },
+  "channelId": "msteams"
+}

@@ -11,3 +11,6 @@ teams4j:
     # Only for a single-tenant registration, which is what the Developer Portal creates by default.
     tenant-id: ${TEAMS_BOT_TENANT_ID:}
     # path: /api/messages   -- the default; the registration's messaging endpoint URL ends in this
+    # Development only: lets the Agents Playground in, which sends no token. With no app-secret the
+    # bot answers it without a token too. Never where the endpoint is reachable from the internet.
+    allow-anonymous: ${TEAMS_BOT_ALLOW_ANONYMOUS:false}

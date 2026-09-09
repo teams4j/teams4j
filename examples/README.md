@@ -37,6 +37,22 @@ export TEAMS_BOT_APP_ID=... TEAMS_BOT_APP_SECRET=... TEAMS_BOT_TENANT_ID=...   #
 ./gradlew :bot-ktor:run              # http://localhost:3978/api/messages
 ```
 
+### Without a tunnel: the Agents Playground
+
+The [Microsoft 365 Agents Playground](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/debug-your-agents-playground)
+is a Teams client and Connector emulator on your machine. It sends no token, so the bot runs in its
+development-only anonymous mode, with the Playground's own bot id and no secret:
+
+```bash
+export TEAMS_BOT_APP_ID=00000000-0000-0000-0000-00000000000011 TEAMS_BOT_ALLOW_ANONYMOUS=true
+./gradlew :bot-ktor:run                                                       # or :bot-spring-boot:run
+npx -y @microsoft/m365agentsplayground -e http://localhost:3978/api/messages -c msteams   # 8080 for Spring
+```
+
+A browser opens on `http://localhost:56150`. Say something, press the button, and use **Mock an
+Activity → Add application** for the install event. What it cannot show is in the
+[bot guide](https://teams4j.github.io/teams4j/guide/bot#local-development-the-agents-playground).
+
 Create the webhook URL from the Teams channel via
 **⋯ → Workflows → "Post to a channel when a webhook request is received"**.
 

@@ -1,0 +1,41 @@
+{
+  "type": "installationUpdate",
+  "id": "917f6bda-e17a-4d89-ab80-08d6e2a31aad",
+  "from": {
+    "id": "user-id-0",
+    "aadObjectId": "00000000-0000-0000-0000-0000000000020"
+  },
+  "timestamp": "2026-09-09T14:48:16.001Z",
+  "serviceUrl": "http://localhost:56150/_connector",
+  "conversation": {
+    "conversationType": "personal",
+    "tenantId": "00000000-0000-0000-0000-0000000000001",
+    "id": "0e19cc28-21fa-496d-b0d2-0f954b1efcdd"
+  },
+  "recipient": {
+    "id": "00000000-0000-0000-0000-00000000000011",
+    "name": "Test Bot"
+  },
+  "locale": "en-US",
+  "entities": [
+    {
+      "type": "clientInfo",
+      "locale": "en-US"
+    }
+  ],
+  "channelData": {
+    "tenant": {
+      "id": "00000000-0000-0000-0000-0000000000001"
+    },
+    "source": {
+      "name": "message"
+    },
+    "settings": {
+      "selectedChannel": {
+        "id": "0e19cc28-21fa-496d-b0d2-0f954b1efcdd"
+      }
+    }
+  },
+  "action": "add",
+  "channelId": "msteams"
+}

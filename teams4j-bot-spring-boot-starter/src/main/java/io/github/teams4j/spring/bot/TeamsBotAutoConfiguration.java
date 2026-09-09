@@ -18,6 +18,7 @@ import io.github.teams4j.bot.ActivityReceiver;
 import io.github.teams4j.bot.BotCredentials;
 import io.github.teams4j.bot.BotTokenVerifier;
 import io.github.teams4j.bot.ConnectorClient;
+import io.github.teams4j.bot.TokenProvider;
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.JsonCodec;
 import io.github.teams4j.cards.jackson.JacksonCardWriter;
@@ -40,6 +41,10 @@ import io.github.teams4j.http.HttpTransport;
  * <p>Nothing is created until {@code teams4j.bot.app-id} is set; blank counts as unset. Every bean
  * gives way to one of the application's own through {@code @ConditionalOnMissingBean}, and an
  * {@link HttpTransport} bean, when there is one, carries every teams4j client's HTTP.
+ *
+ * <p>An app id without a secret fails startup, except under {@code teams4j.bot.allow-anonymous},
+ * the local-emulator mode: then there are no {@link BotCredentials}, the verifier lets a request
+ * without a token through, and the Connector client sends none.
  *
  * <p>The endpoint is a {@code @RestController} on {@code teams4j.bot.path}, {@code /api/messages}
  * by default. It appears only when the application has Spring MVC and an {@code ActivityHandler}
@@ -72,30 +77,33 @@ public class TeamsBotAutoConfiguration {
         }
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public BotCredentials botCredentials(TeamsBotProperties properties) {
-        // Non-null because of the condition; checked so that removing the condition fails here with
-        // a sentence rather than at the first request.
-        String appId = Objects.requireNonNull(properties.getAppId(), "teams4j.bot.app-id");
-        String secret = properties.getAppSecret();
-        if (secret == null || secret.isBlank()) {
-            throw new IllegalStateException("teams4j.bot.app-secret is required once teams4j.bot.app-id is set");
+    /** The credentials, once there is a secret to mint tokens from. */
+    @Configuration(proxyBeanMethods = false)
+    @Conditional(OnBotAppSecretCondition.class)
+    static class CredentialsConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        BotCredentials botCredentials(TeamsBotProperties properties) {
+            // Non-null because of the conditions; checked so that removing one fails here with a
+            // sentence rather than at the first request.
+            String appId = Objects.requireNonNull(properties.getAppId(), "teams4j.bot.app-id");
+            String secret = Objects.requireNonNull(properties.getAppSecret(), "teams4j.bot.app-secret");
+            String tenant = properties.getTenantId();
+            return tenant == null || tenant.isBlank()
+                    ? BotCredentials.of(appId, secret)
+                    : BotCredentials.singleTenant(appId, secret, tenant);
         }
-        String tenant = properties.getTenantId();
-        return tenant == null || tenant.isBlank()
-                ? BotCredentials.of(appId, secret)
-                : BotCredentials.singleTenant(appId, secret, tenant);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public BotTokenVerifier botTokenVerifier(
-            BotCredentials credentials,
-            TeamsBotProperties properties,
-            ObjectProvider<JsonCodec> codec,
-            ObjectProvider<HttpTransport> transport) {
-        BotTokenVerifier.Builder builder = BotTokenVerifier.builder(credentials)
+            TeamsBotProperties properties, ObjectProvider<JsonCodec> codec, ObjectProvider<HttpTransport> transport) {
+        String tenant = properties.getTenantId();
+        BotTokenVerifier.Builder builder = BotTokenVerifier.builder(
+                        Objects.requireNonNull(properties.getAppId(), "teams4j.bot.app-id"))
+                .tenantId(tenant == null || tenant.isBlank() ? null : tenant)
                 .clockSkew(properties.getClockSkew())
                 .keyCacheTtl(properties.getKeyCacheTtl())
                 .requestTimeout(properties.getRequestTimeout());
@@ -117,13 +125,24 @@ public class TeamsBotAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ConnectorClient connectorClient(
-            BotCredentials credentials,
+            ObjectProvider<BotCredentials> credentials,
             TeamsBotProperties properties,
             ObjectProvider<JsonCodec> codec,
             ObjectProvider<CardWriter> cardWriter,
             ObjectProvider<HttpTransport> transport) {
-        ConnectorClient.Builder builder = ConnectorClient.builder(credentials)
-                .validation(properties.getValidation())
+        BotCredentials chosen = credentials.getIfAvailable();
+        ConnectorClient.Builder builder;
+        if (chosen != null) {
+            builder = ConnectorClient.builder(chosen);
+        } else if (properties.isAllowAnonymous()) {
+            // No secret and a local emulator: the client sends no token.
+            builder = ConnectorClient.builder(Objects.requireNonNull(properties.getAppId(), "teams4j.bot.app-id"))
+                    .tokenProvider(TokenProvider.none());
+        } else {
+            throw new IllegalStateException(
+                    "teams4j.bot.app-secret is required once teams4j.bot.app-id is set (unless allow-anonymous is on)");
+        }
+        builder.validation(properties.getValidation())
                 .maxAttempts(properties.getMaxAttempts())
                 .initialBackoff(properties.getInitialBackoff())
                 .maxBackoff(properties.getMaxBackoff())
