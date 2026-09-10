@@ -16,6 +16,9 @@ leaked CI secret cannot publish anything. CI builds and tests; it never publishe
    JRELEASER_MAVENCENTRAL_USERNAME=<token username>
    JRELEASER_MAVENCENTRAL_TOKEN=<token>
    ```
+4. A GitHub personal access token (classic) with `write:packages`, for the GitHub Packages mirror,
+   as `GITHUB_TOKEN` in the environment or `gpr.key` in `~/.gradle/gradle.properties`. Like the
+   others it stays on the machine.
 
 ## Version
 
@@ -58,11 +61,24 @@ git tag -a v0.1.0 -m "0.1.0"
 
 # 3. Portal: inspect, then Publish (cannot be undone)
 
-# 4. the tag is the release; push it
+# 4. the same staged, signed artifacts to the GitHub Packages mirror. After Central, so a Portal
+#    rejection never leaves a version on GitHub that Central does not have. A version cannot be
+#    uploaded twice: on a mistake, delete it in the repository's Packages page and run again.
+./gradlew publishAllPublicationsToGitHubPackagesRepository
+
+# 5. the tag is the release; push it
 git push origin main v0.1.0
 ```
 
-Then point `examples/gradle.properties` (`teams4jVersion`) and the docs at the released coordinates.
+Then point `examples/gradle.properties` (`teams4jVersion`) and the docs at the released coordinates,
+and check the previous release against the new one is no longer the baseline: `-PapiBaseline` in
+CONTRIBUTING and the CI job, if one guards it, move to the version just released.
+
+For a version that is already on Central but not on GitHub Packages (0.1.0 was published this way on
+2026-09-10): check out its tag with a clean tree, so the version derives correctly, and run step 4.
+The repository block is part of the build only from 0.2.0; on an older tag, supply it with an init
+script (`-I`) that declares the same `GitHubPackages` repository rather than editing the tree, which
+would make the version a SNAPSHOT.
 
 `jreleaserDeploy -PreleaseStage=FULL` publishes without the Portal step. Do not use it.
 
@@ -81,3 +97,7 @@ Then point `examples/gradle.properties` (`teams4jVersion`) and the docs at the r
   Portal after looking at what arrived.
 - **ed25519 key, personal-email UID.** Chosen after checking eight comparable libraries. Whether Central
   accepts it is what the first rehearsal checks.
+- **GitHub Packages is a mirror, not a second source of truth.** Downloading from it needs a token
+  even for a public repository, so the docs name Central and nothing else. It gets the same signed
+  files, after Central has accepted them, through plain `maven-publish` rather than a second JReleaser
+  deployer: one more repository block, no more moving parts.

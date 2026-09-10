@@ -134,3 +134,20 @@ publishing.repositories.maven {
     name = "staging"
     url = rootProject.layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
 }
+
+// GitHub Packages, a mirror of what goes to Central: the same signed artifacts, published directly
+// after the Portal step (`publishAllPublicationsToGitHubPackagesRepository`). Reading from it needs
+// a token too, so Central stays the address the docs give. Credentials are looked up only when a
+// task publishes here; a build without them is unaffected.
+publishing.repositories.maven {
+    name = "GitHubPackages"
+    url = uri("https://maven.pkg.github.com/teams4j/teams4j")
+    credentials {
+        username = providers.gradleProperty("gpr.user")
+            .orElse(providers.environmentVariable("GITHUB_ACTOR"))
+            .getOrElse("teams4j")
+        password = providers.gradleProperty("gpr.key")
+            .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+            .getOrElse("")
+    }
+}

@@ -68,6 +68,11 @@ The only third-party library teams4j itself pulls in is the JSON binding you cho
 `HttpClient` and logging is `System.Logger`. See [JSON binding](./json-binding) for why the model and
 the client stay neutral.
 
+Every release is on Maven Central; the same signed artifacts are mirrored to
+[GitHub Packages](https://github.com/teams4j/teams4j/packages) (`https://maven.pkg.github.com/teams4j/teams4j`).
+Reading from that mirror needs a GitHub token with `read:packages`, so it is for a build that already
+resolves from GitHub Packages, not a first choice.
+
 ## 3. Build a card
 
 Both DSLs below produce the JSON on the third tab, and a test proves it on every build.

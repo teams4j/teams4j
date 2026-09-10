@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -46,8 +47,8 @@ class JdkHttpTransportTest {
             assertThat(response.statusCode()).isEqualTo(201);
             List<String> lines = requestLines.get(10, TimeUnit.SECONDS);
             assertThat(lines.get(0)).endsWith(" HTTP/1.1");
-            assertThat(lines).noneMatch(line -> line.toLowerCase().startsWith("upgrade:"));
-            assertThat(lines).noneMatch(line -> line.toLowerCase().startsWith("http2-settings:"));
+            assertThat(lines).noneMatch(line -> line.toLowerCase(Locale.ROOT).startsWith("upgrade:"));
+            assertThat(lines).noneMatch(line -> line.toLowerCase(Locale.ROOT).startsWith("http2-settings:"));
         }
     }
 
