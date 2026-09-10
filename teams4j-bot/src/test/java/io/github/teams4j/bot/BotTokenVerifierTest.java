@@ -241,7 +241,8 @@ class BotTokenVerifierTest {
     /** The Emulator and the Playground mint Entra tokens for the app id with no {@code serviceurl}; the Bot Framework never omits it. */
     @Test
     void anEntraTokenMayLackTheServiceUrlClaimButABotFrameworkTokenMayNot() throws Exception {
-        BotTokenVerifier verifier = verifier();
+        BotTokenVerifier verifier =
+                builder(BotTokenVerifier.builder(APP_ID).tenantId(TENANT)).build();
         long nbf = now.get().getEpochSecond();
         String entraWithoutClaim = token(
                 "k2",
