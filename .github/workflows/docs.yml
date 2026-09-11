@@ -3,6 +3,8 @@ name: Docs
 on:
   push:
     branches: [main]
+    # A release changes the API pages, which follow the latest tag rather than main.
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -24,13 +26,30 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # The API pages are built from the latest release tag; a shallow clone has none.
+          fetch-depth: 0
           persist-credentials: false
+
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          # What this job builds is deployed, so it must not depend on a cache another job could poison.
+          cache-disabled: true
 
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           install_args: node
+          cache: false
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      # Javadoc and Dokka for every module, unpacked under docs/public/api/ from the latest tag.
+      - name: Build the API pages
+        run: docs/scripts/api-docs.sh
 
       - name: Build
         working-directory: docs

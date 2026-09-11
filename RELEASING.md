@@ -70,6 +70,10 @@ git tag -a v0.1.0 -m "0.1.0"
 git push origin main v0.1.0
 ```
 
+Pushing the tag also runs the Docs workflow, which rebuilds the API pages of the site from the
+latest tag (`docs/scripts/api-docs.sh`), so the published Javadoc and Dokka follow the release
+rather than main.
+
 Then point `examples/gradle.properties` (`teams4jVersion`) and the docs at the released coordinates,
 and check the previous release against the new one is no longer the baseline: `-PapiBaseline` in
 CONTRIBUTING and the CI job, if one guards it, move to the version just released.

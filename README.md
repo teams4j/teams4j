@@ -1,7 +1,7 @@
 # teams4j
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.teams4j/teams4j-cards)](https://central.sonatype.com/namespace/io.github.teams4j)
-[![javadoc](https://javadoc.io/badge2/io.github.teams4j/teams4j-cards/javadoc.svg)](https://javadoc.io/doc/io.github.teams4j/teams4j-cards)
+[![API docs](https://img.shields.io/badge/API_docs-teams4j.github.io-blue)](https://teams4j.github.io/teams4j/reference/javadoc)
 [![License](https://img.shields.io/github/license/teams4j/teams4j)](LICENSE)
 
 [![CI](https://github.com/teams4j/teams4j/actions/workflows/ci.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/ci.yml)
