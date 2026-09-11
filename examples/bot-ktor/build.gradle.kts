@@ -15,7 +15,7 @@ dependencies {
     runtimeOnly("io.github.teams4j:teams4j-cards-kotlinx")
     // teams4j-bot-ktor depends on ktor-server-core only; the engine is the application's choice.
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    runtimeOnly("org.slf4j:slf4j-simple:2.0.17")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.18")
 }
 
 kotlin {
