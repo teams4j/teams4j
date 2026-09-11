@@ -1,0 +1,69 @@
+name: javadoc.io
+
+# javadoc.io fetches a version from Central the first time its URL is requested. This makes that
+# request for every published module once a release is on Central, so nobody has to visit the site.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to warm (default: the pushed or latest v* tag)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: javadoc-io-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  warm:
+    name: request every module on javadoc.io
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Pick the version
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then tag="$INPUT_TAG"
+          elif [ "$REF_TYPE" = tag ]; then tag="$REF_NAME"
+          else tag=$(git describe --tags --abbrev=0 --match 'v*'); fi
+          echo "VERSION=${tag#v}" >> "$GITHUB_ENV"
+
+      # A tag is pushed after the Portal publish, and Central takes a while to serve the files.
+      - name: Wait for Central
+        run: |
+          url="https://repo1.maven.org/maven2/io/github/teams4j/teams4j-cards/$VERSION/teams4j-cards-$VERSION.pom"
+          for _ in $(seq 1 40); do
+            curl -sfI "$url" -o /dev/null && exit 0
+            echo "not on Central yet: $url"; sleep 90
+          done
+          echo "::error::$VERSION never appeared on Central"; exit 1
+
+      # Every module directory that is published; the BOM has no javadoc and is skipped.
+      - name: Request each module
+        run: |
+          failed=0
+          for dir in teams4j-*/; do
+            module=${dir%/}
+            [ "$module" = teams4j-bom ] && continue
+            code=$(curl -s -o /dev/null -w '%{http_code}' -L "https://javadoc.io/doc/io.github.teams4j/$module/$VERSION")
+            echo "$code  $module"
+            case "$code" in 2*|3*) ;; *) failed=1 ;; esac
+          done
+          exit "$failed"

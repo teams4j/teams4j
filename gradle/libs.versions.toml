@@ -41,6 +41,8 @@ nullaway = "0.14.0"
 # formatting and runs through Spotless; detekt is the analyser and has a task of its own.
 ktlint = "1.6.0"
 detekt = "1.23.8"
+# API docs for the Kotlin modules; the Java modules use javadoc. Its HTML fills their javadoc jar.
+dokka = "2.2.0"
 
 # Public-ABI gate. Dumps the API to committed .api files, so a change to what consumers can
 # see arrives as a reviewable diff instead of being noticed after release.
@@ -94,6 +96,7 @@ spotless-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", ver
 errorprone-gradle = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorpronePlugin" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+dokka-gradle = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 japicmp-gradle = { module = "me.champeau.gradle:japicmp-gradle-plugin", version.ref = "japicmp" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }

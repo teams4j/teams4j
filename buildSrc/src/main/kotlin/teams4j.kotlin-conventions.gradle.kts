@@ -6,6 +6,7 @@ plugins {
     id("teams4j.java-conventions")
     kotlin("jvm")
     id("io.gitlab.arturbosch.detekt")
+    id("org.jetbrains.dokka")
 }
 
 // Mirrors the Java split in teams4j.java-conventions: published bytecode targets the 17 baseline,
@@ -114,9 +115,20 @@ tasks.named("check") {
     dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
 }
 
-// java-conventions asks for a Javadoc jar, which the Java-free Kotlin module would otherwise build
-// empty. The sources jar still carries the .kt files, so the artifact set Central requires is
-// complete either way.
+// java-conventions asks for a Javadoc jar, which javadoc itself would build empty for a Java-free
+// module. Dokka's HTML fills it instead, which is what javadoc.io serves for Kotlin libraries.
+dokka {
+    dokkaSourceSets.configureEach {
+        // Public API only, matching explicitApi() above.
+        documentedVisibilities.set(setOf(org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier.Public))
+        sourceLink {
+            localDirectory.set(projectDir)
+            remoteUrl("https://github.com/teams4j/teams4j/tree/main/${project.name}")
+            remoteLineSuffix.set("#L")
+        }
+    }
+}
+
 tasks.named<Jar>("javadocJar") {
-    from(tasks.named("javadoc"))
+    from(tasks.named("dokkaGeneratePublicationHtml"))
 }

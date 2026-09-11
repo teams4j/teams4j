@@ -15,6 +15,10 @@ updates:
       # The catalog pins a Boot 3 baseline and a Boot 4 line on purpose; each moves within its major.
       - dependency-name: "org.springframework.boot:*"
         update-types: ["version-update:semver-major"]
+      # Jackson and Ktor are lower bounds the POMs name (a consumer's own version wins); the newest
+      # line is covered by the -PjacksonLine=latest / -PktorLine=latest CI jobs, not by bumping these.
+      - dependency-name: "com.fasterxml.jackson*"
+      - dependency-name: "io.ktor:*"
 
   - package-ecosystem: github-actions
     directory: /

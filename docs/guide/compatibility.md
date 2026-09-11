@@ -45,8 +45,15 @@ has what was seen.
 Not started, and waiting on demand. There is no plan to begin these without adoption signals, and not
 starting them is a normal outcome.
 
-- **Microsoft Graph messaging**: posting to chats and channels through Graph, for cases neither a
-  webhook nor a bot covers.
+- **Bot single sign-on** (`signin/*` invokes and the Token Service), which needs stored conversation
+  state that the protocol client deliberately does not keep.
+- **Streaming replies**, **batch conversations** (`/v3/batch/conversation/*`) and **meeting APIs**
+  (`/v1/meetings`): Teams extensions of the Activity Protocol, each waiting for a concrete use.
+
+Not planned: **Microsoft Graph**. Graph is a different API with its own SDK
+([msgraph-sdk-java](https://github.com/microsoftgraph/msgraph-sdk-java)), and it does not let an
+application post chat messages without a signed-in user, so it would not cover a case a webhook or a
+bot misses.
 
 ## The nullness contract
 

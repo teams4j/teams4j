@@ -353,4 +353,9 @@ resolution over an extension, so a `suspend fun send` would be silently shadowed
 
 ## Not here yet
 
-- **Microsoft Graph** messaging, for what neither a webhook nor a bot covers.
+- **Single sign-on** (`signin/*` invokes, the Token Service): needs stored conversation state.
+- **Streaming replies**, **batch conversations**, **meeting APIs**: waiting for a concrete use.
+
+Within the Activity Protocol itself, the spec test in `teams4j-bot` names every Connector route and
+Activity field that is not modelled, so that gap is visible in the tree rather than here. Microsoft
+Graph is not planned; see [Compatibility](./compatibility.md#roadmap).
