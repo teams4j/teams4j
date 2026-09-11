@@ -7,7 +7,9 @@ export default defineConfig({
   lang: 'en-US',
   base: '/teams4j/',
   cleanUrls: true,
-  ignoreDeadLinks: false,
+  // /api/ is filled by docs/scripts/api-docs.sh, which the Docs workflow runs before this build;
+  // the CI job that only checks the site builds does not, so those links are exempt from the check.
+  ignoreDeadLinks: [/^\/api\//],
 
   head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/teams4j/favicon.svg' }]],
 
