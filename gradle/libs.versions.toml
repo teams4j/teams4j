@@ -12,8 +12,8 @@ kotlin = "2.4.10"
 # Lowest supported Kotlin; the modules compile at this language version and stdlib. Read by CI;
 # the convention plugin repeats the literal.
 kotlinBaseline = "2.2.21"
-kotlinx-serialization = "1.9.0"
-kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.11.0"
+kotlinx-coroutines = "1.11.0"
 junit = "6.1.3"
 assertj = "3.27.7"
 wiremock = "3.13.2"
@@ -25,7 +25,7 @@ springBoot4 = "4.1.1"
 # Lowest supported Ktor, the only version the POM names; a consumer's own wins. The newest 3.x is
 # tested with -PktorLine=latest (teams4j-bot-ktor).
 ktor = "3.0.3"
-spotless = "8.10.0"
+spotless = "8.10.1"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
 # -- Gradle's signing plugin does, and exactly one of the two may be active.
 jreleaser = "1.26.0"
@@ -35,7 +35,7 @@ gitVersion = "5.1.0"
 # Nullness enforcement. NullAway runs as an Error Prone plugin, so the three move together.
 errorprone = "2.50.0"
 errorpronePlugin = "5.1.1"
-nullaway = "0.14.0"
+nullaway = "0.14.1"
 
 # Kotlin static analysis, the counterpart to Error Prone + NullAway on the Java side. ktlint is
 # formatting and runs through Spotless; detekt is the analyser and has a task of its own.
@@ -46,7 +46,7 @@ dokka = "2.2.0"
 
 # Public-ABI gate. Dumps the API to committed .api files, so a change to what consumers can
 # see arrives as a reviewable diff instead of being noticed after release.
-binaryCompatibilityValidator = "0.18.0"
+binaryCompatibilityValidator = "0.18.2"
 
 # Binary-compatibility gate for the Java modules, which binary-compatibility-validator does not
 # cover -- it registers tasks only where the Kotlin plugin is applied.
