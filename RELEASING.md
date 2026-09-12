@@ -74,6 +74,16 @@ Pushing the tag also runs the Docs workflow, which rebuilds the API pages of the
 latest tag (`docs/scripts/api-docs.sh`), so the published Javadoc and Dokka follow the release
 rather than main.
 
+[Reproducible Central](https://github.com/jvm-repo-rebuild/reproducible-central) rebuilds each
+release independently in a Linux container and feeds the README badge. Its maintainers' scripts
+watch Central's `maven-metadata.xml` for tracked projects and open their own PR for a new version by
+copying the latest `content/io/github/teams4j/teams4j-cards/*.buildspec`, so a release normally
+needs nothing from here. If the rebuild command or the JDK changes, or a version is not picked up,
+copy the previous buildspec to the new version, run `./rebuild.sh` on it (Docker; on macOS `CI=true`
+and a patched `time` call) and open a PR with the `.buildspec`, `.buildinfo` and `.buildcompare` it
+wrote. Delete the project's `buildcache/` before a second run: the first leaves untracked files in
+the checkout, which turns the tag-derived version into a SNAPSHOT.
+
 Then point `examples/gradle.properties` (`teams4jVersion`) and the docs at the released coordinates,
 and check the previous release against the new one is no longer the baseline: `-PapiBaseline` in
 CONTRIBUTING and the CI job, if one guards it, move to the version just released.
@@ -101,6 +111,12 @@ would make the version a SNAPSHOT.
   Portal after looking at what arrived.
 - **ed25519 key, personal-email UID.** Chosen after checking eight comparable libraries. Whether Central
   accepts it is what the first rehearsal checks.
+- **Reproducible by construction, verified after the fact.** Gradle 9 writes archives with fixed
+  entry order and timestamps, the version comes from the tag, and nothing in the build reads the
+  clock or the machine, so a rebuild of a tag matches Central (0.1.0 was checked this way on
+  2026-09-11: 39 jars, 14 POMs and 13 module files identical, and Reproducible Central's own rebuild in
+  a Linux container agreed, 40/40). The README badge is Reproducible Central's independent verdict on
+  each release, not a promise.
 - **GitHub Packages is a mirror, not a second source of truth.** Downloading from it needs a token
   even for a public repository, so the docs name Central and nothing else. It gets the same signed
   files, after Central has accepted them, through plain `maven-publish` rather than a second JReleaser

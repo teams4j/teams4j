@@ -48,16 +48,16 @@ tasks.named<KotlinCompile>("compileTestKotlin") {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(javaToolchain.toString()))
 }
 
-// The Kotlin plugin contributes its sources to the jar under the source set's name, so entries
-// come out as `main/io/github/...` where every Java module's are `io/github/...`. An IDE attaching
-// such a jar finds nothing, so the prefix is stripped back off.
+// The Kotlin plugin registers its own `kotlinSourcesJar`, which writes to the same file as the Java
+// plugin's `sourcesJar` but lays the sources out under `main/`. Publishing schedules both, so with
+// parallel execution the later one won the file and a rebuild differed from Central (found on
+// 2026-09-12 by Reproducible Central's rebuild of 0.1.0). One producer, the one the publication
+// declares.
+tasks.named("kotlinSourcesJar") {
+    enabled = false
+}
+
 tasks.named<Jar>("sourcesJar") {
-    eachFile {
-        val prefix = "main/"
-        if (path.startsWith(prefix)) {
-            path = path.removePrefix(prefix)
-        }
-    }
     includeEmptyDirs = false
 }
 

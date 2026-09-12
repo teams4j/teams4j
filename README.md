@@ -7,6 +7,7 @@
 [![CI](https://github.com/teams4j/teams4j/actions/workflows/ci.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/teams4j/teams4j/actions/workflows/codeql.yml/badge.svg)](https://github.com/teams4j/teams4j/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/teams4j/teams4j/badge)](https://scorecard.dev/viewer/?uri=github.com/teams4j/teams4j)
+[![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/io/github/teams4j/teams4j-cards/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/io/github/teams4j/teams4j-cards/README.md)
 
 Adaptive Cards and Microsoft Teams for the JVM. Build a card in Java or Kotlin, check it against
 what Teams actually renders, and post it to a channel through a Workflows webhook.
