@@ -19,6 +19,11 @@ updates:
       # line is covered by the -PjacksonLine=latest / -PktorLine=latest CI jobs, not by bumping these.
       - dependency-name: "com.fasterxml.jackson*"
       - dependency-name: "io.ktor:*"
+      # kotlinx-serialization 1.10+ requires kotlin-stdlib 2.3, above kotlinBaseline; lift this when
+      # the baseline moves to 2.3.
+      - dependency-name: "org.jetbrains.kotlinx:kotlinx-serialization*"
+      # CodeQL and detekt reject Kotlin 2.4.20 (2026-09); lift this when both support it.
+      - dependency-name: "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
   - package-ecosystem: github-actions
     directory: /
