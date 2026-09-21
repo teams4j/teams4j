@@ -6,7 +6,7 @@ the Jackson binding with them. One artifact each supports Spring Boot 3.5.x and 
 their tests against both lines on every change.
 
 ```kotlin
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
 ```
 
 ## Configuration
@@ -97,7 +97,7 @@ Jackson is something teams4j added, and the kotlinx route above is how to avoid 
 ## Bots
 
 ```kotlin
-implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:0.1.0")
+implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:$version")
 implementation("org.springframework.boot:spring-boot-starter-web")
 ```
 

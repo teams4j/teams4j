@@ -6,11 +6,6 @@ one thing this library sets out to do well in 0.1.0.
 - Target: Spring Boot 3.5+ on Java 17+
 - Time: about five minutes, then one section that actually matters
 
-::: warning Pre-release
-0.1.0 is not on Maven Central yet. Until it is, `./gradlew publishToMavenLocal` from a clone and
-`mavenLocal()` in your repositories.
-:::
-
 ## 1. Get a webhook URL (one minute)
 
 Next to the channel name: **⋯ → Workflows → "Post to a channel when a webhook request is received"**.
@@ -28,8 +23,11 @@ channel.** Inject it from an environment variable or a secret store; never commi
 
 ## 2. The dependency (thirty seconds)
 
+`$version` is the current release, listed at
+[central.sonatype.com/namespace/io.github.teams4j](https://central.sonatype.com/namespace/io.github.teams4j).
+
 ```kotlin
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
 ```
 
 The starter brings the card model, the validator, the webhook client and the Jackson binding. The only

@@ -28,37 +28,39 @@ Inject it from an environment variable or a secret store; never commit it.
 ## 2. Add the dependency
 
 Pick the shape that matches your application. Every module shares one version, and the BOM
-(`io.github.teams4j:teams4j-bom`) aligns them if you declare more than one.
+(`io.github.teams4j:teams4j-bom`) aligns them if you declare more than one. `$version` below stands
+for the current release, listed at
+[central.sonatype.com/namespace/io.github.teams4j](https://central.sonatype.com/namespace/io.github.teams4j).
 
 ::: code-group
 
 ```kotlin [Spring Boot]
 // build.gradle.kts — the starter brings the card model, the validator, the webhook client
 // and the Jackson binding. One property (below) is the whole configuration.
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
 ```
 
 ```kotlin [Plain Java]
 // build.gradle.kts — the client, plus the JSON binding you already use. Without a binding
 // the client fails when you construct it, naming the artifact to add.
-implementation("io.github.teams4j:teams4j-webhook:0.1.0")
-implementation("io.github.teams4j:teams4j-cards-jackson:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook:$version")
+implementation("io.github.teams4j:teams4j-cards-jackson:$version")
 ```
 
 ```kotlin [Kotlin]
 // build.gradle.kts — type-safe DSL, coroutine sendAwait, and kotlinx.serialization.
 // Jackson appears nowhere in this graph.
-implementation("io.github.teams4j:teams4j-webhook:0.1.0")
-implementation("io.github.teams4j:teams4j-webhook-kotlin:0.1.0")
-implementation("io.github.teams4j:teams4j-cards-kotlin:0.1.0")
-implementation("io.github.teams4j:teams4j-cards-kotlinx:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook:$version")
+implementation("io.github.teams4j:teams4j-webhook-kotlin:$version")
+implementation("io.github.teams4j:teams4j-cards-kotlin:$version")
+implementation("io.github.teams4j:teams4j-cards-kotlinx:$version")
 ```
 
 ```xml [Maven]
 <dependency>
   <groupId>io.github.teams4j</groupId>
   <artifactId>teams4j-webhook-spring-boot-starter</artifactId>
-  <version>0.1.0</version>
+  <version>${teams4j.version}</version>
 </dependency>
 ```
 

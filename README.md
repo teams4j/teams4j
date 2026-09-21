@@ -59,19 +59,20 @@ connector.replyToActivity(activity.conversationReference(), activity.id(),
 ## Getting started
 
 Java 17+. Every module is on Maven Central under `io.github.teams4j`; the BOM
-(`teams4j-bom`) aligns their versions.
+(`teams4j-bom`) aligns their versions. `$version` is the current release, the one on the Maven
+Central badge above.
 
 ```kotlin
 // Spring Boot: one dependency, one property (teams4j.webhook.url)
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
 
 // Plain Java: the client plus the JSON binding you already use
-implementation("io.github.teams4j:teams4j-webhook:0.1.0")
-implementation("io.github.teams4j:teams4j-cards-jackson:0.1.0")
+implementation("io.github.teams4j:teams4j-webhook:$version")
+implementation("io.github.teams4j:teams4j-cards-jackson:$version")
 
 // A bot: three properties (teams4j.bot.app-id, app-secret, tenant-id) and one ActivityHandler bean.
 // teams4j-bot-ktor is the same endpoint as a Ktor route
-implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:0.1.0")
+implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:$version")
 ```
 
 - [Getting started](https://teams4j.github.io/teams4j/guide/getting-started) — webhook URL, dependency, first card
