@@ -9,7 +9,7 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 val forbidden = extensions.create<ForbiddenRuntimeDependenciesExtension>("forbiddenRuntimeDependencies")
 forbidden.groups.convention(emptySet())
 
-val checkForbiddenRuntimeDependencies by tasks.registering {
+val checkForbiddenRuntimeDependencies = tasks.register("checkForbiddenRuntimeDependencies") {
     description = "Asserts the published runtime graph carries none of the forbidden groups"
     group = "verification"
 

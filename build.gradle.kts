@@ -23,7 +23,8 @@ plugins {
 // the first release". Any other tag shape is an error rather than a guess: `git describe` takes the
 // nearest tag of any kind, so one stray tag would otherwise turn every build into 0.1.0-SNAPSHOT.
 // CI needs the tags to be present, so checkout runs with fetch-depth 0.
-val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+@Suppress("UNCHECKED_CAST")
+val versionDetails = extra["versionDetails"] as groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails>
 val git = versionDetails()
 val releaseTag = Regex("""v(\d+)\.(\d+)\.(\d+)""")
 val commitHash = Regex("""[0-9a-f]{7,40}""")
@@ -67,7 +68,7 @@ apiValidation {
 
 // Gradle also writes checksums for the .asc signatures, and JReleaser uploads the staging directory
 // as-is. Central neither needs them nor exempts them from its file limits, so they go first.
-val pruneSignatureChecksums by tasks.registering(Delete::class) {
+val pruneSignatureChecksums = tasks.register<Delete>("pruneSignatureChecksums") {
     group = "publishing"
     description = "Deletes the checksum files of .asc signatures from the staging directory."
     val staging = layout.buildDirectory.dir("staging-deploy")
