@@ -16,10 +16,10 @@ val javaRelease = 17
 val javaToolchain = 21
 
 // Lowest Kotlin a consumer may be on: metadata and stdlib are pinned to it so ours never raises
-// theirs. 2.2 is the oldest the compiler accepts without a deprecation warning (= error here).
+// theirs. 2.3 is what Spring Boot 4.1's BOM manages and what kotlinx-serialization 1.10+ needs.
 // Mirrors kotlinBaseline in gradle/libs.versions.toml by hand.
-val kotlinBaseline = KotlinVersion.KOTLIN_2_2
-val kotlinBaselineStdlib = "2.2.21"
+val kotlinBaseline = KotlinVersion.KOTLIN_2_3
+val kotlinBaselineStdlib = "2.3.21"
 
 kotlin {
     coreLibrariesVersion = kotlinBaselineStdlib
