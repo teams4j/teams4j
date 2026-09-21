@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("teams4j.java-conventions")
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("dev.detekt")
     id("org.jetbrains.dokka")
 }
 
@@ -88,7 +88,7 @@ detekt {
     config.setFrom(rootProject.layout.projectDirectory.file("config/detekt.yml"))
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
     // Set on every Detekt task, not just the one the `detekt` extension configures: the plugin also
     // registers detektMain and detektTest, which take their sources from the Kotlin compilation and
     // so pick up src/generated/kotlin -- 152 findings there, every one of them KotlinEmitter's to
@@ -98,21 +98,21 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     // against the path *relative to each source root*, and src/generated/kotlin is itself a root,
     // so "**/src/generated/**" matches nothing.
     setSource(files("src/main/kotlin", "src/test/kotlin"))
-    jvmTarget = javaRelease.toString()
+    jvmTarget.set(javaRelease.toString())
     reports {
         html.required.set(false)
-        xml.required.set(false)
+        checkstyle.required.set(false)
         sarif.required.set(false)
-        md.required.set(false)
+        markdown.required.set(false)
     }
 }
-tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
-    jvmTarget = javaRelease.toString()
+tasks.withType<dev.detekt.gradle.DetektCreateBaselineTask>().configureEach {
+    jvmTarget.set(javaRelease.toString())
 }
 
 // `check` runs it, which is the whole point: an analyser nothing invokes reports nothing.
 tasks.named("check") {
-    dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
+    dependsOn(tasks.withType<dev.detekt.gradle.Detekt>())
 }
 
 // java-conventions asks for a Javadoc jar, which javadoc itself would build empty for a Java-free

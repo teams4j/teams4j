@@ -1,10 +1,7 @@
 # Deltas from detekt's default config, which `buildUponDefaultConfig = true` keeps underneath.
 # Only rules this project deliberately differs on belong here; anything absent runs at its default.
-
-build:
-  # Zero, for the reason -Werror exists on the Java side: a threshold above zero is a budget for
-  # findings nobody reads.
-  maxIssues: 0
+# No issue budget: detekt 2 fails the build on any finding at the default `error` severity, which is
+# what -Werror does on the Java side.
 
 style:
   MaxLineLength:

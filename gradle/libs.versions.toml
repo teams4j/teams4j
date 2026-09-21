@@ -42,8 +42,10 @@ nullaway = "0.14.1"
 
 # Kotlin static analysis, the counterpart to Error Prone + NullAway on the Java side. ktlint is
 # formatting and runs through Spotless; detekt is the analyser and has a task of its own.
+# detekt 2.0 is still alpha, but 1.23.8 embeds Kotlin 2.0.21 and cannot read a stdlib newer than 2.2,
+# which mis-resolves every suspend call. Build-time only: nothing of it reaches a consumer.
 ktlint = "1.6.0"
-detekt = "1.23.8"
+detekt = "2.0.0-alpha.6"
 # API docs for the Kotlin modules; the Java modules use javadoc. Its HTML fills their javadoc jar.
 dokka = "2.2.0"
 
@@ -98,7 +100,7 @@ nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
 spotless-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 errorprone-gradle = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorpronePlugin" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt-gradle = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 dokka-gradle = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 japicmp-gradle = { module = "me.champeau.gradle:japicmp-gradle-plugin", version.ref = "japicmp" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
