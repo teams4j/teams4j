@@ -47,7 +47,8 @@ writes the useful part to `build/jreleaser/trace.log`.
 ## Release
 
 ```bash
-# 0. the public ABI must not have broken against the previous release (0.1.0 is the first baseline)
+# 0. the public ABI must not have broken against the previous release -- or, when it has, the report
+#    (build/reports/japicmp/*.txt) is the breaking-changes section of the release notes
 ./gradlew check -PapiBaseline=<previous version>
 
 # 1. version: a tag on a clean tree. Uncommitted changes make it 0.1.1-SNAPSHOT, which Central rejects.
@@ -83,7 +84,13 @@ that says what changed for a consumer, not what was done to the tree.
 
 Pushing the tag also runs the Docs workflow, which rebuilds the API pages of the site from the
 latest tag (`docs/scripts/api-docs.sh`), so the published Javadoc and Dokka follow the release
-rather than main.
+rather than main. The `github-pages` environment has to allow tags `v*` to deploy (Settings →
+Environments → github-pages → Deployment branches and tags); with only `main` allowed, the 0.2.0 run
+built the site and was then refused at the deploy step. One-time:
+
+```bash
+gh api -X POST repos/teams4j/teams4j/environments/github-pages/deployment-branch-policies -f name='v*' -f type='tag'
+```
 
 [Reproducible Central](https://github.com/jvm-repo-rebuild/reproducible-central) rebuilds each
 release independently in a Linux container and feeds the README badge. Its maintainers' scripts

@@ -171,7 +171,7 @@ What the build enforces beyond formatting:
 - **The public ABI is guarded twice.** Kotlin modules dump theirs to committed `api/*.api`
   files — after an intended API change, run `./gradlew apiDump` and read the diff before
   committing it. Java modules are compared against the previous release with japicmp:
-  `./gradlew check -PapiBaseline=<last release>` (`0.1.0` is the first baseline).
+  `./gradlew check -PapiBaseline=<last release>` (`0.2.0` at the time of writing).
 - **Comments are in English.** This is a public project; the working language of the code is
   English regardless of the language a discussion happens in.
 
