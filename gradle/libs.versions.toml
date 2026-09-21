@@ -29,8 +29,13 @@ springBoot4 = "4.1.1"
 ktor = "3.0.3"
 spotless = "8.10.2"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
-# -- Gradle's signing plugin does, and exactly one of the two may be active.
+# -- Gradle's signing plugin does, and exactly one of the two may be active. It stays in the root
+# `plugins {}` block: on the buildSrc classpath its JGit collides with Spotless's (7.x dropped
+# GpgObjectSigner).
 jreleaser = "1.26.0"
+# Build classpath only (buildSrc/build.gradle.kts), unrelated to the library's Jackson baseline
+# above: the Jackson every root plugin runs on. Must be JReleaser's Jackson line or newer.
+jacksonBuild = "2.22.1"
 # The version comes from the nearest `v*` tag (see the root build), so no file in the tree carries
 # it and a release is a tag rather than a commit. Read-only: it never tags or pushes.
 gitVersion = "5.1.0"

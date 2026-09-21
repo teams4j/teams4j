@@ -68,7 +68,18 @@ git tag -a v0.1.0 -m "0.1.0"
 
 # 5. the tag is the release; push it
 git push origin main v0.1.0
+
+# 6. release notes: the commits since the previous tag, one section per conventional-commit type
+#    (`feat:`, `fix:`, ...; `feat!:` marks a breaking change). Read the file: drop the sections a
+#    consumer does not care about (Tasks, Build, Tests, CI), and add the ABI breaks from step 0's
+#    japicmp report (build/reports/japicmp/*.txt) under a heading of their own -- a commit type
+#    cannot tell a binary break from an addition.
+./gradlew jreleaserChangelog         # build/jreleaser/release/CHANGELOG.md
+gh release create v0.1.0 --title 0.1.0 --notes-file build/jreleaser/release/CHANGELOG.md
 ```
+
+The commit message is the release note, so a squashed commit carries a conventional-commit subject
+that says what changed for a consumer, not what was done to the tree.
 
 Pushing the tag also runs the Docs workflow, which rebuilds the API pages of the site from the
 latest tag (`docs/scripts/api-docs.sh`), so the published Javadoc and Dokka follow the release
@@ -84,9 +95,10 @@ and a patched `time` call) and open a PR with the `.buildspec`, `.buildinfo` and
 wrote. Delete the project's `buildcache/` before a second run: the first leaves untracked files in
 the checkout, which turns the tag-derived version into a SNAPSHOT.
 
-Then point `examples/gradle.properties` (`teams4jVersion`) and the docs at the released coordinates,
-and check the previous release against the new one is no longer the baseline: `-PapiBaseline` in
-CONTRIBUTING and the CI job, if one guards it, move to the version just released.
+Then point `examples/gradle.properties` (`teams4jVersion`) at the release -- the guides write
+`$version` and need no edit; CI checks that no release number crept in -- and check the previous
+release against the new one is no longer the baseline: `-PapiBaseline` in CONTRIBUTING and the CI
+job, if one guards it, move to the version just released.
 
 For a version that is already on Central but not on GitHub Packages (0.1.0 was published this way on
 2026-09-10): check out its tag with a clean tree, so the version derives correctly, and run step 4.

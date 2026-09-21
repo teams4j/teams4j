@@ -220,6 +220,10 @@ Beyond that:
 
 - One concern per pull request. A formatting sweep mixed into a behaviour change hides the
   behaviour change.
+- Pull requests are squashed, and the squashed message is a [conventional
+  commit](https://www.conventionalcommits.org): `feat:`, `fix:`, `docs:`, `build:`, ... with `!`
+  for a change a consumer has to act on (`feat!: ...`). The release notes are generated from these
+  subjects (`RELEASING.md`), so write what changed for a consumer, not what was done to the tree.
 - If you change something a reader of the README or the cookbook would then find wrong, update
   it in the same pull request. The same goes for `teams4j-smoke`, which no CI job compiles. Documentation that does not run is the worst failure mode here,
   which is why the examples are wired into CI at all.

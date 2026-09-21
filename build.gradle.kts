@@ -101,6 +101,19 @@ jreleaser {
             name.set("teams4j")
             skipTag.set(true)
             skipRelease.set(true)
+            // `jreleaserChangelog` writes build/jreleaser/release/CHANGELOG.md from the commits since
+            // the previous tag, one section per conventional-commit type (`feat:`, `fix:`, ...; a `!`
+            // marks a breaking change). The release notes start from that file, so the commit
+            // message is the release note.
+            changelog {
+                formatted.set(Active.ALWAYS)
+                preset.set("conventional-commits")
+                skipMergeCommits.set(true)
+                hide {
+                    categories.set(listOf("merge"))
+                    contributors.set(listOf("[bot]", "GitHub"))
+                }
+            }
         }
     }
 
