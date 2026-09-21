@@ -65,6 +65,18 @@ apiValidation {
     ignoredProjects.add("codegen")
 }
 
+// Gradle also writes checksums for the .asc signatures, and JReleaser uploads the staging directory
+// as-is. Central neither needs them nor exempts them from its file limits, so they go first.
+val pruneSignatureChecksums by tasks.registering(Delete::class) {
+    group = "publishing"
+    description = "Deletes the checksum files of .asc signatures from the staging directory."
+    val staging = layout.buildDirectory.dir("staging-deploy")
+    delete(staging.map { it.asFileTree.matching { include("**/*.asc.md5", "**/*.asc.sha1", "**/*.asc.sha256", "**/*.asc.sha512") } })
+    mustRunAfter(subprojects.map { it.tasks.matching { t -> t.name == "publishAllPublicationsToStagingRepository" } })
+}
+
+tasks.named("jreleaserDeploy") { dependsOn(pruneSignatureChecksums) }
+
 jreleaser {
     project {
         description.set("Adaptive Cards and Microsoft Teams for the JVM")

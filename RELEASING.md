@@ -117,6 +117,11 @@ would make the version a SNAPSHOT.
   2026-09-11: 39 jars, 14 POMs and 13 module files identical, and Reproducible Central's own rebuild in
   a Linux container agreed, 40/40). The README badge is Reproducible Central's independent verdict on
   each release, not a promise.
+- **No checksums of signatures.** Gradle writes checksum files for the `.asc` signatures as well.
+  Central does not need them but counts them against its [publishing
+  limits](https://central.sonatype.org/publish/reducing-publishing-usage/), so `jreleaserDeploy`
+  deletes them from the staging directory first. The GitHub Packages mirror is published by Gradle
+  directly and still carries them; the artifacts and signatures are the same.
 - **GitHub Packages is a mirror, not a second source of truth.** Downloading from it needs a token
   even for a public repository, so the docs name Central and nothing else. It gets the same signed
   files, after Central has accepted them, through plain `maven-publish` rather than a second JReleaser
