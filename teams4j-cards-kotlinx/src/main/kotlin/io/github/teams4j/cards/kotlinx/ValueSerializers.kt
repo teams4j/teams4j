@@ -7,11 +7,13 @@ import io.github.teams4j.cards.ColumnFallback
 import io.github.teams4j.cards.Dimension
 import io.github.teams4j.cards.ElementFallback
 import io.github.teams4j.cards.FallbackDrop
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonUnquotedLiteral
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
@@ -30,12 +32,17 @@ import java.math.BigDecimal
  * documents nothing.
  */
 
+// JsonPrimitive(Number) is written through a Double: -2.50 came out as -2.5 and 1e3 as 1000.0.
+// The unquoted literal writes the BigDecimal's own text, which is what Jackson writes.
+@OptIn(ExperimentalSerializationApi::class)
+private fun number(value: BigDecimal): JsonElement = JsonUnquotedLiteral(value.toString())
+
 /** The open value at `Action.Submit.data` and `Action.Execute.data`. */
 public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
     override fun toJson(value: CardValue): JsonElement =
         when (value) {
             is CardValue.Str -> JsonPrimitive(value.value())
-            is CardValue.Num -> JsonPrimitive(value.value())
+            is CardValue.Num -> number(value.value())
             is CardValue.Bool -> JsonPrimitive(value.value())
             is CardValue.Arr -> buildJsonArray { value.values().forEach { add(toJson(it)) } }
             is CardValue.Obj -> buildJsonObject { value.entries().forEach { (k, v) -> put(k, toJson(v)) } }
@@ -62,7 +69,7 @@ public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
 public object DimensionSerializer : CardSerializer<Dimension>("Dimension") {
     override fun toJson(value: Dimension): JsonElement =
         when (value) {
-            is Dimension.Numeric -> JsonPrimitive(value.value())
+            is Dimension.Numeric -> number(value.value())
             is Dimension.Text -> JsonPrimitive(value.value())
         }
 
