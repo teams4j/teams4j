@@ -72,6 +72,21 @@ public API, the DSL, a module's coordinates or the Kotlin baseline has to be car
 same sitting**, or it rots silently: nothing here compiles it. `cd ../teams4j-smoke && ./gradlew build`
 after `publishToMavenLocal` is the check.
 
+### Fuzzing
+
+`teams4j-fuzz` holds [Jazzer](https://github.com/CodeIntelligenceTesting/jazzer) tests over what
+teams4j reads from outside: the bot endpoint's body and `Authorization` header, and the two JSON
+bindings, which must agree. `./gradlew build` runs them in regression mode over the inputs committed
+under `src/test/resources/**/<Class>Inputs/<method>/`. To fuzz one, as `fuzz.yml` does nightly for
+five minutes each:
+
+```bash
+./gradlew :teams4j-fuzz:fuzz --tests '*BotEndpointFuzzTest.body' -PfuzzDuration=5m
+```
+
+A finding is written into that inputs directory as `crash-<sha1>`. Fix the bug, rename the file to
+say what it is, and commit it: it is the regression test.
+
 ## Do not hand-edit generated sources
 
 The Adaptive Cards model is **generated from the official schema**, not written by hand:

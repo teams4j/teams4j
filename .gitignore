@@ -47,3 +47,6 @@ docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 docs/public/api/
+
+# Jazzer: the corpus libFuzzer grows while fuzzing
+teams4j-fuzz/.cifuzz-corpus/

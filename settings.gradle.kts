@@ -39,3 +39,4 @@ include(":teams4j-bom")
 
 // Build tooling; never published
 include(":codegen")
+include(":teams4j-fuzz")
