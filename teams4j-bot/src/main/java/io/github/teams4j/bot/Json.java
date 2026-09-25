@@ -1,5 +1,6 @@
 package io.github.teams4j.bot;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +12,9 @@ import io.github.teams4j.cards.CardValue;
 
 /** Forgiving reads over a {@link CardValue} tree: a value of the wrong shape is absent, never an error. */
 final class Json {
+
+    /** Past this, a number is not an id or a count; {@code toPlainString} of {@code 1e999999999} is a gigabyte. */
+    private static final int MAX_PLAIN_SCALE = 1000;
 
     private Json() {}
 
@@ -31,7 +35,8 @@ final class Json {
             return s.value();
         }
         if (value instanceof CardValue.Num n) {
-            return n.value().toPlainString();
+            BigDecimal number = n.value();
+            return Math.abs((long) number.scale()) <= MAX_PLAIN_SCALE ? number.toPlainString() : null;
         }
         return null;
     }

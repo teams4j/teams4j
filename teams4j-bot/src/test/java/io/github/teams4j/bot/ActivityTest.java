@@ -76,6 +76,19 @@ class ActivityTest {
     }
 
     @Test
+    void aNumberWhereAStringBelongsIsReadPlainUnlessItsExponentIsAbsurd() {
+        // The body is read before the token is checked, so this arrives from anyone.
+        Activity a = Activity.parse(codec, """
+                {"type": 1e999999999, "id": 1693900000000, "text": 1e-999999999, "locale": 1e2}
+                """);
+
+        assertThat(a.type()).isNull();
+        assertThat(a.text()).isNull();
+        assertThat(a.id()).isEqualTo("1693900000000");
+        assertThat(a.locale()).isEqualTo("100");
+    }
+
+    @Test
     void theConversationReferenceDropsTheTrailingSlash() {
         Activity a = Activity.parse(codec, CHANNEL_MESSAGE);
 
