@@ -406,7 +406,8 @@ final class JavaEmitter {
     /**
      * Accepts the schema's bare-string shorthand for a type that is declared "a string or this
      * object". Reading is therefore lossless for both wire forms; writing always emits the object
-     * form, which is semantically identical.
+     * form, which is semantically identical. A union member's object form carries its discriminator:
+     * written without "type" it is invalid, and kotlinx drops it on the next read.
      */
     private MethodSpec emitStringShorthandCreator(Ir.Type type, ClassName self) {
         String prop = type.stringShorthand();
@@ -418,7 +419,15 @@ final class JavaEmitter {
 
         CodeBlock args = CodeBlock.join(
                 type.props().stream()
-                        .map(p -> CodeBlock.of("$L", p == target ? target.javaName() : "null"))
+                        .map(p -> {
+                            if (p == target) {
+                                return CodeBlock.of("$L", target.javaName());
+                            }
+                            boolean discriminator = !type.unions().isEmpty()
+                                    && type.discriminator() != null
+                                    && p.jsonName().equals("type");
+                            return CodeBlock.of(discriminator ? "TYPE" : "null");
+                        })
                         .toList(),
                 ", ");
         return MethodSpec.methodBuilder("fromShorthand")

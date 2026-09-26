@@ -57,7 +57,7 @@ public record TextRun(@JsonProperty("type") @Nullable String type,
      */
     @JsonCreator
     public static TextRun fromShorthand(String text) {
-        return new TextRun(null, text, null, null, null, null, null, null, null, null, null, null);
+        return new TextRun(TYPE, text, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
