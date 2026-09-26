@@ -144,20 +144,45 @@ class BotTokenVerifierTest {
     }
 
     @Test
-    void anUnknownKeyIdRefreshesTheSetOnce() throws Exception {
+    void anUnknownKeyIdRefreshesTheSetAtMostOnceAnHour() throws Exception {
         BotTokenVerifier verifier = verifier();
         verifier.verify(token("k1", k1), SERVICE_URL);
-
         // Rotation: the published set now carries k2 as well.
         jwks = jwks(jwk("k1", k1), jwk("k2", k2));
+
+        // Within the hour of the last fetch, an unknown key id is refused without a round trip.
+        assertThatThrownBy(() -> verifier.verify(token("k2", k2), SERVICE_URL))
+                .isInstanceOf(TokenVerificationException.class)
+                .hasMessageContaining("key id is unknown");
+        assertThat(transport.requests).hasSize(2);
+
+        now.set(now.get().plus(Duration.ofMinutes(61)));
         verifier.verify(token("k2", k2), SERVICE_URL);
         assertThat(transport.requests).as("one more metadata + jwks round").hasSize(4);
 
-        // A key id nobody publishes: refetched once, then refused -- not fetched on every request.
+        // A key id nobody publishes: that refresh was this hour's, so no request for it.
         assertThatThrownBy(() -> verifier.verify(token("k9", k2), SERVICE_URL))
                 .isInstanceOf(TokenVerificationException.class)
                 .hasMessageContaining("key id is unknown");
-        assertThat(transport.requests).hasSize(6);
+        assertThat(transport.requests).hasSize(4);
+    }
+
+    @Test
+    void aFailedRefreshOnAMissIsNotRetriedWithinTheHour() throws Exception {
+        BotTokenVerifier verifier = verifier();
+        verifier.verify(token("k1", k1), SERVICE_URL);
+        now.set(now.get().plus(Duration.ofMinutes(61)));
+        jwks = "not json";
+
+        assertThatThrownBy(() -> verifier.verify(token("k9", k1), SERVICE_URL))
+                .isInstanceOf(TokenVerificationException.class);
+        assertThatThrownBy(() -> verifier.verify(token("k9", k1), SERVICE_URL))
+                .hasMessageContaining("key id is unknown");
+
+        assertThat(transport.requests).as("the one refresh attempt").hasSize(4);
+        assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId())
+                .as("the cached keys still verify")
+                .isEqualTo(APP_ID);
     }
 
     @Test
@@ -379,7 +404,8 @@ class BotTokenVerifierTest {
 
         verifier.verify(token("k1", k1), SERVICE_URL);
         verifier.verify(entraToken(ENTRA_V2, TENANT), SERVICE_URL);
-        // k2 is Entra's key, not the Bot Framework's: refreshing the Bot Framework set does not find it.
+        // k2 is Entra's key, not the Bot Framework's: refreshing the Bot Framework set would not find it.
+        now.set(now.get().plus(Duration.ofMinutes(61)));
         assertThatThrownBy(() -> verifier.verify(token("k2", k2), SERVICE_URL))
                 .hasMessageContaining("key id is unknown");
 

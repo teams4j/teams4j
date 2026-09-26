@@ -47,8 +47,8 @@ import io.github.teams4j.http.HttpTransport;
  * Microsoft tenants behind Teams, so a token minted by Entra rather than the channel -- as the Agents
  * SDK's tooling and agent-to-agent calls do -- verifies too. The Bot Framework and Entra publish
  * separate key sets; each is fetched from its OpenID metadata document and cached, and a token naming
- * a key id the cache lacks refreshes that set once, which is how key rotation is followed without a
- * schedule.
+ * a key id the cache lacks refreshes that set, at most once an hour, which is how key rotation is
+ * followed without a schedule.
  *
  * <p>Fail closed: no app id, no verifier. Every failure is a {@link TokenVerificationException}
  * whose message names the check, for the log; the HTTP answer should be a bare {@code 401}. The one
@@ -271,8 +271,12 @@ public final class BotTokenVerifier {
 
     // ---- keys ------------------------------------------------------------------------------
 
-    /** One issuer's published keys: fetched through its OpenID metadata, cached, refreshed once on a miss. */
+    /** One issuer's published keys: fetched through its OpenID metadata, cached, refreshed on a miss hourly at most. */
     private static final class KeySet {
+
+        // A key id is read before the signature is checked, so a miss costs its sender nothing; the
+        // Bot Framework's own SDK refreshes on a miss at most this often too.
+        private static final Duration MISS_REFRESH_INTERVAL = Duration.ofHours(1);
 
         private record Keys(Map<String, PublicKey> byId, Instant fetchedAt) {}
 
@@ -284,6 +288,8 @@ public final class BotTokenVerifier {
         private final Duration requestTimeout;
         private final AtomicReference<@Nullable Keys> keys = new AtomicReference<>();
         private final AtomicReference<@Nullable CompletableFuture<Keys>> fetching = new AtomicReference<>();
+        // Set when a miss starts a refresh, success or not: a failing endpoint is not retried per request.
+        private final AtomicReference<@Nullable Instant> lastMissRefresh = new AtomicReference<>();
 
         KeySet(
                 URI openIdMetadata,
@@ -302,10 +308,15 @@ public final class BotTokenVerifier {
 
         CompletableFuture<PublicKey> keyFor(String kid) {
             Keys current = keys.get();
-            if (current != null && current.fetchedAt().plus(ttl).isAfter(clock.instant())) {
+            Instant now = clock.instant();
+            if (current != null && current.fetchedAt().plus(ttl).isAfter(now)) {
                 PublicKey key = current.byId().get(kid);
                 if (key != null) {
                     return CompletableFuture.completedFuture(key);
+                }
+                if (!mayRefreshOnMiss(current, now)) {
+                    return CompletableFuture.failedFuture(
+                            new TokenVerificationException("token key id is unknown: " + kid));
                 }
             }
             return fetch().thenCompose(fetched -> {
@@ -317,6 +328,16 @@ public final class BotTokenVerifier {
                 return CompletableFuture.failedFuture(
                         new TokenVerificationException("token key id is unknown: " + kid));
             });
+        }
+
+        private boolean mayRefreshOnMiss(Keys current, Instant now) {
+            Instant last = lastMissRefresh.get();
+            Instant since = last != null && last.isAfter(current.fetchedAt()) ? last : current.fetchedAt();
+            if (since.plus(MISS_REFRESH_INTERVAL).isAfter(now)) {
+                return false;
+            }
+            lastMissRefresh.set(now);
+            return true;
         }
 
         // The derived future is dropped on purpose: `mine` carries the outcome.

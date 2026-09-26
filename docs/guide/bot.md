@@ -62,7 +62,7 @@ tokens minted for your app directly, which is what the Agents SDK's tooling and 
 send; its issuers are accepted for your registration's own tenant and for the Microsoft tenants
 behind Teams, and an Entra token's `tid` must be the tenant its issuer names. Each issuer's keys are
 fetched from its OpenID metadata document and cached (12 hours); a token naming a key id the cache
-lacks refreshes that set once, which is how rotation is followed. `builder(credentials)` passes the
+lacks refreshes that set, at most once an hour, which is how rotation is followed. `builder(credentials)` passes the
 tenant along; `builder(appId)` with no `tenantId` is right for a multi-tenant registration.
 
 Fail closed: the builder refuses a blank app id, and every failure is a `TokenVerificationException`
