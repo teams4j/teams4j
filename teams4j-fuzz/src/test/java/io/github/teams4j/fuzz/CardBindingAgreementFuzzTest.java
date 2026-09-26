@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import com.code_intelligence.jazzer.junit.FuzzTest;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.Nullable;
@@ -18,7 +19,8 @@ import io.github.teams4j.cards.kotlinx.KotlinxJsonCodec;
 /**
  * BindingAgreementTest over arbitrary text rather than the official samples: both bindings read a
  * card to the same JSON or both refuse it, and what either writes reads back to itself. Text that
- * either parser rejects as JSON is JsonCodecAgreementFuzzTest's business, not this one's.
+ * either parser rejects as JSON is JsonCodecAgreementFuzzTest's business, not this one's, and so is
+ * a duplicate key, whose meaning JSON leaves open.
  */
 class CardBindingAgreementFuzzTest {
 
@@ -26,6 +28,8 @@ class CardBindingAgreementFuzzTest {
     // Compares trees rather than text, so property order is not a difference.
     private static final JsonCodec TREE = new JacksonJsonCodec();
     private static final JsonCodec KOTLINX_TREE = new KotlinxJsonCodec();
+    private static final ObjectMapper NO_DUPLICATES =
+            new ObjectMapper().enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
 
     @FuzzTest
     void read(byte[] data) {
@@ -50,8 +54,9 @@ class CardBindingAgreementFuzzTest {
         try {
             TREE.read(text);
             KOTLINX_TREE.read(text);
+            NO_DUPLICATES.readTree(text);
             return true;
-        } catch (IllegalArgumentException notJson) {
+        } catch (IllegalArgumentException | JsonProcessingException notJson) {
             return false;
         }
     }
