@@ -13,20 +13,26 @@ import io.github.teams4j.cards.CardValue;
 import io.github.teams4j.cards.JsonCodec;
 import io.github.teams4j.cards.jackson.CardJson;
 import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.kotlinx.KotlinxJsonCodec;
 
 /**
  * BindingAgreementTest over arbitrary text rather than the official samples: both bindings read a
- * card to the same JSON or both refuse it, and what either writes reads back to itself.
+ * card to the same JSON or both refuse it, and what either writes reads back to itself. Text that
+ * either parser rejects as JSON is JsonCodecAgreementFuzzTest's business, not this one's.
  */
 class CardBindingAgreementFuzzTest {
 
     private static final ObjectMapper JACKSON = CardJson.mapper();
     // Compares trees rather than text, so property order is not a difference.
     private static final JsonCodec TREE = new JacksonJsonCodec();
+    private static final JsonCodec KOTLINX_TREE = new KotlinxJsonCodec();
 
     @FuzzTest
     void read(byte[] data) {
         String text = new String(data, StandardCharsets.UTF_8);
+        if (!isJsonToBoth(text)) {
+            return;
+        }
         CardValue viaJackson = viaJackson(text);
         CardValue viaKotlinx = viaKotlinx(text);
         if (!Objects.equals(viaJackson, viaKotlinx)) {
@@ -37,6 +43,16 @@ class CardBindingAgreementFuzzTest {
             if (!viaJackson.equals(viaJackson(written)) || !viaJackson.equals(viaKotlinx(written))) {
                 throw new AssertionError("a second round trip changed " + written);
             }
+        }
+    }
+
+    private static boolean isJsonToBoth(String text) {
+        try {
+            TREE.read(text);
+            KOTLINX_TREE.read(text);
+            return true;
+        } catch (IllegalArgumentException notJson) {
+            return false;
         }
     }
 
