@@ -337,6 +337,7 @@ final class JavaEmitter {
         }
 
         addDiscriminator(b, type);
+        addOwnTypeInfo(b, type, self);
 
         if (type.stringShorthand() != null) {
             b.addMethod(emitStringShorthandCreator(type, self));
@@ -401,6 +402,25 @@ final class JavaEmitter {
                         .initializer("$S", type.discriminator())
                         .addJavadoc("The Adaptive Cards type discriminator for this element.\n")
                         .build());
+    }
+
+    /**
+     * A union member inherits the union's type info, so Jackson demanded "type" even where a
+     * property names the member itself -- ColumnSet.columns, ImageSet.images, Refresh.action --
+     * and the schema does not require it there. Defaulting to the member reads those as the schema
+     * does; through the union, a missing type is still refused.
+     */
+    private void addOwnTypeInfo(TypeSpec.Builder b, Ir.Type type, ClassName self) {
+        if (type.unions().isEmpty() || type.discriminator() == null || !hasProp(type, "type")) {
+            return;
+        }
+        b.addAnnotation(AnnotationSpec.builder(JSON_TYPE_INFO)
+                .addMember("use", "$T.Id.NAME", JSON_TYPE_INFO)
+                .addMember("include", "$T.As.EXISTING_PROPERTY", JSON_TYPE_INFO)
+                .addMember("property", "$S", "type")
+                .addMember("visible", "$L", true)
+                .addMember("defaultImpl", "$T.class", self)
+                .build());
     }
 
     /**

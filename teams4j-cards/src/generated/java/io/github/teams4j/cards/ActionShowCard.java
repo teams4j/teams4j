@@ -4,6 +4,7 @@ package io.github.teams4j.cards;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -25,6 +26,13 @@ import org.jspecify.annotations.Nullable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("Action.ShowCard")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true,
+        defaultImpl = ActionShowCard.class
+)
 public record ActionShowCard(@JsonProperty("requires") @Nullable Map<String, String> requires,
         @JsonProperty("title") @Nullable String title,
         @JsonProperty("iconUrl") @Nullable String iconUrl, @JsonProperty("id") @Nullable String id,

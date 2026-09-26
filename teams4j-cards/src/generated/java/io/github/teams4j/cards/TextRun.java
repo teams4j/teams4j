@@ -5,6 +5,7 @@ package io.github.teams4j.cards;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,13 @@ import org.jspecify.annotations.Nullable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("TextRun")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true,
+        defaultImpl = TextRun.class
+)
 public record TextRun(@JsonProperty("type") @Nullable String type,
         @JsonProperty("text") @Nullable String text, @JsonProperty("color") @Nullable Colors color,
         @JsonProperty("fontType") @Nullable FontType fontType,

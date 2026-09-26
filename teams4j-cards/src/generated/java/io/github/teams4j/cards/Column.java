@@ -4,6 +4,7 @@ package io.github.teams4j.cards;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,13 @@ import org.jspecify.annotations.Nullable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("Column")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true,
+        defaultImpl = Column.class
+)
 public record Column(@JsonProperty("requires") @Nullable Map<String, String> requires,
         @JsonProperty("id") @Nullable String id,
         @JsonProperty("isVisible") @Nullable Boolean isVisible,

@@ -1,0 +1,1 @@
+{"type":"AdaptiveCard","version":"1.5","body":[{"type":"ColumnSet","columns":[{"items":[{"type":"TextBlock","text":"a"}]}]},{"type":"ImageSet","images":[{"url":"https://example.com/a.png"}]}],"refresh":{"action":{"verb":"v"}}}

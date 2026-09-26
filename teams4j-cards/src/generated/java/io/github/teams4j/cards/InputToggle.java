@@ -4,6 +4,7 @@ package io.github.teams4j.cards;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,13 @@ import org.jspecify.annotations.Nullable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("Input.Toggle")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true,
+        defaultImpl = InputToggle.class
+)
 public record InputToggle(@JsonProperty("id") @Nullable String id,
         @JsonProperty("errorMessage") @Nullable String errorMessage,
         @JsonProperty("isRequired") @Nullable Boolean isRequired,
