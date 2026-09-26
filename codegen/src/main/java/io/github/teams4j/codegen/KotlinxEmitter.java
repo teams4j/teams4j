@@ -310,7 +310,18 @@ final class KotlinxEmitter {
                     .append(javaNames.get(member))
                     .append("Serializer.fromJson(element)\n");
         }
-        out.append("            null -> null\n");
+        // A missing type is what Jackson's defaultImpl decides: the shorthand member if there is
+        // one, otherwise a refusal. Dropping the element instead lost it silently.
+        if (shorthandMember != null) {
+            out.append("            null -> ")
+                    .append(javaNames.get(shorthandMember))
+                    .append("Serializer.fromJson(element)\n");
+        } else {
+            out.append("            null -> if (element is JsonNull) null else throw SerializationException(\n");
+            out.append("                \"$element has no type; a ")
+                    .append(name)
+                    .append(" is one of ${byType.keys}\",\n            )\n");
+        }
         // Refused rather than skipped, as the Jackson binding does. Reading it as an absence
         // would be the more forgiving choice and the wrong one: the bindings have to mean the same
         // thing by a card, and an unknown element type is settled as unsupported.

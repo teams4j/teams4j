@@ -1,0 +1,1 @@
+{"type":"AdaptiveCard","version":"1.3","body":[{"type":"TextBlock","text":"hi"},{"tpe":"Input.Text","id":"firstName"}]}
