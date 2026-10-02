@@ -6,7 +6,7 @@ javaToolchain = "21"
 # Lowest supported Jackson, and the only version the POMs name; a consumer's own wins. The newest
 # 2.x is tested with -PjacksonLine=latest (teams4j.java-conventions).
 jackson = "2.18.10"
-javapoet = "0.19.0"
+javapoet = "0.20.0"
 jspecify = "1.0.1"
 kotlin = "2.4.10"
 # Lowest supported Kotlin; the modules compile at this language version and stdlib. Read by CI;
@@ -42,7 +42,7 @@ gitVersion = "5.1.0"
 # Nullness enforcement. NullAway runs as an Error Prone plugin, so the three move together.
 errorprone = "2.50.0"
 errorpronePlugin = "5.1.1"
-nullaway = "0.14.1"
+nullaway = "0.14.2"
 
 # Kotlin static analysis, the counterpart to Error Prone + NullAway on the Java side. ktlint is
 # formatting and runs through Spotless; detekt is the analyser and has a task of its own.
