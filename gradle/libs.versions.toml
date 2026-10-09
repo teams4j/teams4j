@@ -27,7 +27,7 @@ springBoot4 = "4.1.1"
 # Lowest supported Ktor, the only version the POM names; a consumer's own wins. The newest 3.x is
 # tested with -PktorLine=latest (teams4j-bot-ktor).
 ktor = "3.0.3"
-spotless = "8.10.2"
+spotless = "8.10.3"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
 # -- Gradle's signing plugin does, and exactly one of the two may be active. It stays in the root
 # `plugins {}` block: on the buildSrc classpath its JGit collides with Spotless's (7.x dropped
