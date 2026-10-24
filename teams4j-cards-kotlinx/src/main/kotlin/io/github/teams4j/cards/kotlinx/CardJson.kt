@@ -16,8 +16,8 @@ import kotlinx.serialization.json.Json
  *
  * Reading is forgiving, as it must be: unknown properties are skipped, an unrecognised enum value
  * reads as null, and enum values match case-insensitively — real cards carry host-specific and
- * newer-schema values, and Teams renders cards the schema would reject. A value of the wrong shape
- * is refused, as the Jackson binding refuses it. Writing is strict.
+ * newer-schema values, and Teams renders cards the schema would reject. A value of the wrong JSON
+ * type, such as a number where a string belongs, is refused. Writing is strict.
  */
 public object CardJson {
     /**

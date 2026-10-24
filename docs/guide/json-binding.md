@@ -52,15 +52,17 @@ because the model has none and cannot have any without picking a library.
 
 ## The bindings agree, and a test says so
 
-Whether the bindings read the same card the same way is checked by running the official sample
-cards through each of them and comparing the resulting JSON, **including what they reject**, because one side
-being more lenient than the other *is* the drift. The lenient-reading rules (ignore unknown properties,
-unknown enum values become `null`, enum matching is case-insensitive) are mapper configuration on the
-Jackson side and generated code on the kotlinx side, so without that comparison they would diverge
-quietly. Past those, both read a value as Jackson does by default: a scalar is converted where Jackson
-converts it (`5` into a string, `"3"` into a number), and a value of the wrong shape, such as an array
-where a string belongs, fails the card. An enum is read by name only, never by ordinal. A fuzz test
-compares the two bindings on arbitrary input as well.
+Both bindings make the same of a **valid** card: the same model, written back as the same JSON. The
+lenient-reading rules they share (ignore unknown properties, unknown enum values become `null`, enum
+matching is case-insensitive, an enum is read by name and never by ordinal) are mapper configuration
+on the Jackson side and generated code on the kotlinx side. The official sample cards are run through
+both and compared, including the samples they reject, and a fuzz test compares them on arbitrary
+input.
+
+A card the schema rejects is read by each library's own rules. Jackson converts a scalar where its
+defaults do (`1` into `true`, `"3"` into a number); kotlinx wants each value to have its JSON type.
+Either way, a value of the wrong shape, such as an array where a string belongs, fails the card rather
+than being dropped.
 
 The two write the same card the same way **but not byte for byte**: property order can differ. The
 webhook client's 28 KB check counts the bytes that actually go out, so it is always right; just do not

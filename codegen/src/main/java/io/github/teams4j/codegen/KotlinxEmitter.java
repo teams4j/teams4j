@@ -132,7 +132,7 @@ final class KotlinxEmitter {
             out.append("    // samples carry deliberately invalid ones to exercise renderer fallback.\n");
             out.append("    override fun fromJson(element: JsonElement): ")
                     .append(name)
-                    .append("? = byJson[element.readEnumName().lowercase()]\n");
+                    .append("? = byJson[element.readString().lowercase()]\n");
             out.append("}\n\n");
         }
         return out.toString();
@@ -356,7 +356,7 @@ final class KotlinxEmitter {
         };
     }
 
-    /** An expression reading {@code expr} back; a shape the Jackson binding refuses throws. */
+    /** An expression reading {@code expr} back; a value of the wrong JSON type throws. */
     private String fromJson(Ir.Ref ref, String expr) {
         return switch (ref) {
             case Ir.Ref.Prim prim ->

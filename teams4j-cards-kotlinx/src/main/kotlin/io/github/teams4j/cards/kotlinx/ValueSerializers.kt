@@ -74,15 +74,13 @@ public object DimensionSerializer : CardSerializer<Dimension>("Dimension") {
         }
 
     override fun fromJson(element: JsonElement): Dimension? {
-        val primitive = element as? JsonPrimitive ?: element.refuse("a number or a string")
-        if (primitive is JsonNull) {
+        if (element is JsonNull) {
             return null
         }
-        // A boolean is read as text, as the Jackson binding reads it.
-        if (primitive.isString || primitive.booleanOrNull != null) {
-            return Dimension.Text(primitive.content)
-        }
-        return Dimension.Numeric(BigDecimal(primitive.content))
+        element.readShorthand()?.let { return Dimension.Text(it) }
+        val number =
+            (element as? JsonPrimitive)?.takeIf { it.booleanOrNull == null } ?: element.refuse("a number or a string")
+        return Dimension.Numeric(BigDecimal(number.content))
     }
 }
 

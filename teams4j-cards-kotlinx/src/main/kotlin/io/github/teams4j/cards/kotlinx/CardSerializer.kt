@@ -15,7 +15,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonUnquotedLiteral
 import kotlinx.serialization.json.booleanOrNull
-import java.math.BigInteger
 
 /**
  * A serializer for a card type, written against the JSON tree rather than against an encoder.
@@ -69,8 +68,8 @@ public abstract class CardSerializer<T : Any>(
 /** Null and JSON's null are the same absence here, and neither is worth putting in the output. */
 internal fun JsonElement?.orNull(): JsonElement? = if (this == null || this is JsonNull) null else this
 
-// Reading accessors. Each reads what the Jackson binding reads and refuses what it refuses, so the
-// two bindings make the same of any card; the rules are Jackson's defaults for the Java type.
+// Reading accessors, with kotlinx's own rules: a value must have its JSON type -- a quoted string,
+// an unquoted number or boolean -- and anything else fails the card. Absence is the only leniency.
 
 /** The property, or null when it is absent or JSON null. */
 internal fun JsonObject.at(name: String): JsonElement? = this[name].orNull()
@@ -82,74 +81,26 @@ internal fun JsonElement.asObject(): JsonObject? = this as? JsonObject
 
 internal fun JsonElement.refuse(what: String): Nothing = throw SerializationException("$this is not $what")
 
-/** Any scalar, as its text: a number or boolean where a string belongs is still read. */
-internal fun JsonElement.readString(): String = (this as? JsonPrimitive)?.content ?: refuse("a string")
+internal fun JsonElement.readString(): String = readShorthand() ?: refuse("a string")
 
-/** true and false; an integer, as zero or not; or their text. Empty or "null" text is absent. */
-internal fun JsonElement.readBoolean(): Boolean? {
-    val primitive = this as? JsonPrimitive ?: refuse("a boolean")
-    if (primitive.isString) {
-        return when (primitive.content.trim()) {
-            "", "null" -> null
-            "true", "True", "TRUE" -> true
-            "false", "False", "FALSE" -> false
-            else -> refuse("a boolean")
-        }
-    }
-    primitive.booleanOrNull?.let { return it }
-    return primitive.content.toBigIntegerOrNull()?.let { it.signum() != 0 } ?: refuse("a boolean")
+internal fun JsonElement.readBoolean(): Boolean =
+    (this as? JsonPrimitive)?.takeIf { !it.isString }?.booleanOrNull ?: refuse("a boolean")
+
+/** As Integer, Long or BigInteger when integral and BigDecimal otherwise, as the Jackson binding reads it. */
+internal fun JsonElement.readNumber(): Number {
+    val text =
+        (this as? JsonPrimitive)?.takeIf { !it.isString && it.booleanOrNull == null }?.content
+            ?: refuse("a number")
+    return text.toIntOrNull() ?: text.toLongOrNull() ?: text.toBigIntegerOrNull() ?: text.toBigDecimalOrNull()
+        ?: refuse("a number")
 }
 
-/** A number, or its text, as Integer, Long or BigInteger when integral and Double otherwise. */
-internal fun JsonElement.readNumber(): Number? {
-    val primitive = this as? JsonPrimitive ?: refuse("a number")
-    if (primitive.isString) {
-        return numberFromText(primitive.content.trim())
-    }
-    if (primitive.booleanOrNull != null) refuse("a number")
-    return integral(primitive.content) ?: primitive.content.toDoubleOrNull() ?: refuse("a number")
-}
-
-private fun JsonElement.numberFromText(text: String): Number? =
-    when {
-        text == "" || text == "null" -> null
-        text == "NaN" -> Double.NaN
-        text in POSITIVE_INFINITY -> Double.POSITIVE_INFINITY
-        text in NEGATIVE_INFINITY -> Double.NEGATIVE_INFINITY
-        INTEGRAL.matches(text) -> text.toLongOrNull()?.let(::narrow) ?: refuse("a number")
-        DECIMAL.matches(text) -> text.toDouble()
-        else -> refuse("a number")
-    }
-
-private fun narrow(value: Long): Number = if (value in Int.MIN_VALUE..Int.MAX_VALUE) value.toInt() else value
-
-internal fun JsonElement.readInt(): Int? = readNumber()?.let { it as? Int ?: refuse("an integer") }
-
-private val POSITIVE_INFINITY = setOf("INF", "+INF", "Infinity", "+Infinity")
-private val NEGATIVE_INFINITY = setOf("-INF", "-Infinity")
-private val INTEGRAL = Regex("[+-]?[0-9]+")
-
-// Decimal only: Kotlin's toDouble also takes hex floats and Java's 1f/1d suffixes, which Jackson refuses.
-private val DECIMAL = Regex("[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?")
-
-private fun integral(text: String): Number? =
-    if (!INTEGRAL.matches(text)) {
-        null
-    } else {
-        text.toIntOrNull() ?: text.toLongOrNull() ?: BigInteger(text)
-    }
+internal fun JsonElement.readInt(): Int = readNumber() as? Int ?: refuse("an integer")
 
 internal fun JsonElement.readObject(): JsonObject = this as? JsonObject ?: refuse("an object")
 
-/** The bare-string form of a type that has one; a number is not a string here. */
+/** A quoted string's text, or null for anything else. */
 internal fun JsonElement.readShorthand(): String? = (this as? JsonPrimitive)?.takeIf { it.isString }?.content
-
-/** An enum's name as written; any other primitive is an unknown name, and a boolean is refused. */
-internal fun JsonElement.readEnumName(): String {
-    val primitive = this as? JsonPrimitive ?: refuse("an enum name")
-    if (!primitive.isString && primitive.booleanOrNull != null) refuse("an enum name")
-    return primitive.content
-}
 
 /** An array whose every element reads; a null element is refused. */
 internal inline fun <T : Any> JsonElement.readList(read: (JsonElement) -> T?): List<T> =
@@ -159,13 +110,6 @@ internal inline fun <T : Any> JsonElement.readList(read: (JsonElement) -> T?): L
 internal inline fun <T : Any> JsonElement.readMap(read: (JsonElement) -> T?): Map<String, T> =
     readObject().mapValues { (_, v) -> v.orNull()?.let(read) ?: v.refuse("a map value") }
 
-/** Written exactly, where JsonPrimitive(Number) goes through a Double; NaN and infinity as text, as Jackson does. */
+/** Written exactly, where JsonPrimitive(Number) goes through a Double. */
 @OptIn(ExperimentalSerializationApi::class)
-internal fun numberLiteral(value: Number): JsonElement =
-    if ((value as? Double)?.isFinite() ==
-        false
-    ) {
-        JsonPrimitive(value.toString())
-    } else {
-        JsonUnquotedLiteral(value.toString())
-    }
+internal fun numberLiteral(value: Number): JsonElement = JsonUnquotedLiteral(value.toString())
