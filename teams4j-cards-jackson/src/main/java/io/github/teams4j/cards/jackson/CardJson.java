@@ -42,6 +42,8 @@ public final class CardJson {
                 // The schema pairs every enum with a case-insensitive pattern, so "Default" and
                 // "default" are both valid on the wire.
                 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                // A Number property keeps a decimal exactly; as a Double, 1e400 would be written as "Infinity".
+                .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .addModule(new CardsModule());
     }
 }
