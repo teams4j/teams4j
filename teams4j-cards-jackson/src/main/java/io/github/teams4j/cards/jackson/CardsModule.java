@@ -4,17 +4,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.fasterxml.jackson.databind.deser.std.DelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.jspecify.annotations.Nullable;
 
 import io.github.teams4j.cards.ActionFallback;
 import io.github.teams4j.cards.CardAction;
@@ -63,6 +75,71 @@ public final class CardsModule extends SimpleModule {
 
         addSerializer(ColumnFallback.class, new FallbackSerializer<>());
         addDeserializer(ColumnFallback.class, new FallbackDeserializer<>(Column.class, ColumnFallback::of, "a column"));
+
+        setDeserializerModifier(new BeanDeserializerModifier() {
+            @Override
+            public JsonDeserializer<?> modifyEnumDeserializer(
+                    DeserializationConfig config,
+                    JavaType type,
+                    BeanDescription beanDesc,
+                    JsonDeserializer<?> deserializer) {
+                Class<?> raw = type.getRawClass();
+                return raw.getPackageName().equals(CardValue.class.getPackageName())
+                        ? new NamesOnlyEnumDeserializer(deserializer, raw)
+                        : deserializer;
+            }
+        });
+    }
+
+    /**
+     * Jackson also reads an enum from its ordinal and from a padded name; the schema allows only
+     * the names, case aside. Anything else is an unknown value, read as the mapper reads one.
+     */
+    private static final class NamesOnlyEnumDeserializer extends DelegatingDeserializer {
+
+        private static final long serialVersionUID = 1L;
+
+        private final Class<?> type;
+        private final Set<String> names;
+
+        NamesOnlyEnumDeserializer(JsonDeserializer<?> delegate, Class<?> type) {
+            super(delegate);
+            this.type = type;
+            this.names = Stream.of(type.getEnumConstants())
+                    .map(constant -> wireName(type, (Enum<?>) constant))
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+
+        private static String wireName(Class<?> type, Enum<?> constant) {
+            try {
+                JsonProperty property = type.getField(constant.name()).getAnnotation(JsonProperty.class);
+                return (property == null ? constant.name() : property.value()).toLowerCase(Locale.ROOT);
+            } catch (NoSuchFieldException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Override
+        protected JsonDeserializer<?> newDelegatingInstance(JsonDeserializer<?> newDelegatee) {
+            return new NamesOnlyEnumDeserializer(newDelegatee, type);
+        }
+
+        @Override
+        public @Nullable Object deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+            JsonToken token = parser.currentToken();
+            boolean number = token == JsonToken.VALUE_NUMBER_INT || token == JsonToken.VALUE_NUMBER_FLOAT;
+            boolean unknownName = token == JsonToken.VALUE_STRING
+                    && !names.contains(parser.getText().toLowerCase(Locale.ROOT));
+            if (!number && !unknownName) {
+                return super.deserialize(parser, context);
+            }
+            if (context.isEnabled(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)) {
+                return null;
+            }
+            throw number
+                    ? context.weirdNumberException(parser.getNumberValue(), type, "an enum is read by name")
+                    : context.weirdStringException(parser.getText(), type, "not one of " + names);
+        }
     }
 
     private static final class CardValueSerializer extends JsonSerializer<CardValue> {
@@ -144,12 +221,11 @@ public final class CardsModule extends SimpleModule {
             if (token == JsonToken.VALUE_NUMBER_INT || token == JsonToken.VALUE_NUMBER_FLOAT) {
                 return new Dimension.Numeric(parser.getDecimalValue());
             }
-            if (token == JsonToken.VALUE_STRING) {
+            // A boolean is read as text, as any scalar is into a string; an array or object is refused.
+            if (token == JsonToken.VALUE_STRING || token == JsonToken.VALUE_TRUE || token == JsonToken.VALUE_FALSE) {
                 return new Dimension.Text(parser.getText());
             }
-            // Read leniently: a shape the schema does not allow still has a text form, and keeping
-            // it beats failing to read a card Teams itself would render.
-            return new Dimension.Text(parser.getValueAsString(""));
+            return (Dimension) context.handleUnexpectedToken(Dimension.class, parser);
         }
     }
 
