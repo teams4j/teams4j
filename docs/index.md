@@ -27,6 +27,12 @@ features:
     details: A builder DSL for Java and a type-safe DSL for Kotlin, generated from the same schema. That they emit the same JSON is a test, and the snippets on this site are that test.
 ---
 
+::: tip Coming from somewhere else?
+Office 365 connectors were retired in May 2026, and the Bot Framework Java SDK in 2023.
+[From Office 365 connectors](/migrate/office-365-connectors) ·
+[From the Bot Framework Java SDK](/migrate/botbuilder-java)
+:::
+
 ## Thirty seconds
 
 The card the cookbook leads with, in both DSLs, and the JSON it becomes. The code is quoted from a

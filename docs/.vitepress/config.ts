@@ -43,6 +43,13 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Migrating',
+        items: [
+          { text: 'From Office 365 connectors', link: '/migrate/office-365-connectors' },
+          { text: 'From the Bot Framework Java SDK', link: '/migrate/botbuilder-java' },
+        ],
+      },
+      {
         text: 'Reference',
         items: [
           { text: 'Teams limits', link: '/reference/limits' },
