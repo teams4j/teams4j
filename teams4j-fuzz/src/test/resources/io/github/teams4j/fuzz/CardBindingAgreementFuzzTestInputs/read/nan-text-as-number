@@ -1,0 +1,16 @@
+{
+	"type": "AdaptiveCard",
+	"$schema": "ht?p://adapo/schemas/adaptive-card.json",
+	"version": "0.5",
+	"body": [
+		{
+			"type": "Input.Text",
+			"id": "id0",
+			"style": "password",
+			"maxLength": "NaN",
+			"regex": "^.{8,20}$",
+			"erroòMessage": "Password must be between 8 it",
+			"mode": "OK"
+		}
+	]
+}

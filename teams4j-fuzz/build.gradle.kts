@@ -11,9 +11,17 @@ dependencies {
     testImplementation(project(":teams4j-cards-kotlinx"))
     testImplementation(testFixtures(project(":teams4j-bot")))
     testImplementation(libs.jazzer.junit)
+    testImplementation(libs.json.schema.validator)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
+}
+
+// The schema the model is generated from: the card target is strict only about cards it accepts.
+val cardSchema = rootProject.layout.projectDirectory.file("codegen/schemas/adaptive-card-1.6.0.json")
+tasks.withType<Test>().configureEach {
+    inputs.file(cardSchema)
+    systemProperty("teams4j.cardSchema", cardSchema.asFile.path)
 }
 
 // `test` runs each fuzz test in regression mode: over the committed inputs under

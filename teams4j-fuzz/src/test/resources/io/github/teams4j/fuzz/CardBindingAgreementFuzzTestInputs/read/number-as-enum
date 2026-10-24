@@ -1,0 +1,13 @@
+{
+	"$schema": "http://adaptivecards.io/schemas/adaptived-ac.rjson",
+	"type": "AdaptiveCard",
+	"version": "0.0",
+	"body": [
+		{
+			"type": "TextBlock",
+			"text": "Lorem ipsum doloi officia deseruntminesse cillum dolore eu fugiat nulla pariatur. Excepteur sint occ in culpa qui of id est laboKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKconsecqetur adipiscing elit, sed do eiusmod tempor incid¶dunt ut labore et dolore magna aliqua. Ut enim ad minesse cillum dolore eu fugiat nulla pariatur. Excepteur sint occ in culpa qui of id est laboKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKrum.",
+			"wrap": true,
+			"height": 2
+		}
+	]
+}
