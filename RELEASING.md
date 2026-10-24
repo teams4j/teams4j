@@ -104,8 +104,8 @@ the checkout, which turns the tag-derived version into a SNAPSHOT.
 
 Then point `examples/gradle.properties` (`teams4jVersion`) at the release -- the guides write
 `$version` and need no edit; CI checks that no release number crept in -- and check the previous
-release against the new one is no longer the baseline: `-PapiBaseline` in CONTRIBUTING and the CI
-job, if one guards it, move to the version just released.
+release against the new one is no longer the baseline: `-PapiBaseline` in CONTRIBUTING and in
+`ci.yml` (the binary-compatibility step) move to the version just released.
 
 For a version that is already on Central but not on GitHub Packages (0.1.0 was published this way on
 2026-09-10): check out its tag with a clean tree, so the version derives correctly, and run step 4.

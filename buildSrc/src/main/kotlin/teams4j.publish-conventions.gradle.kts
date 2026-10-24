@@ -70,13 +70,19 @@ signing {
 // most of this library, so the Java modules are compared the way the Java ecosystem does it:
 // against the previously released artifact.
 //
-// Dormant until there is a release to compare against -- `-PapiBaseline=0.1.0` from 0.2.0 onward,
-// and in the CI job that guards a release. Verified before it was committed by pointing it at the
+// Not on the Kotlin modules: japicmp reads bytecode, where an `internal` declaration is public, so
+// removing one failed the gate against 0.2.0 (2026-10-24). The Kotlin plugin is applied before this
+// one in every module (kotlin-conventions comes first), so the check below sees it.
+//
+// Dormant until there is a release to compare against -- `-PapiBaseline=<last release>` locally,
+// and in CI (`ci.yml`, the build job). Verified before it was committed by pointing it at the
 // 0.1.0-SNAPSHOT in the local repository, so this is wiring that has run, not wiring that compiles.
 val apiBaseline = providers.gradleProperty("apiBaseline").orNull
 
 if (apiBaseline != null) {
     plugins.withId("java-library") {
+        if (pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")) return@withId
+
         apply(plugin = "me.champeau.gradle.japicmp")
 
         // The baseline jar is fetched by URL, NOT declared as a dependency. Declared as one, its
