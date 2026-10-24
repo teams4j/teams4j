@@ -319,7 +319,7 @@ public object InlineSerializer : CardSerializer<Inline>("Inline") {
     )
 
     override fun fromJson(element: JsonElement): Inline? {
-        element.asString()?.let { return TextRunSerializer.fromJson(element) }
+        element.readShorthand()?.let { return TextRunSerializer.fromJson(element) }
         return when (val type = element.asObject()?.at("type")?.asString()) {
             "TextRun" -> TextRunSerializer.fromJson(element)
             null -> TextRunSerializer.fromJson(element)

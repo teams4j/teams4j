@@ -74,17 +74,15 @@ public object DimensionSerializer : CardSerializer<Dimension>("Dimension") {
         }
 
     override fun fromJson(element: JsonElement): Dimension? {
-        val primitive = element as? JsonPrimitive ?: return null
+        val primitive = element as? JsonPrimitive ?: element.refuse("a number or a string")
         if (primitive is JsonNull) {
             return null
         }
-        if (primitive.isString) {
+        // A boolean is read as text, as the Jackson binding reads it.
+        if (primitive.isString || primitive.booleanOrNull != null) {
             return Dimension.Text(primitive.content)
         }
-        // Read leniently, as the Jackson binding does: an unquoted token that is not a number still
-        // has a text form, and keeping it beats refusing a card Teams itself would render.
-        return runCatching { Dimension.Numeric(BigDecimal(primitive.content)) }
-            .getOrElse { Dimension.Text(primitive.content) }
+        return Dimension.Numeric(BigDecimal(primitive.content))
     }
 }
 
@@ -112,11 +110,14 @@ private class FallbackSerializer<T : Any, C : Any>(
     override fun fromJson(element: JsonElement): T? {
         val primitive = element as? JsonPrimitive
         if (primitive != null) {
+            if (primitive is JsonNull) {
+                return null
+            }
             if (primitive.isString && primitive.content.trim().equals(FallbackDrop.JSON, ignoreCase = true)) {
                 // Safe: FallbackDrop implements all three fallback interfaces, and T is one of them.
                 return FallbackDrop.DROP as T
             }
-            return null
+            element.refuse("\"drop\" or a replacement")
         }
         return content().fromJson(element)?.let(wrap)
     }

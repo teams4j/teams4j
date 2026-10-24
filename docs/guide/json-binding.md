@@ -57,7 +57,10 @@ cards through each of them and comparing the resulting JSON, **including what th
 being more lenient than the other *is* the drift. The lenient-reading rules (ignore unknown properties,
 unknown enum values become `null`, enum matching is case-insensitive) are mapper configuration on the
 Jackson side and generated code on the kotlinx side, so without that comparison they would diverge
-quietly.
+quietly. Past those, both read a value as Jackson does by default: a scalar is converted where Jackson
+converts it (`5` into a string, `"3"` into a number), and a value of the wrong shape, such as an array
+where a string belongs, fails the card. An enum is read by name only, never by ordinal. A fuzz test
+compares the two bindings on arbitrary input as well.
 
 The two write the same card the same way **but not byte for byte**: property order can differ. The
 webhook client's 28 KB check counts the bytes that actually go out, so it is always right; just do not

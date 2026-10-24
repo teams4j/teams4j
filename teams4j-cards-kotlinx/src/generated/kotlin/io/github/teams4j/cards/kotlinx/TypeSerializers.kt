@@ -30,19 +30,19 @@ public object ActionExecuteSerializer : CardSerializer<ActionExecute>("ActionExe
     }
 
     override fun fromJson(element: JsonElement): ActionExecute? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ActionExecute(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("iconUrl")?.let { it.asString() },
-            obj.at("id")?.let { it.asString() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("title")?.let { it.readString() },
+            obj.at("iconUrl")?.let { it.readString() },
+            obj.at("id")?.let { it.readString() },
             obj.at("style")?.let { ActionStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ActionFallbackSerializer.fromJson(it) },
-            obj.at("tooltip")?.let { it.asString() },
-            obj.at("isEnabled")?.let { it.asBoolean() },
+            obj.at("tooltip")?.let { it.readString() },
+            obj.at("isEnabled")?.let { it.readBoolean() },
             obj.at("mode")?.let { ActionModeSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("verb")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("verb")?.let { it.readString() },
             obj.at("data")?.let { CardValueSerializer.fromJson(it) },
             obj.at("associatedInputs")?.let { AssociatedInputsSerializer.fromJson(it) },
         )
@@ -67,19 +67,19 @@ public object ActionOpenUrlSerializer : CardSerializer<ActionOpenUrl>("ActionOpe
     }
 
     override fun fromJson(element: JsonElement): ActionOpenUrl? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ActionOpenUrl(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("iconUrl")?.let { it.asString() },
-            obj.at("id")?.let { it.asString() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("title")?.let { it.readString() },
+            obj.at("iconUrl")?.let { it.readString() },
+            obj.at("id")?.let { it.readString() },
             obj.at("style")?.let { ActionStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ActionFallbackSerializer.fromJson(it) },
-            obj.at("tooltip")?.let { it.asString() },
-            obj.at("isEnabled")?.let { it.asBoolean() },
+            obj.at("tooltip")?.let { it.readString() },
+            obj.at("isEnabled")?.let { it.readBoolean() },
             obj.at("mode")?.let { ActionModeSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("url")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("url")?.let { it.readString() },
         )
     }
 }
@@ -102,18 +102,18 @@ public object ActionShowCardSerializer : CardSerializer<ActionShowCard>("ActionS
     }
 
     override fun fromJson(element: JsonElement): ActionShowCard? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ActionShowCard(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("iconUrl")?.let { it.asString() },
-            obj.at("id")?.let { it.asString() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("title")?.let { it.readString() },
+            obj.at("iconUrl")?.let { it.readString() },
+            obj.at("id")?.let { it.readString() },
             obj.at("style")?.let { ActionStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ActionFallbackSerializer.fromJson(it) },
-            obj.at("tooltip")?.let { it.asString() },
-            obj.at("isEnabled")?.let { it.asBoolean() },
+            obj.at("tooltip")?.let { it.readString() },
+            obj.at("isEnabled")?.let { it.readBoolean() },
             obj.at("mode")?.let { ActionModeSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
             obj.at("card")?.let { AdaptiveCardSerializer.fromJson(it) },
         )
     }
@@ -138,18 +138,18 @@ public object ActionSubmitSerializer : CardSerializer<ActionSubmit>("ActionSubmi
     }
 
     override fun fromJson(element: JsonElement): ActionSubmit? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ActionSubmit(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("iconUrl")?.let { it.asString() },
-            obj.at("id")?.let { it.asString() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("title")?.let { it.readString() },
+            obj.at("iconUrl")?.let { it.readString() },
+            obj.at("id")?.let { it.readString() },
             obj.at("style")?.let { ActionStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ActionFallbackSerializer.fromJson(it) },
-            obj.at("tooltip")?.let { it.asString() },
-            obj.at("isEnabled")?.let { it.asBoolean() },
+            obj.at("tooltip")?.let { it.readString() },
+            obj.at("isEnabled")?.let { it.readBoolean() },
             obj.at("mode")?.let { ActionModeSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
             obj.at("data")?.let { CardValueSerializer.fromJson(it) },
             obj.at("associatedInputs")?.let { AssociatedInputsSerializer.fromJson(it) },
         )
@@ -174,19 +174,19 @@ public object ActionToggleVisibilitySerializer : CardSerializer<ActionToggleVisi
     }
 
     override fun fromJson(element: JsonElement): ActionToggleVisibility? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ActionToggleVisibility(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("iconUrl")?.let { it.asString() },
-            obj.at("id")?.let { it.asString() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("title")?.let { it.readString() },
+            obj.at("iconUrl")?.let { it.readString() },
+            obj.at("id")?.let { it.readString() },
             obj.at("style")?.let { ActionStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ActionFallbackSerializer.fromJson(it) },
-            obj.at("tooltip")?.let { it.asString() },
-            obj.at("isEnabled")?.let { it.asBoolean() },
+            obj.at("tooltip")?.let { it.readString() },
+            obj.at("isEnabled")?.let { it.readBoolean() },
             obj.at("mode")?.let { ActionModeSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("targetElements")?.let { it.asArray()?.mapNotNull { e -> TargetElementSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("targetElements")?.let { it.readList { e -> TargetElementSerializer.fromJson(e) } },
         )
     }
 }
@@ -202,12 +202,12 @@ public object TargetElementSerializer : CardSerializer<TargetElement>("TargetEle
 
     override fun fromJson(element: JsonElement): TargetElement? {
         // The bare-string form: "x" means { "elementId": "x" }.
-        element.asString()?.let { return TargetElement.fromShorthand(it) }
-        val obj = element.asObject() ?: return null
+        element.readShorthand()?.let { return TargetElement.fromShorthand(it) }
+        val obj = element.readObject()
         return TargetElement(
-            obj.at("type")?.let { it.asString() },
-            obj.at("elementId")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("elementId")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
         )
     }
 }
@@ -235,24 +235,24 @@ public object AdaptiveCardSerializer : CardSerializer<AdaptiveCard>("AdaptiveCar
     }
 
     override fun fromJson(element: JsonElement): AdaptiveCard? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return AdaptiveCard(
-            obj.at("type")?.let { it.asString() },
-            obj.at("version")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("version")?.let { it.readString() },
             obj.at("refresh")?.let { RefreshSerializer.fromJson(it) },
             obj.at("authentication")?.let { AuthenticationSerializer.fromJson(it) },
-            obj.at("body")?.let { it.asArray()?.mapNotNull { e -> CardElementSerializer.fromJson(e) } },
-            obj.at("actions")?.let { it.asArray()?.mapNotNull { e -> CardActionSerializer.fromJson(e) } },
+            obj.at("body")?.let { it.readList { e -> CardElementSerializer.fromJson(e) } },
+            obj.at("actions")?.let { it.readList { e -> CardActionSerializer.fromJson(e) } },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
-            obj.at("fallbackText")?.let { it.asString() },
+            obj.at("fallbackText")?.let { it.readString() },
             obj.at("backgroundImage")?.let { BackgroundImageSerializer.fromJson(it) },
             obj.at("metadata")?.let { MetadataSerializer.fromJson(it) },
-            obj.at("minHeight")?.let { it.asString() },
-            obj.at("rtl")?.let { it.asBoolean() },
-            obj.at("speak")?.let { it.asString() },
-            obj.at("lang")?.let { it.asString() },
+            obj.at("minHeight")?.let { it.readString() },
+            obj.at("rtl")?.let { it.readBoolean() },
+            obj.at("speak")?.let { it.readString() },
+            obj.at("lang")?.let { it.readString() },
             obj.at("verticalContentAlignment")?.let { VerticalContentAlignmentSerializer.fromJson(it) },
-            obj.at("\$schema")?.let { it.asString() },
+            obj.at("\$schema")?.let { it.readString() },
         )
     }
 }
@@ -273,17 +273,17 @@ public object ActionSetSerializer : CardSerializer<ActionSet>("ActionSet") {
     }
 
     override fun fromJson(element: JsonElement): ActionSet? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ActionSet(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("actions")?.let { it.asArray()?.mapNotNull { e -> CardActionSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("actions")?.let { it.readList { e -> CardActionSerializer.fromJson(e) } },
         )
     }
 }
@@ -299,12 +299,12 @@ public object CaptionSourceSerializer : CardSerializer<CaptionSource>("CaptionSo
     }
 
     override fun fromJson(element: JsonElement): CaptionSource? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return CaptionSource(
-            obj.at("type")?.let { it.asString() },
-            obj.at("mimeType")?.let { it.asString() },
-            obj.at("url")?.let { it.asString() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("mimeType")?.let { it.readString() },
+            obj.at("url")?.let { it.readString() },
+            obj.at("label")?.let { it.readString() },
         )
     }
 }
@@ -332,19 +332,19 @@ public object ColumnSerializer : CardSerializer<Column>("Column") {
     }
 
     override fun fromJson(element: JsonElement): Column? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Column(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("items")?.let { it.asArray()?.mapNotNull { e -> CardElementSerializer.fromJson(e) } },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("items")?.let { it.readList { e -> CardElementSerializer.fromJson(e) } },
             obj.at("backgroundImage")?.let { BackgroundImageSerializer.fromJson(it) },
-            obj.at("bleed")?.let { it.asBoolean() },
+            obj.at("bleed")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ColumnFallbackSerializer.fromJson(it) },
-            obj.at("minHeight")?.let { it.asString() },
-            obj.at("rtl")?.let { it.asBoolean() },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("minHeight")?.let { it.readString() },
+            obj.at("rtl")?.let { it.readBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
             obj.at("style")?.let { ContainerStyleSerializer.fromJson(it) },
@@ -375,21 +375,21 @@ public object ColumnSetSerializer : CardSerializer<ColumnSet>("ColumnSet") {
     }
 
     override fun fromJson(element: JsonElement): ColumnSet? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ColumnSet(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("columns")?.let { it.asArray()?.mapNotNull { e -> ColumnSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("columns")?.let { it.readList { e -> ColumnSerializer.fromJson(e) } },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
             obj.at("style")?.let { ContainerStyleSerializer.fromJson(it) },
-            obj.at("bleed")?.let { it.asBoolean() },
-            obj.at("minHeight")?.let { it.asString() },
+            obj.at("bleed")?.let { it.readBoolean() },
+            obj.at("minHeight")?.let { it.readString() },
             obj.at("horizontalAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
         )
     }
@@ -418,24 +418,24 @@ public object ContainerSerializer : CardSerializer<Container>("Container") {
     }
 
     override fun fromJson(element: JsonElement): Container? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Container(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("items")?.let { it.asArray()?.mapNotNull { e -> CardElementSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("items")?.let { it.readList { e -> CardElementSerializer.fromJson(e) } },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
             obj.at("style")?.let { ContainerStyleSerializer.fromJson(it) },
             obj.at("verticalContentAlignment")?.let { VerticalContentAlignmentSerializer.fromJson(it) },
-            obj.at("bleed")?.let { it.asBoolean() },
+            obj.at("bleed")?.let { it.readBoolean() },
             obj.at("backgroundImage")?.let { BackgroundImageSerializer.fromJson(it) },
-            obj.at("minHeight")?.let { it.asString() },
-            obj.at("rtl")?.let { it.asBoolean() },
+            obj.at("minHeight")?.let { it.readString() },
+            obj.at("rtl")?.let { it.readBoolean() },
         )
     }
 }
@@ -450,11 +450,11 @@ public object FactSerializer : CardSerializer<Fact>("Fact") {
     }
 
     override fun fromJson(element: JsonElement): Fact? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Fact(
-            obj.at("type")?.let { it.asString() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("value")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("title")?.let { it.readString() },
+            obj.at("value")?.let { it.readString() },
         )
     }
 }
@@ -475,17 +475,17 @@ public object FactSetSerializer : CardSerializer<FactSet>("FactSet") {
     }
 
     override fun fromJson(element: JsonElement): FactSet? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return FactSet(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("facts")?.let { it.asArray()?.mapNotNull { e -> FactSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("facts")?.let { it.readList { e -> FactSerializer.fromJson(e) } },
         )
     }
 }
@@ -513,24 +513,24 @@ public object ImageSerializer : CardSerializer<Image>("Image") {
     }
 
     override fun fromJson(element: JsonElement): Image? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Image(
-            obj.at("type")?.let { it.asString() },
-            obj.at("url")?.let { it.asString() },
-            obj.at("altText")?.let { it.asString() },
-            obj.at("backgroundColor")?.let { it.asString() },
-            obj.at("height")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("url")?.let { it.readString() },
+            obj.at("altText")?.let { it.readString() },
+            obj.at("backgroundColor")?.let { it.readString() },
+            obj.at("height")?.let { it.readString() },
             obj.at("horizontalAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
             obj.at("size")?.let { ImageSizeSerializer.fromJson(it) },
             obj.at("style")?.let { ImageStyleSerializer.fromJson(it) },
-            obj.at("width")?.let { it.asString() },
+            obj.at("width")?.let { it.readString() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
         )
     }
 }
@@ -552,17 +552,17 @@ public object ImageSetSerializer : CardSerializer<ImageSet>("ImageSet") {
     }
 
     override fun fromJson(element: JsonElement): ImageSet? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return ImageSet(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("images")?.let { it.asArray()?.mapNotNull { e -> ImageSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("images")?.let { it.readList { e -> ImageSerializer.fromJson(e) } },
             obj.at("imageSize")?.let { ImageSizeSerializer.fromJson(it) },
         )
     }
@@ -588,20 +588,20 @@ public object TextRunSerializer : CardSerializer<TextRun>("TextRun") {
 
     override fun fromJson(element: JsonElement): TextRun? {
         // The bare-string form: "x" means { "text": "x" }.
-        element.asString()?.let { return TextRun.fromShorthand(it) }
-        val obj = element.asObject() ?: return null
+        element.readShorthand()?.let { return TextRun.fromShorthand(it) }
+        val obj = element.readObject()
         return TextRun(
-            obj.at("type")?.let { it.asString() },
-            obj.at("text")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("text")?.let { it.readString() },
             obj.at("color")?.let { ColorsSerializer.fromJson(it) },
             obj.at("fontType")?.let { FontTypeSerializer.fromJson(it) },
-            obj.at("highlight")?.let { it.asBoolean() },
-            obj.at("isSubtle")?.let { it.asBoolean() },
-            obj.at("italic")?.let { it.asBoolean() },
+            obj.at("highlight")?.let { it.readBoolean() },
+            obj.at("isSubtle")?.let { it.readBoolean() },
+            obj.at("italic")?.let { it.readBoolean() },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
             obj.at("size")?.let { FontSizeSerializer.fromJson(it) },
-            obj.at("strikethrough")?.let { it.asBoolean() },
-            obj.at("underline")?.let { it.asBoolean() },
+            obj.at("strikethrough")?.let { it.readBoolean() },
+            obj.at("underline")?.let { it.readBoolean() },
             obj.at("weight")?.let { FontWeightSerializer.fromJson(it) },
         )
     }
@@ -613,17 +613,17 @@ public object DataQuerySerializer : CardSerializer<DataQuery>("DataQuery") {
     override fun toJson(value: DataQuery): JsonElement = buildJsonObject {
         value.type()?.let { put("type", JsonPrimitive(it)) }
         value.dataset()?.let { put("dataset", JsonPrimitive(it)) }
-        value.count()?.let { put("count", JsonPrimitive(it)) }
-        value.skip()?.let { put("skip", JsonPrimitive(it)) }
+        value.count()?.let { put("count", numberLiteral(it)) }
+        value.skip()?.let { put("skip", numberLiteral(it)) }
     }
 
     override fun fromJson(element: JsonElement): DataQuery? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return DataQuery(
-            obj.at("type")?.let { it.asString() },
-            obj.at("dataset")?.let { it.asString() },
-            obj.at("count")?.let { it.asNumber() },
-            obj.at("skip")?.let { it.asNumber() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("dataset")?.let { it.readString() },
+            obj.at("count")?.let { it.readNumber() },
+            obj.at("skip")?.let { it.readNumber() },
         )
     }
 }
@@ -638,11 +638,11 @@ public object InputChoiceSerializer : CardSerializer<InputChoice>("InputChoice")
     }
 
     override fun fromJson(element: JsonElement): InputChoice? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputChoice(
-            obj.at("type")?.let { it.asString() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("value")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("title")?.let { it.readString() },
+            obj.at("value")?.let { it.readString() },
         )
     }
 }
@@ -675,29 +675,29 @@ public object InputChoiceSetSerializer : CardSerializer<InputChoiceSet>("InputCh
     }
 
     override fun fromJson(element: JsonElement): InputChoiceSet? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputChoiceSet(
-            obj.at("id")?.let { it.asString() },
-            obj.at("errorMessage")?.let { it.asString() },
-            obj.at("isRequired")?.let { it.asBoolean() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("errorMessage")?.let { it.readString() },
+            obj.at("isRequired")?.let { it.readBoolean() },
+            obj.at("label")?.let { it.readString() },
             obj.at("labelPosition")?.let { InputLabelPositionSerializer.fromJson(it) },
             obj.at("labelWidth")?.let { DimensionSerializer.fromJson(it) },
             obj.at("inputStyle")?.let { InputStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("choices")?.let { it.asArray()?.mapNotNull { e -> InputChoiceSerializer.fromJson(e) } },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("choices")?.let { it.readList { e -> InputChoiceSerializer.fromJson(e) } },
             obj.at("choices.data")?.let { DataQuerySerializer.fromJson(it) },
-            obj.at("isMultiSelect")?.let { it.asBoolean() },
+            obj.at("isMultiSelect")?.let { it.readBoolean() },
             obj.at("style")?.let { ChoiceInputStyleSerializer.fromJson(it) },
-            obj.at("value")?.let { it.asString() },
-            obj.at("placeholder")?.let { it.asString() },
-            obj.at("wrap")?.let { it.asBoolean() },
+            obj.at("value")?.let { it.readString() },
+            obj.at("placeholder")?.let { it.readString() },
+            obj.at("wrap")?.let { it.readBoolean() },
         )
     }
 }
@@ -727,26 +727,26 @@ public object InputDateSerializer : CardSerializer<InputDate>("InputDate") {
     }
 
     override fun fromJson(element: JsonElement): InputDate? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputDate(
-            obj.at("id")?.let { it.asString() },
-            obj.at("errorMessage")?.let { it.asString() },
-            obj.at("isRequired")?.let { it.asBoolean() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("errorMessage")?.let { it.readString() },
+            obj.at("isRequired")?.let { it.readBoolean() },
+            obj.at("label")?.let { it.readString() },
             obj.at("labelPosition")?.let { InputLabelPositionSerializer.fromJson(it) },
             obj.at("labelWidth")?.let { DimensionSerializer.fromJson(it) },
             obj.at("inputStyle")?.let { InputStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("max")?.let { it.asString() },
-            obj.at("min")?.let { it.asString() },
-            obj.at("placeholder")?.let { it.asString() },
-            obj.at("value")?.let { it.asString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("max")?.let { it.readString() },
+            obj.at("min")?.let { it.readString() },
+            obj.at("placeholder")?.let { it.readString() },
+            obj.at("value")?.let { it.readString() },
         )
     }
 }
@@ -769,33 +769,33 @@ public object InputNumberSerializer : CardSerializer<InputNumber>("InputNumber")
         value.isVisible()?.let { put("isVisible", JsonPrimitive(it)) }
         value.requires()?.let { put("requires", buildJsonObject { it.forEach { (k, v) -> put(k, JsonPrimitive(v)) } }) }
         value.type()?.let { put("type", JsonPrimitive(it)) }
-        value.max()?.let { put("max", JsonPrimitive(it)) }
-        value.min()?.let { put("min", JsonPrimitive(it)) }
+        value.max()?.let { put("max", numberLiteral(it)) }
+        value.min()?.let { put("min", numberLiteral(it)) }
         value.placeholder()?.let { put("placeholder", JsonPrimitive(it)) }
-        value.value()?.let { put("value", JsonPrimitive(it)) }
+        value.value()?.let { put("value", numberLiteral(it)) }
     }
 
     override fun fromJson(element: JsonElement): InputNumber? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputNumber(
-            obj.at("id")?.let { it.asString() },
-            obj.at("errorMessage")?.let { it.asString() },
-            obj.at("isRequired")?.let { it.asBoolean() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("errorMessage")?.let { it.readString() },
+            obj.at("isRequired")?.let { it.readBoolean() },
+            obj.at("label")?.let { it.readString() },
             obj.at("labelPosition")?.let { InputLabelPositionSerializer.fromJson(it) },
             obj.at("labelWidth")?.let { DimensionSerializer.fromJson(it) },
             obj.at("inputStyle")?.let { InputStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("max")?.let { it.asNumber() },
-            obj.at("min")?.let { it.asNumber() },
-            obj.at("placeholder")?.let { it.asString() },
-            obj.at("value")?.let { it.asNumber() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("max")?.let { it.readNumber() },
+            obj.at("min")?.let { it.readNumber() },
+            obj.at("placeholder")?.let { it.readString() },
+            obj.at("value")?.let { it.readNumber() },
         )
     }
 }
@@ -819,7 +819,7 @@ public object InputTextSerializer : CardSerializer<InputText>("InputText") {
         value.requires()?.let { put("requires", buildJsonObject { it.forEach { (k, v) -> put(k, JsonPrimitive(v)) } }) }
         value.type()?.let { put("type", JsonPrimitive(it)) }
         value.isMultiline()?.let { put("isMultiline", JsonPrimitive(it)) }
-        value.maxLength()?.let { put("maxLength", JsonPrimitive(it)) }
+        value.maxLength()?.let { put("maxLength", numberLiteral(it)) }
         value.placeholder()?.let { put("placeholder", JsonPrimitive(it)) }
         value.regex()?.let { put("regex", JsonPrimitive(it)) }
         value.style()?.let { put("style", TextInputStyleSerializer.toJson(it)) }
@@ -828,29 +828,29 @@ public object InputTextSerializer : CardSerializer<InputText>("InputText") {
     }
 
     override fun fromJson(element: JsonElement): InputText? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputText(
-            obj.at("id")?.let { it.asString() },
-            obj.at("errorMessage")?.let { it.asString() },
-            obj.at("isRequired")?.let { it.asBoolean() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("errorMessage")?.let { it.readString() },
+            obj.at("isRequired")?.let { it.readBoolean() },
+            obj.at("label")?.let { it.readString() },
             obj.at("labelPosition")?.let { InputLabelPositionSerializer.fromJson(it) },
             obj.at("labelWidth")?.let { DimensionSerializer.fromJson(it) },
             obj.at("inputStyle")?.let { InputStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("isMultiline")?.let { it.asBoolean() },
-            obj.at("maxLength")?.let { it.asNumber() },
-            obj.at("placeholder")?.let { it.asString() },
-            obj.at("regex")?.let { it.asString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("isMultiline")?.let { it.readBoolean() },
+            obj.at("maxLength")?.let { it.readNumber() },
+            obj.at("placeholder")?.let { it.readString() },
+            obj.at("regex")?.let { it.readString() },
             obj.at("style")?.let { TextInputStyleSerializer.fromJson(it) },
             obj.at("inlineAction")?.let { SelectActionSerializer.fromJson(it) },
-            obj.at("value")?.let { it.asString() },
+            obj.at("value")?.let { it.readString() },
         )
     }
 }
@@ -880,26 +880,26 @@ public object InputTimeSerializer : CardSerializer<InputTime>("InputTime") {
     }
 
     override fun fromJson(element: JsonElement): InputTime? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputTime(
-            obj.at("id")?.let { it.asString() },
-            obj.at("errorMessage")?.let { it.asString() },
-            obj.at("isRequired")?.let { it.asBoolean() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("errorMessage")?.let { it.readString() },
+            obj.at("isRequired")?.let { it.readBoolean() },
+            obj.at("label")?.let { it.readString() },
             obj.at("labelPosition")?.let { InputLabelPositionSerializer.fromJson(it) },
             obj.at("labelWidth")?.let { DimensionSerializer.fromJson(it) },
             obj.at("inputStyle")?.let { InputStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("max")?.let { it.asString() },
-            obj.at("min")?.let { it.asString() },
-            obj.at("placeholder")?.let { it.asString() },
-            obj.at("value")?.let { it.asString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("max")?.let { it.readString() },
+            obj.at("min")?.let { it.readString() },
+            obj.at("placeholder")?.let { it.readString() },
+            obj.at("value")?.let { it.readString() },
         )
     }
 }
@@ -930,27 +930,27 @@ public object InputToggleSerializer : CardSerializer<InputToggle>("InputToggle")
     }
 
     override fun fromJson(element: JsonElement): InputToggle? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return InputToggle(
-            obj.at("id")?.let { it.asString() },
-            obj.at("errorMessage")?.let { it.asString() },
-            obj.at("isRequired")?.let { it.asBoolean() },
-            obj.at("label")?.let { it.asString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("errorMessage")?.let { it.readString() },
+            obj.at("isRequired")?.let { it.readBoolean() },
+            obj.at("label")?.let { it.readString() },
             obj.at("labelPosition")?.let { InputLabelPositionSerializer.fromJson(it) },
             obj.at("labelWidth")?.let { DimensionSerializer.fromJson(it) },
             obj.at("inputStyle")?.let { InputStyleSerializer.fromJson(it) },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("isVisible")?.let { it.asBoolean() },
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("type")?.let { it.asString() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("value")?.let { it.asString() },
-            obj.at("valueOff")?.let { it.asString() },
-            obj.at("valueOn")?.let { it.asString() },
-            obj.at("wrap")?.let { it.asBoolean() },
+            obj.at("isVisible")?.let { it.readBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("title")?.let { it.readString() },
+            obj.at("value")?.let { it.readString() },
+            obj.at("valueOff")?.let { it.readString() },
+            obj.at("valueOn")?.let { it.readString() },
+            obj.at("wrap")?.let { it.readBoolean() },
         )
     }
 }
@@ -974,20 +974,20 @@ public object MediaSerializer : CardSerializer<Media>("Media") {
     }
 
     override fun fromJson(element: JsonElement): Media? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Media(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("sources")?.let { it.asArray()?.mapNotNull { e -> MediaSourceSerializer.fromJson(e) } },
-            obj.at("poster")?.let { it.asString() },
-            obj.at("altText")?.let { it.asString() },
-            obj.at("captionSources")?.let { it.asArray()?.mapNotNull { e -> CaptionSourceSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("sources")?.let { it.readList { e -> MediaSourceSerializer.fromJson(e) } },
+            obj.at("poster")?.let { it.readString() },
+            obj.at("altText")?.let { it.readString() },
+            obj.at("captionSources")?.let { it.readList { e -> CaptionSourceSerializer.fromJson(e) } },
         )
     }
 }
@@ -1002,11 +1002,11 @@ public object MediaSourceSerializer : CardSerializer<MediaSource>("MediaSource")
     }
 
     override fun fromJson(element: JsonElement): MediaSource? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return MediaSource(
-            obj.at("type")?.let { it.asString() },
-            obj.at("mimeType")?.let { it.asString() },
-            obj.at("url")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("mimeType")?.let { it.readString() },
+            obj.at("url")?.let { it.readString() },
         )
     }
 }
@@ -1028,17 +1028,17 @@ public object RichTextBlockSerializer : CardSerializer<RichTextBlock>("RichTextB
     }
 
     override fun fromJson(element: JsonElement): RichTextBlock? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return RichTextBlock(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("inlines")?.let { it.asArray()?.mapNotNull { e -> InlineSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("inlines")?.let { it.readList { e -> InlineSerializer.fromJson(e) } },
             obj.at("horizontalAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
         )
     }
@@ -1066,20 +1066,20 @@ public object TableSerializer : CardSerializer<Table>("Table") {
     }
 
     override fun fromJson(element: JsonElement): Table? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Table(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("columns")?.let { it.asArray()?.mapNotNull { e -> TableColumnDefinitionSerializer.fromJson(e) } },
-            obj.at("rows")?.let { it.asArray()?.mapNotNull { e -> TableRowSerializer.fromJson(e) } },
-            obj.at("firstRowAsHeader")?.let { it.asBoolean() },
-            obj.at("showGridLines")?.let { it.asBoolean() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("columns")?.let { it.readList { e -> TableColumnDefinitionSerializer.fromJson(e) } },
+            obj.at("rows")?.let { it.readList { e -> TableRowSerializer.fromJson(e) } },
+            obj.at("firstRowAsHeader")?.let { it.readBoolean() },
+            obj.at("showGridLines")?.let { it.readBoolean() },
             obj.at("gridStyle")?.let { ContainerStyleSerializer.fromJson(it) },
             obj.at("horizontalCellContentAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
             obj.at("verticalCellContentAlignment")?.let { VerticalAlignmentSerializer.fromJson(it) },
@@ -1103,17 +1103,17 @@ public object TableCellSerializer : CardSerializer<TableCell>("TableCell") {
     }
 
     override fun fromJson(element: JsonElement): TableCell? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return TableCell(
-            obj.at("type")?.let { it.asString() },
-            obj.at("items")?.let { it.asArray()?.mapNotNull { e -> CardElementSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("items")?.let { it.readList { e -> CardElementSerializer.fromJson(e) } },
             obj.at("selectAction")?.let { SelectActionSerializer.fromJson(it) },
             obj.at("style")?.let { ContainerStyleSerializer.fromJson(it) },
             obj.at("verticalContentAlignment")?.let { VerticalContentAlignmentSerializer.fromJson(it) },
-            obj.at("bleed")?.let { it.asBoolean() },
+            obj.at("bleed")?.let { it.readBoolean() },
             obj.at("backgroundImage")?.let { BackgroundImageSerializer.fromJson(it) },
-            obj.at("minHeight")?.let { it.asString() },
-            obj.at("rtl")?.let { it.asBoolean() },
+            obj.at("minHeight")?.let { it.readString() },
+            obj.at("rtl")?.let { it.readBoolean() },
         )
     }
 }
@@ -1129,9 +1129,9 @@ public object TableColumnDefinitionSerializer : CardSerializer<TableColumnDefini
     }
 
     override fun fromJson(element: JsonElement): TableColumnDefinition? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return TableColumnDefinition(
-            obj.at("type")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
             obj.at("width")?.let { DimensionSerializer.fromJson(it) },
             obj.at("horizontalCellContentAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
             obj.at("verticalCellContentAlignment")?.let { VerticalAlignmentSerializer.fromJson(it) },
@@ -1151,10 +1151,10 @@ public object TableRowSerializer : CardSerializer<TableRow>("TableRow") {
     }
 
     override fun fromJson(element: JsonElement): TableRow? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return TableRow(
-            obj.at("type")?.let { it.asString() },
-            obj.at("cells")?.let { it.asArray()?.mapNotNull { e -> TableCellSerializer.fromJson(e) } },
+            obj.at("type")?.let { it.readString() },
+            obj.at("cells")?.let { it.readList { e -> TableCellSerializer.fromJson(e) } },
             obj.at("style")?.let { ContainerStyleSerializer.fromJson(it) },
             obj.at("horizontalCellContentAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
             obj.at("verticalCellContentAlignment")?.let { VerticalAlignmentSerializer.fromJson(it) },
@@ -1179,7 +1179,7 @@ public object TextBlockSerializer : CardSerializer<TextBlock>("TextBlock") {
         value.fontType()?.let { put("fontType", FontTypeSerializer.toJson(it)) }
         value.horizontalAlignment()?.let { put("horizontalAlignment", HorizontalAlignmentSerializer.toJson(it)) }
         value.isSubtle()?.let { put("isSubtle", JsonPrimitive(it)) }
-        value.maxLines()?.let { put("maxLines", JsonPrimitive(it)) }
+        value.maxLines()?.let { put("maxLines", numberLiteral(it)) }
         value.size()?.let { put("size", FontSizeSerializer.toJson(it)) }
         value.weight()?.let { put("weight", FontWeightSerializer.toJson(it)) }
         value.wrap()?.let { put("wrap", JsonPrimitive(it)) }
@@ -1187,25 +1187,25 @@ public object TextBlockSerializer : CardSerializer<TextBlock>("TextBlock") {
     }
 
     override fun fromJson(element: JsonElement): TextBlock? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return TextBlock(
-            obj.at("requires")?.let { it.asObject()?.entries?.mapNotNull { (k, v) -> v.asString()?.let { k to it } }?.toMap() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("isVisible")?.let { it.asBoolean() },
+            obj.at("requires")?.let { it.readMap { v -> v.readString() } },
+            obj.at("id")?.let { it.readString() },
+            obj.at("isVisible")?.let { it.readBoolean() },
             obj.at("fallback")?.let { ElementFallbackSerializer.fromJson(it) },
             obj.at("height")?.let { BlockElementHeightSerializer.fromJson(it) },
-            obj.at("separator")?.let { it.asBoolean() },
+            obj.at("separator")?.let { it.readBoolean() },
             obj.at("spacing")?.let { SpacingSerializer.fromJson(it) },
-            obj.at("type")?.let { it.asString() },
-            obj.at("text")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("text")?.let { it.readString() },
             obj.at("color")?.let { ColorsSerializer.fromJson(it) },
             obj.at("fontType")?.let { FontTypeSerializer.fromJson(it) },
             obj.at("horizontalAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
-            obj.at("isSubtle")?.let { it.asBoolean() },
-            obj.at("maxLines")?.let { it.asNumber() },
+            obj.at("isSubtle")?.let { it.readBoolean() },
+            obj.at("maxLines")?.let { it.readNumber() },
             obj.at("size")?.let { FontSizeSerializer.fromJson(it) },
             obj.at("weight")?.let { FontWeightSerializer.fromJson(it) },
-            obj.at("wrap")?.let { it.asBoolean() },
+            obj.at("wrap")?.let { it.readBoolean() },
             obj.at("style")?.let { TextBlockStyleSerializer.fromJson(it) },
         )
     }
@@ -1222,12 +1222,12 @@ public object AuthCardButtonSerializer : CardSerializer<AuthCardButton>("AuthCar
     }
 
     override fun fromJson(element: JsonElement): AuthCardButton? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return AuthCardButton(
-            obj.at("type")?.let { it.asString() },
-            obj.at("title")?.let { it.asString() },
-            obj.at("image")?.let { it.asString() },
-            obj.at("value")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("title")?.let { it.readString() },
+            obj.at("image")?.let { it.readString() },
+            obj.at("value")?.let { it.readString() },
         )
     }
 }
@@ -1244,13 +1244,13 @@ public object AuthenticationSerializer : CardSerializer<Authentication>("Authent
     }
 
     override fun fromJson(element: JsonElement): Authentication? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Authentication(
-            obj.at("type")?.let { it.asString() },
-            obj.at("text")?.let { it.asString() },
-            obj.at("connectionName")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("text")?.let { it.readString() },
+            obj.at("connectionName")?.let { it.readString() },
             obj.at("tokenExchangeResource")?.let { TokenExchangeResourceSerializer.fromJson(it) },
-            obj.at("buttons")?.let { it.asArray()?.mapNotNull { e -> AuthCardButtonSerializer.fromJson(e) } },
+            obj.at("buttons")?.let { it.readList { e -> AuthCardButtonSerializer.fromJson(e) } },
         )
     }
 }
@@ -1268,11 +1268,11 @@ public object BackgroundImageSerializer : CardSerializer<BackgroundImage>("Backg
 
     override fun fromJson(element: JsonElement): BackgroundImage? {
         // The bare-string form: "x" means { "url": "x" }.
-        element.asString()?.let { return BackgroundImage.fromShorthand(it) }
-        val obj = element.asObject() ?: return null
+        element.readShorthand()?.let { return BackgroundImage.fromShorthand(it) }
+        val obj = element.readObject()
         return BackgroundImage(
-            obj.at("type")?.let { it.asString() },
-            obj.at("url")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("url")?.let { it.readString() },
             obj.at("fillMode")?.let { ImageFillModeSerializer.fromJson(it) },
             obj.at("horizontalAlignment")?.let { HorizontalAlignmentSerializer.fromJson(it) },
             obj.at("verticalAlignment")?.let { VerticalAlignmentSerializer.fromJson(it) },
@@ -1289,10 +1289,10 @@ public object MetadataSerializer : CardSerializer<Metadata>("Metadata") {
     }
 
     override fun fromJson(element: JsonElement): Metadata? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Metadata(
-            obj.at("type")?.let { it.asString() },
-            obj.at("webUrl")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("webUrl")?.let { it.readString() },
         )
     }
 }
@@ -1308,12 +1308,12 @@ public object RefreshSerializer : CardSerializer<Refresh>("Refresh") {
     }
 
     override fun fromJson(element: JsonElement): Refresh? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return Refresh(
-            obj.at("type")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
             obj.at("action")?.let { ActionExecuteSerializer.fromJson(it) },
-            obj.at("expires")?.let { it.asString() },
-            obj.at("userIds")?.let { it.asArray()?.mapNotNull { e -> e.asString() } },
+            obj.at("expires")?.let { it.readString() },
+            obj.at("userIds")?.let { it.readList { e -> e.readString() } },
         )
     }
 }
@@ -1329,12 +1329,12 @@ public object TokenExchangeResourceSerializer : CardSerializer<TokenExchangeReso
     }
 
     override fun fromJson(element: JsonElement): TokenExchangeResource? {
-        val obj = element.asObject() ?: return null
+        val obj = element.readObject()
         return TokenExchangeResource(
-            obj.at("type")?.let { it.asString() },
-            obj.at("id")?.let { it.asString() },
-            obj.at("uri")?.let { it.asString() },
-            obj.at("providerId")?.let { it.asString() },
+            obj.at("type")?.let { it.readString() },
+            obj.at("id")?.let { it.readString() },
+            obj.at("uri")?.let { it.readString() },
+            obj.at("providerId")?.let { it.readString() },
         )
     }
 }

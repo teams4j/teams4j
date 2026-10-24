@@ -130,10 +130,9 @@ final class KotlinxEmitter {
                     .append("): JsonElement = JsonPrimitive(toWire[value] ?: value.name)\n\n");
             out.append("    // An unrecognised value reads as null rather than failing: the official\n");
             out.append("    // samples carry deliberately invalid ones to exercise renderer fallback.\n");
-            // `?.let`, not `?: return null`: a return in an expression body is an error at language 2.2.
             out.append("    override fun fromJson(element: JsonElement): ")
                     .append(name)
-                    .append("? = element.asString()?.let { byJson[it.lowercase()] }\n");
+                    .append("? = byJson[element.readEnumName().lowercase()]\n");
             out.append("}\n\n");
         }
         return out.toString();
@@ -173,11 +172,11 @@ final class KotlinxEmitter {
                 out.append("        // The bare-string form: \"x\" means { \"")
                         .append(t.stringShorthand())
                         .append("\": \"x\" }.\n");
-                out.append("        element.asString()?.let { return ")
+                out.append("        element.readShorthand()?.let { return ")
                         .append(name)
                         .append(".fromShorthand(it) }\n");
             }
-            out.append("        val obj = element.asObject() ?: return null\n");
+            out.append("        val obj = element.readObject()\n");
             out.append("        return ").append(name).append("(\n");
             String args = t.props().stream().map(p -> "            " + read(p)).collect(Collectors.joining(",\n"));
             out.append(args).append(",\n        )\n");
@@ -296,7 +295,7 @@ final class KotlinxEmitter {
                 .append(name)
                 .append("? {\n");
         if (shorthandMember != null) {
-            out.append("        element.asString()?.let { return ")
+            out.append("        element.readShorthand()?.let { return ")
                     .append(javaNames.get(shorthandMember))
                     .append("Serializer.fromJson(element) }\n");
         }
@@ -345,7 +344,8 @@ final class KotlinxEmitter {
     /** An expression turning {@code expr} into a {@code JsonElement}. */
     private String toJson(Ir.Ref ref, String expr) {
         return switch (ref) {
-            case Ir.Ref.Prim ignored -> "JsonPrimitive(" + expr + ")";
+            case Ir.Ref.Prim prim ->
+                (prim.kind() == Ir.Ref.Prim.Kind.NUMBER ? "numberLiteral(" : "JsonPrimitive(") + expr + ")";
             case Ir.Ref.Named named -> javaNames.get(named.schemaName()) + "Serializer.toJson(" + expr + ")";
             case Ir.Ref.Model model -> model.simpleName() + "Serializer.toJson(" + expr + ")";
             case Ir.Ref.Opaque ignored -> "CardValueSerializer.toJson(" + expr + ")";
@@ -356,23 +356,21 @@ final class KotlinxEmitter {
         };
     }
 
-    /** An expression reading {@code expr} back, yielding null when it does not fit. */
+    /** An expression reading {@code expr} back; a shape the Jackson binding refuses throws. */
     private String fromJson(Ir.Ref ref, String expr) {
         return switch (ref) {
             case Ir.Ref.Prim prim ->
                 switch (prim.kind()) {
-                    case STRING -> expr + ".asString()";
-                    case BOOLEAN -> expr + ".asBoolean()";
-                    case INTEGER -> expr + ".asInt()";
-                    case NUMBER -> expr + ".asNumber()";
+                    case STRING -> expr + ".readString()";
+                    case BOOLEAN -> expr + ".readBoolean()";
+                    case INTEGER -> expr + ".readInt()";
+                    case NUMBER -> expr + ".readNumber()";
                 };
             case Ir.Ref.Named named -> javaNames.get(named.schemaName()) + "Serializer.fromJson(" + expr + ")";
             case Ir.Ref.Model model -> model.simpleName() + "Serializer.fromJson(" + expr + ")";
             case Ir.Ref.Opaque ignored -> "CardValueSerializer.fromJson(" + expr + ")";
-            case Ir.Ref.ListOf list -> expr + ".asArray()?.mapNotNull { e -> " + fromJson(list.element(), "e") + " }";
-            case Ir.Ref.MapOf map ->
-                expr + ".asObject()?.entries?.mapNotNull { (k, v) -> " + fromJson(map.value(), "v")
-                        + "?.let { k to it } }?.toMap()";
+            case Ir.Ref.ListOf list -> expr + ".readList { e -> " + fromJson(list.element(), "e") + " }";
+            case Ir.Ref.MapOf map -> expr + ".readMap { v -> " + fromJson(map.value(), "v") + " }";
         };
     }
 
