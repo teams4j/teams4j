@@ -201,6 +201,63 @@ The same Ktor example against the [Microsoft 365 Agents Playground](../guide/bot
 | Channel messages look like Teams': `conversation.id` is `team-id;messageid=<id>`, `channelData.team` and `.channel` are filled, the mention arrives as an entity plus `<at>Test Bot</at>` | Nothing to change; `withoutMessageId()` and `textWithoutMentions()` behave as in the tenant |
 | An `Action.Execute` invoke carries `value` like a submit does | The examples check `isInvoke()` before `value()`; the order was wrong before and the Playground showed it |
 
+## Connector payloads on a Workflows webhook (2026-10-24)
+
+Microsoft's pages disagree on whether a Workflows webhook takes the `MessageCard` format the retired
+connectors used. Support was announced for December 2025, and as late as January 2026 forum reports
+still described the flow failing on it. Three payloads were posted to a
+URL from the "Post to a channel when a webhook request is received" template:
+
+| Probe | Payload | Response | In the channel |
+|---|---|---|---|
+| A | A bare `MessageCard`, as a connector client sent it | `202` | **Rendered**: title, text, the `themeColor` bar |
+| B | The same card in `{"type":"message","attachments":[…]}`, content type `application/vnd.microsoft.card.o365connector` | `202` | **Rendered**, identical to A |
+| C | An Adaptive Card, as teams4j sends it (control) | `202` | Rendered, with the attribution line |
+
+So the payload is not what breaks in a migration; the URL is. Two differences were visible: neither
+`MessageCard` carried the Workflows attribution line, and both kept the coloured bar that an Adaptive
+Card has no equivalent for.
+
+A second run, the same day, took the rest of the format, one bare `MessageCard` each:
+
+| Probe | What the card carried | Response | In the channel |
+|---|---|---|---|
+| D | An `OpenUri` button | `202` | Title only. **No button** |
+| E | An `ActionCard` with a text input and an `HttpPOST` | `202` | Title only. **No button** |
+| F | An `HttpPOST` button | `202` | Title only. **No button** |
+| G | Two `sections`: activity title, subtitle and image, facts, a section image | `202` | Activity header, facts and the second section's text rendered. The image URLs were dead (404), so G2 repeated it |
+| G2 | G with live images, plus a `heroImage` | `202` | **Rendered**: the activity image and the section image. **The `heroImage` did not appear** |
+| H2 | Block Markdown: a heading, bulleted and numbered lists, a table, a quote, a code block | `202` | **All rendered**, the table with borders |
+| I | A 40 KB `MessageCard` | `202` | **Not in the channel**, as with an Adaptive Card of that size |
+| J | An Adaptive Card with an `Action.OpenUrl` (control for D) | `202` | Rendered, **with its button** |
+
+(A first Markdown probe, H, escaped its newlines and is not reported.)
+
+**Every `potentialAction` is dropped, silently.** Nothing in the response or the card says a button
+was there. A connector card whose point was its button, "Acknowledge" or "View build", arrives on a
+Workflows webhook as a card without one. J rules out the webhook itself: an Adaptive Card button on
+the same URL survives.
+
+**The Markdown goes the other way.** A `MessageCard` renders headings, tables, quotes and code blocks
+that a `TextBlock` cannot. Moving a Markdown-heavy card to Adaptive Cards means rebuilding those
+parts from elements, not pasting the text across. The 28 KB loss applies to both formats.
+
+## Tables and headings (2026-10-24)
+
+The replacements for a `MessageCard`'s Markdown tables and headings, on the same Workflows URL. All
+`202`, all delivered; none showed its `fallbackText`.
+
+| Probe | Card | In the channel |
+|---|---|---|
+| T1 | `Table` with defaults | **Rendered**: grid lines, the first row bold as a header |
+| T2 | `showGridLines: false`, `firstRowAsHeaders: false`, `gridStyle: accent` | No grid lines. The first row **still looked bold**; the accent had nothing to colour without a grid |
+| T3 | Column widths `1`, `3`, `80px`; right alignment; an `attention` row and a `good` cell | **All honoured**: widths in proportion, the column right-aligned, the row tinted red, the cell green. A `TextBlock` without `wrap` in a narrow cell was cut to `cell-…` |
+| T4 | Eight columns of long text | **Squashed, not scrolled**: every column narrowed and words broke mid-word (`colum/n-on/e`) |
+| T5 | `TextBlock` with `style: heading` | **Rendered** larger, as a heading |
+
+A `Table` is the replacement for a Markdown table, within about four columns on the desktop client.
+Beyond that it stays readable only with short values.
+
 ## What Teams adds to a card
 
 Observed while running the probes, and worth knowing before you compare the channel with your JSON:
@@ -208,7 +265,8 @@ Observed while running the probes, and worth knowing before you compare the chan
 - **The endpoint answers `202 Accepted`, not `200`.** The retry policy treats any 2xx as delivered, so
   nothing breaks, but the semantics are "queued", not "posted". The runs above are what that
   distinction costs.
-- **Workflows appends an attribution line** to every card: a separator, then "*name* used a Workflow
+- **Workflows appends an attribution line** to every Adaptive Card (not to a
+  [`MessageCard`](#connector-payloads-on-a-workflows-webhook-2026-10-24)): a separator, then "*name* used a Workflow
   template to send this card. Get template". It is not in the payload teams4j sends.
 - **ISO-8601 strings are reformatted.** `Instant.now().toString()` (`2026-08-31T15:00:38.xxxZ`) in a
   fact value rendered as `08/31/2026 15:00:38`. teams4j passes strings through unchanged; the renderer
