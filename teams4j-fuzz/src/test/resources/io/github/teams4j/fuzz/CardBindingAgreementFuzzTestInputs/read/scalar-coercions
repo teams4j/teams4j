@@ -1,0 +1,1 @@
+{"type":"AdaptiveCard","version":"1.5","body":[{"type":"TextBlock","text":5,"wrap":2,"maxLines":"3"},{"type":"TextBlock","text":"a","wrap":" true"},{"type":"Input.Number","id":"n","value":"10"}]}

@@ -64,7 +64,9 @@ class CardBindingAgreementFuzzTest {
     /** A refusal is a {@link JsonProcessingException}; anything else escaping is a finding. */
     private static @Nullable CardValue viaJackson(String text) {
         try {
-            return TREE.read(JACKSON.writeValueAsString(JACKSON.readValue(text, AdaptiveCard.class)));
+            AdaptiveCard card = JACKSON.readValue(text, AdaptiveCard.class);
+            // A top-level null is no card to Jackson and a refusal to kotlinx; the same answer.
+            return card == null ? null : TREE.read(JACKSON.writeValueAsString(card));
         } catch (JsonProcessingException refused) {
             return null;
         }
