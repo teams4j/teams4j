@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,6 +80,8 @@ public final class BotTokenVerifier {
     private static final Pattern ENTRA_ISSUER = Pattern.compile(
             "^https://(?:sts\\.windows\\.net/([0-9a-f-]{36})/|login\\.microsoftonline\\.(?:com|us)/([0-9a-f-]{36})/v2\\.0)$",
             Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern LOOPBACK_V4 = Pattern.compile("^127(?:\\.\\d{1,3}){3}$");
 
     /**
      * The issuers accepted by default, each with the OpenID metadata document that names its keys:
@@ -190,9 +193,15 @@ public final class BotTokenVerifier {
             @Nullable String authorizationHeader, @Nullable String serviceUrl) {
         if (authorizationHeader == null || authorizationHeader.isBlank()) {
             // A header that is present but wrong is never excused; only its absence is.
-            return allowAnonymous
-                    ? CompletableFuture.completedFuture(VerifiedToken.anonymous(appId))
-                    : CompletableFuture.failedFuture(new TokenVerificationException("no Authorization header"));
+            if (!allowAnonymous) {
+                return CompletableFuture.failedFuture(new TokenVerificationException("no Authorization header"));
+            }
+            // Replies go to the serviceUrl, perhaps with a real token: without one, only to this machine.
+            if (serviceUrl != null && !isLoopback(serviceUrl)) {
+                return CompletableFuture.failedFuture(new TokenVerificationException(
+                        "a request without a token may only name a loopback serviceUrl"));
+            }
+            return CompletableFuture.completedFuture(VerifiedToken.anonymous(appId));
         }
         Jwt jwt;
         String issuer;
@@ -259,6 +268,23 @@ public final class BotTokenVerifier {
             return false;
         }
         return strip(claimed).equalsIgnoreCase(strip(actual));
+    }
+
+    /** Literal loopback hosts only: nothing is resolved. */
+    static boolean isLoopback(String url) {
+        String host;
+        try {
+            host = URI.create(url.trim()).getHost();
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        if (host == null) {
+            return false;
+        }
+        host = host.toLowerCase(Locale.ROOT);
+        return host.equals("localhost")
+                || host.equals("[::1]")
+                || LOOPBACK_V4.matcher(host).matches();
     }
 
     private static String strip(String url) {
@@ -357,6 +383,8 @@ public final class BotTokenVerifier {
                         return get(URI.create(jwksUri));
                     })
                     .thenApply(this::parse)
+                    // A transport that ignores the request timeout must not hold `fetching` forever.
+                    .orTimeout(requestTimeout.multipliedBy(2).toMillis(), TimeUnit.MILLISECONDS)
                     .whenComplete((fetched, failure) -> {
                         fetching.set(null);
                         if (failure != null) {
@@ -372,7 +400,14 @@ public final class BotTokenVerifier {
         private CompletableFuture<CardValue> get(URI uri) {
             HttpExchange.Request request =
                     new HttpExchange.Request("GET", uri, Map.of("Accept", "application/json"), null, requestTimeout);
-            return transport.send(request).thenApply(response -> {
+            CompletableFuture<HttpExchange.Response> sent;
+            try {
+                sent = transport.send(request);
+            } catch (RuntimeException e) {
+                // Thrown rather than failed: still a failure of this fetch, or `fetching` is never cleared.
+                sent = CompletableFuture.failedFuture(e);
+            }
+            return sent.thenApply(response -> {
                 if (response.statusCode() < 200 || response.statusCode() >= 300) {
                     throw new TokenVerificationException("fetching " + uri + " returned " + response.statusCode());
                 }
@@ -511,8 +546,10 @@ public final class BotTokenVerifier {
         /**
          * Development only. Accepts a request that carries no {@code Authorization} header at all,
          * which is what a local emulator such as the Agents Playground sends, and reports it as
-         * {@link VerifiedToken#isAnonymous()}. A header that is present is verified as always. Never
-         * set this where the endpoint is reachable from the internet.
+         * {@link VerifiedToken#isAnonymous()}. Such a request may only name a loopback
+         * {@code serviceUrl}, since a reply may still carry the bot's token. A header that is
+         * present is verified as always. Never set this where the endpoint is reachable from the
+         * internet.
          */
         public Builder allowAnonymous() {
             this.allowAnonymous = true;

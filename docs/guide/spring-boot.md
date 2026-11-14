@@ -141,7 +141,7 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 | `connect-timeout` | `5s` | Ignored when an `HttpTransport` bean is present |
 | `clock-skew` | `5m` | Tolerance on inbound tokens' `exp` and `nbf` |
 | `key-cache-ttl` | `12h` | How long a fetched signing key set is trusted |
-| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header, for a local emulator such as the Agents Playground; with no `app-secret`, send none either |
+| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header and a loopback `serviceUrl`, for a local emulator such as the Agents Playground; with no `app-secret`, send none either |
 
 ## In tests
 

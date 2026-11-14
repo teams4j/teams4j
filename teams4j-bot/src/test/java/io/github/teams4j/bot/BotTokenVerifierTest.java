@@ -9,6 +9,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ class BotTokenVerifierTest {
 
     private static final String APP_ID = "app-id";
     private static final String SERVICE_URL = "https://smba.trafficmanager.net/apac/";
+    private static final String PLAYGROUND_URL = "http://localhost:56150/_connector";
     private static final URI METADATA = URI.create("https://login.example/openid");
     private static final URI JWKS = URI.create("https://login.example/keys");
     private static final URI ENTRA_JWKS = URI.create("https://entra.example/keys");
@@ -183,6 +186,23 @@ class BotTokenVerifierTest {
         assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId())
                 .as("the cached keys still verify")
                 .isEqualTo(APP_ID);
+    }
+
+    /** A transport that throws instead of failing its future must not leave the fetch in flight forever. */
+    @Test
+    void aTransportThatThrowsDoesNotWedgeTheKeySet() throws Exception {
+        BotTokenVerifier verifier = verifier();
+        AtomicReference<Boolean> thrown = new AtomicReference<>(false);
+        transport.on(METADATA, () -> {
+            if (!thrown.getAndSet(true)) {
+                throw new RejectedExecutionException("pool saturated");
+            }
+            return FakeTransport.json(200, "{\"jwks_uri\":\"" + JWKS + "\"}");
+        });
+
+        assertThatThrownBy(() -> verifier.verify(token("k1", k1), SERVICE_URL))
+                .isInstanceOf(RejectedExecutionException.class);
+        assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId()).isEqualTo(APP_ID);
     }
 
     @Test
@@ -440,11 +460,12 @@ class BotTokenVerifierTest {
         BotTokenVerifier verifier =
                 builder(BotTokenVerifier.builder(APP_ID).allowAnonymous()).build();
 
-        VerifiedToken anonymous = verifier.verify(null, SERVICE_URL);
+        VerifiedToken anonymous = verifier.verify(null, PLAYGROUND_URL);
         assertThat(anonymous.isAnonymous()).isTrue();
         assertThat(anonymous.appId()).isEqualTo(APP_ID);
         assertThat(anonymous.serviceUrl()).isNull();
-        assertThat(verifier.verify("", SERVICE_URL).isAnonymous()).isTrue();
+        assertThat(verifier.verify("", PLAYGROUND_URL).isAnonymous()).isTrue();
+        assertThat(verifier.verify(null, null).isAnonymous()).isTrue();
 
         // A header that is there is checked in full.
         assertThatThrownBy(() -> verifier.verify("Bearer a.b.c", SERVICE_URL)).hasMessageContaining("malformed");
@@ -455,5 +476,27 @@ class BotTokenVerifierTest {
         assertThat(receiver.receive(null, "{\"type\":\"message\",\"text\":\"hi\"}")
                         .text())
                 .isEqualTo("hi");
+    }
+
+    /** A reply may carry the bot's real token, so a request without one must not choose where it goes. */
+    @Test
+    void anAnonymousRequestMayOnlyNameALoopbackServiceUrl() throws Exception {
+        BotTokenVerifier verifier =
+                builder(BotTokenVerifier.builder(APP_ID).allowAnonymous()).build();
+
+        for (String local : List.of(PLAYGROUND_URL, "http://127.0.0.1:3978/", "http://[::1]:56150/_connector")) {
+            assertThat(verifier.verify(null, local).isAnonymous()).as(local).isTrue();
+        }
+        for (String remote : List.of(
+                SERVICE_URL,
+                "https://evil.example/",
+                "http://localhost@evil.example/",
+                "http://127.0.0.1.evil.example/",
+                "not a url")) {
+            assertThatThrownBy(() -> verifier.verify(null, remote))
+                    .as(remote)
+                    .isInstanceOf(TokenVerificationException.class)
+                    .hasMessageContaining("loopback");
+        }
     }
 }

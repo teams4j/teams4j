@@ -74,7 +74,7 @@ whose message names the check. **Log the message, return a bare `401`.**
 | `issuers` | `defaultIssuers(tenantId)` | Each accepted `iss` with the metadata document naming its keys. Replace for another cloud; `issuer(iss, uri)` adds one, or points one at a stub in tests |
 | `clockSkew` | 5 min | Tolerance on `exp` and `nbf` |
 | `keyCacheTtl` | 12 h | How long a fetched key set is trusted |
-| `allowAnonymous` | off | **Development only.** A request with no `Authorization` header passes, as `VerifiedToken.isAnonymous()`; a header that is present is still verified. For a local emulator such as the Agents Playground |
+| `allowAnonymous` | off | **Development only.** A request with no `Authorization` header passes, as `VerifiedToken.isAnonymous()`, if its `serviceUrl` is a loopback address -- a reply may still carry the bot's token; a header that is present is still verified. For a local emulator such as the Agents Playground |
 
 `ActivityReceiver` is the two steps in one call: parse the body, verify the header against it. Parse
 first, because the `serviceUrl` check needs the activity.
