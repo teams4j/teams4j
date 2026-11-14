@@ -8,6 +8,7 @@ import io.github.teams4j.cards.Dimension
 import io.github.teams4j.cards.ElementFallback
 import io.github.teams4j.cards.FallbackDrop
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -37,6 +38,17 @@ import java.math.BigDecimal
 @OptIn(ExperimentalSerializationApi::class)
 private fun number(value: BigDecimal): JsonElement = JsonUnquotedLiteral(value.toString())
 
+// Jackson's StreamReadConstraints default. BigDecimal(String) is quadratic in the length, and an
+// activity is parsed before its token is verified.
+private const val MAX_NUMBER_LENGTH = 1000
+
+private fun decimal(number: JsonPrimitive): BigDecimal {
+    if (number.content.length > MAX_NUMBER_LENGTH) {
+        throw SerializationException("a number is longer than $MAX_NUMBER_LENGTH characters")
+    }
+    return BigDecimal(number.content)
+}
+
 /** The open value at `Action.Submit.data` and `Action.Execute.data`. */
 public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
     override fun toJson(value: CardValue): JsonElement =
@@ -57,7 +69,7 @@ public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
                 when {
                     element.isString -> CardValue.of(element.content)
                     bool != null -> CardValue.of(bool)
-                    else -> CardValue.of(BigDecimal(element.content))
+                    else -> CardValue.of(decimal(element))
                 }
             }
             is JsonArray -> CardValue.array(element.map { fromJson(it) })
@@ -80,7 +92,7 @@ public object DimensionSerializer : CardSerializer<Dimension>("Dimension") {
         element.readShorthand()?.let { return Dimension.Text(it) }
         val number =
             (element as? JsonPrimitive)?.takeIf { it.booleanOrNull == null } ?: element.refuse("a number or a string")
-        return Dimension.Numeric(BigDecimal(number.content))
+        return Dimension.Numeric(decimal(number))
     }
 }
 
