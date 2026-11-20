@@ -141,7 +141,7 @@ configure<SpotlessExtension> {
         // each does to a builder chain. This is a builder-DSL library whose code samples are its
         // documentation, and google-java-format turns a nested builder into a staircase of one
         // lambda arrow per line. Generated sources are not a target: the emitter owns their layout.
-        palantirJavaFormat()
+        palantirJavaFormat(libs.findVersion("palantirJavaFormat").orElseThrow().requiredVersion)
         importOrder("java", "javax", "", "io.github.teams4j")
         trimTrailingWhitespace()
         leadingTabsToSpaces(4)

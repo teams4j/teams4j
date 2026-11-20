@@ -111,8 +111,10 @@ class DocumentedCardsTest {
                 .columns(c -> c.column(
                                 "auto",
                                 left -> left.image("https://example.com/avatar.png", i -> i.size(ImageSize.SMALL)))
-                        .column(4, right -> right.text("Ada Lovelace", t -> t.weight(FontWeight.BOLDER))
-                                .text("Opened a pull request")))
+                        .column(
+                                4,
+                                right -> right.text("Ada Lovelace", t -> t.weight(FontWeight.BOLDER))
+                                        .text("Opened a pull request")))
                 .container(c -> c.text("Adds the analytical engine").facts(f -> f.add("Files", "12")))
                 .build();
         // #endregion columns-and-container

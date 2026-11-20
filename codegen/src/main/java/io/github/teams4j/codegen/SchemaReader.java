@@ -74,9 +74,9 @@ final class SchemaReader {
 
         // 2. Invert that into "which unions does this concrete type belong to".
         Map<String, List<String>> memberOf = new LinkedHashMap<>();
-        unions.forEach(
-                (unionName, union) -> union.members().forEach(m -> memberOf.computeIfAbsent(m, k -> new ArrayList<>())
-                        .add(unionName)));
+        unions.forEach((unionName, union) -> union.members()
+                .forEach(
+                        m -> memberOf.computeIfAbsent(m, k -> new ArrayList<>()).add(unionName)));
 
         // 3. Enums and concrete types.
         for (String name : allDefinitionNames()) {

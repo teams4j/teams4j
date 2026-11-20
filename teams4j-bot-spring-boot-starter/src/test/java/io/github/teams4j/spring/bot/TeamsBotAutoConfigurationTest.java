@@ -131,11 +131,12 @@ class TeamsBotAutoConfigurationTest {
 
     @Test
     void registersTheJacksonBindingForBothCardsAndActivities() {
-        runner.withPropertyValues(CREDENTIALS).run(context -> assertThat(context)
-                .hasSingleBean(CardWriter.class)
-                .hasSingleBean(JsonCodec.class)
-                .getBean(JsonCodec.class)
-                .isInstanceOf(JacksonJsonCodec.class));
+        runner.withPropertyValues(CREDENTIALS)
+                .run(context -> assertThat(context)
+                        .hasSingleBean(CardWriter.class)
+                        .hasSingleBean(JsonCodec.class)
+                        .getBean(JsonCodec.class)
+                        .isInstanceOf(JacksonJsonCodec.class));
         runner.withPropertyValues(CREDENTIALS)
                 .run(context -> assertThat(context.getBean(CardWriter.class)).isInstanceOf(JacksonCardWriter.class));
     }

@@ -29,8 +29,9 @@ final class BindingLookup {
                     + " io.github.teams4j:teams4j-cards-kotlinx -- or pass one to the client builder's " + setting);
         }
         // By class name within a tie, so the result never depends on class loader order.
-        found.sort(Comparator.comparingInt(priority).reversed().thenComparing(binding -> binding.getClass()
-                .getName()));
+        found.sort(Comparator.comparingInt(priority)
+                .reversed()
+                .thenComparing(binding -> binding.getClass().getName()));
         T chosen = found.get(0);
         if (found.size() > 1) {
             List<String> losers = found.subList(1, found.size()).stream()

@@ -107,25 +107,24 @@ class GeneratedModelTest {
     @Test
     void sealedUnionsSupportExhaustiveSwitching() {
         CardElement element = TextBlock.builder().text("hi").build();
-        String described =
-                switch (element) {
-                    case TextBlock t -> "text:" + t.text();
-                    case Image i -> "image";
-                    case Container c -> "container";
-                    case ColumnSet c -> "columns";
-                    case FactSet f -> "facts";
-                    case ActionSet a -> "actions";
-                    case ImageSet i -> "images";
-                    case RichTextBlock r -> "richtext";
-                    case Media m -> "media";
-                    case Table t -> "table";
-                    case InputText i -> "input";
-                    case InputNumber i -> "input";
-                    case InputDate i -> "input";
-                    case InputTime i -> "input";
-                    case InputToggle i -> "input";
-                    case InputChoiceSet i -> "input";
-                };
+        String described = switch (element) {
+            case TextBlock t -> "text:" + t.text();
+            case Image i -> "image";
+            case Container c -> "container";
+            case ColumnSet c -> "columns";
+            case FactSet f -> "facts";
+            case ActionSet a -> "actions";
+            case ImageSet i -> "images";
+            case RichTextBlock r -> "richtext";
+            case Media m -> "media";
+            case Table t -> "table";
+            case InputText i -> "input";
+            case InputNumber i -> "input";
+            case InputDate i -> "input";
+            case InputTime i -> "input";
+            case InputToggle i -> "input";
+            case InputChoiceSet i -> "input";
+        };
         assertThat(described).isEqualTo("text:hi");
     }
 

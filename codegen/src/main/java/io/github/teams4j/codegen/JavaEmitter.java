@@ -92,9 +92,10 @@ final class JavaEmitter {
         model.enums().forEach(e -> bySchemaName.put(e.schemaName(), ClassName.get(packageName, e.javaName())));
         model.types().forEach(t -> bySchemaName.put(t.schemaName(), ClassName.get(packageName, t.javaName())));
         model.markers().forEach(m -> {
-            m.members().forEach(member -> markersOf
-                    .computeIfAbsent(member, k -> new ArrayList<>())
-                    .add(ClassName.get(packageName, m.javaName())));
+            m.members()
+                    .forEach(member -> markersOf
+                            .computeIfAbsent(member, k -> new ArrayList<>())
+                            .add(ClassName.get(packageName, m.javaName())));
             markersByUnion
                     .computeIfAbsent(m.extendsUnion(), k -> new ArrayList<>())
                     .add(m);
@@ -260,9 +261,11 @@ final class JavaEmitter {
 
         List<MethodSpec> methods = new ArrayList<>();
         for (Ir.Prop candidate : members.get(0).props()) {
-            boolean sharedByAll = members.stream().skip(1).allMatch(m -> m.props().stream()
-                    .anyMatch(p -> p.javaName().equals(candidate.javaName())
-                            && p.type().equals(candidate.type())));
+            boolean sharedByAll = members.stream()
+                    .skip(1)
+                    .allMatch(m -> m.props().stream()
+                            .anyMatch(p -> p.javaName().equals(candidate.javaName())
+                                    && p.type().equals(candidate.type())));
             if (!sharedByAll) {
                 continue;
             }

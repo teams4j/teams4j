@@ -60,10 +60,11 @@ class TeamsWebhookAutoConfigurationTest {
      */
     @Test
     void registersTheJacksonBindingSoTheStarterIsSelfContained() {
-        runner.withPropertyValues("teams4j.webhook.url=" + URL).run(context -> assertThat(context)
-                .hasSingleBean(CardWriter.class)
-                .getBean(CardWriter.class)
-                .isInstanceOf(JacksonCardWriter.class));
+        runner.withPropertyValues("teams4j.webhook.url=" + URL)
+                .run(context -> assertThat(context)
+                        .hasSingleBean(CardWriter.class)
+                        .getBean(CardWriter.class)
+                        .isInstanceOf(JacksonCardWriter.class));
     }
 
     /**
@@ -105,11 +106,12 @@ class TeamsWebhookAutoConfigurationTest {
 
     @Test
     void aUrlIsEnoughToGetAClient() {
-        runner.withPropertyValues("teams4j.webhook.url=" + URL).run(context -> assertThat(context)
-                .hasSingleBean(WorkflowsWebhookClient.class)
-                .getBean(WorkflowsWebhookClient.class)
-                .extracting(WorkflowsWebhookClient::url)
-                .isEqualTo(URI.create(URL)));
+        runner.withPropertyValues("teams4j.webhook.url=" + URL)
+                .run(context -> assertThat(context)
+                        .hasSingleBean(WorkflowsWebhookClient.class)
+                        .getBean(WorkflowsWebhookClient.class)
+                        .extracting(WorkflowsWebhookClient::url)
+                        .isEqualTo(URI.create(URL)));
     }
 
     @Test
@@ -187,9 +189,10 @@ class TeamsWebhookAutoConfigurationTest {
 
     @Test
     void allowPlainHttpIsOffByDefault() {
-        runner.withPropertyValues("teams4j.webhook.url=" + URL).run(context -> assertThat(
-                        context.getBean(TeamsWebhookProperties.class).isAllowPlainHttp())
-                .isFalse());
+        runner.withPropertyValues("teams4j.webhook.url=" + URL)
+                .run(context -> assertThat(
+                                context.getBean(TeamsWebhookProperties.class).isAllowPlainHttp())
+                        .isFalse());
     }
 
     /**
