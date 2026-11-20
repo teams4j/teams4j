@@ -11,8 +11,17 @@ public final class BodyTooLargeException extends IllegalArgumentException {
     private final int limit;
 
     public BodyTooLargeException(int length, int limit) {
-        super("the request body has " + length + " characters; the limit is " + limit);
+        this("the request body has " + length + " characters; the limit is " + limit, limit);
+    }
+
+    private BodyTooLargeException(String message, int limit) {
+        super(message);
         this.limit = limit;
+    }
+
+    static BodyTooLargeException ofBytes(long maxBytes, int limit) {
+        return new BodyTooLargeException(
+                "the request body has more than " + maxBytes + " bytes; the limit is " + limit + " characters", limit);
     }
 
     /** The limit that was exceeded, in characters. */

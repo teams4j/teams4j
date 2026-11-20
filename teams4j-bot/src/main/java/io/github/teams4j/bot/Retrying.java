@@ -12,6 +12,7 @@ import java.util.function.IntFunction;
 import org.jspecify.annotations.Nullable;
 
 import io.github.teams4j.http.HttpExchange;
+import io.github.teams4j.http.ResponseTooLargeException;
 import io.github.teams4j.http.RetryPolicy;
 
 /**
@@ -106,7 +107,8 @@ final class Retrying {
 
     private void onFailure(int n, @Nullable Throwable failure) {
         Throwable cause = unwrap(failure);
-        if (!(cause instanceof IOException)) {
+        // An oversized body would come back the same on a retry.
+        if (!(cause instanceof IOException) || cause instanceof ResponseTooLargeException) {
             result.completeExceptionally(cause);
             return;
         }

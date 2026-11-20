@@ -1,12 +1,13 @@
 package io.github.teams4j.spring.bot;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,8 +33,9 @@ public class TeamsBotController {
 
     @PostMapping(path = "${teams4j.bot.path:/api/messages}")
     public ResponseEntity<String> receive(
-            @RequestHeader(name = "Authorization", required = false) @Nullable String authorization,
-            @RequestBody String body) {
+            @RequestHeader(name = "Authorization", required = false) @Nullable String authorization, InputStream body)
+            throws IOException {
+        // The raw stream, not @RequestBody String: the size limit applies before the body is buffered.
         ActivityEndpoint.Response answer = endpoint.handle(authorization, body, handler);
         ResponseEntity.BodyBuilder response = ResponseEntity.status(answer.status());
         String json = answer.body();

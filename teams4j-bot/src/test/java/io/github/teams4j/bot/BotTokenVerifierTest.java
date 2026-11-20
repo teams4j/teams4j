@@ -25,6 +25,7 @@ class BotTokenVerifierTest {
 
     private static final String APP_ID = "app-id";
     private static final String SERVICE_URL = "https://smba.trafficmanager.net/apac/";
+    private static final String LOOPBACK = "http://localhost:3978/";
     private static final String PLAYGROUND_URL = "http://localhost:56150/_connector";
     private static final URI METADATA = URI.create("https://login.example/openid");
     private static final URI JWKS = URI.create("https://login.example/keys");
@@ -327,15 +328,21 @@ class BotTokenVerifierTest {
                     .isInstanceOf(TokenVerificationException.class)
                     .hasMessageContaining("caller is not allowed");
         }
-        assertThat(strict.verify(self, SERVICE_URL).issuer())
+        assertThat(strict.verify(self, LOOPBACK).issuer())
                 .as("app ids compare ignoring case")
                 .isEqualTo(ENTRA_V2);
 
         BotTokenVerifier withCaller = builder(
                         BotTokenVerifier.builder(APP_ID).tenantId(TENANT).allowedCallers(List.of("other-app")))
                 .build();
-        assertThat(withCaller.verify(foreign, SERVICE_URL).issuer()).isEqualTo(ENTRA_V2);
-        assertThat(withCaller.verify(foreignV1, SERVICE_URL).issuer()).isEqualTo(ENTRA_V1);
+        assertThat(withCaller.verify(foreign, LOOPBACK).issuer()).isEqualTo(ENTRA_V2);
+        assertThat(withCaller.verify(foreignV1, LOOPBACK).issuer()).isEqualTo(ENTRA_V1);
+        assertThatThrownBy(() -> withCaller.verify(foreign, "https://attacker.example/"))
+                .as("an allowed caller does not choose where the bot's Connector token goes")
+                .hasMessageContaining("loopback");
+
+        String delegated = token("k2", k2, claims.apply(",\"azp\":\"" + APP_ID + "\",\"scp\":\"access_as_user\""));
+        assertThatThrownBy(() -> strict.verify(delegated, LOOPBACK)).hasMessageContaining("delegated");
     }
 
     /** Unverified claims reach the log through the reason: one rejected request, one log line. */
@@ -351,7 +358,10 @@ class BotTokenVerifierTest {
         assertThat(BotTokenVerifier.quote("a".repeat(500))).hasSize(205).endsWith("...\"");
     }
 
-    /** The Emulator and the Playground mint Entra tokens for the app id with no {@code serviceurl}; the Bot Framework never omits it. */
+    /**
+     * The Emulator and the Playground mint Entra tokens for the app id with no {@code serviceurl}, and
+     * run on this machine; the Bot Framework never omits it.
+     */
     @Test
     void anEntraTokenMayLackTheServiceUrlClaimButABotFrameworkTokenMayNot() throws Exception {
         BotTokenVerifier verifier =
@@ -368,7 +378,9 @@ class BotTokenVerifierTest {
                 "{\"iss\":\"https://api.botframework.com\",\"aud\":\"" + APP_ID + "\",\"nbf\":" + nbf + ",\"exp\":"
                         + (nbf + 3600) + "}");
 
-        assertThat(verifier.verify(entraWithoutClaim, SERVICE_URL).serviceUrl()).isNull();
+        assertThat(verifier.verify(entraWithoutClaim, LOOPBACK).serviceUrl()).isNull();
+        assertThatThrownBy(() -> verifier.verify(entraWithoutClaim, SERVICE_URL))
+                .hasMessageContaining("loopback");
         assertThatThrownBy(() -> verifier.verify(botFrameworkWithoutClaim, SERVICE_URL))
                 .hasMessageContaining("serviceurl");
         assertThatThrownBy(() -> verifier.verify(entraToken(ENTRA_V2, TENANT), "https://smba.trafficmanager.net/emea/"))

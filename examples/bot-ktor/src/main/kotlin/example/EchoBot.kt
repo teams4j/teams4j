@@ -42,6 +42,8 @@ fun main() {
     val secret = System.getenv("TEAMS_BOT_APP_SECRET")?.takeIf { it.isNotBlank() }
     val tenant = System.getenv("TEAMS_BOT_TENANT_ID")?.takeIf { it.isNotBlank() }
     val anonymous = System.getenv("TEAMS_BOT_ALLOW_ANONYMOUS") == "true"
+    // A request without a token would get a reply carrying the bot's real one.
+    check(!(anonymous && secret != null)) { "TEAMS_BOT_ALLOW_ANONYMOUS and TEAMS_BOT_APP_SECRET cannot be combined" }
 
     val verifier = BotTokenVerifier.builder(appId).tenantId(tenant).apply { if (anonymous) allowAnonymous() }.build()
     val receiver = ActivityReceiver(verifier)

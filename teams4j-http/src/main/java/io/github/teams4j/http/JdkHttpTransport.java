@@ -1,13 +1,12 @@
 package io.github.teams4j.http;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -26,8 +25,8 @@ final class JdkHttpTransport implements HttpTransport {
 
     JdkHttpTransport(HttpClient client, long maxResponseBytes) {
         this.client = Objects.requireNonNull(client, "client");
-        if (maxResponseBytes < 1) {
-            throw new IllegalArgumentException("maxResponseBytes must be positive");
+        if (maxResponseBytes < 1 || maxResponseBytes > Integer.MAX_VALUE - 8) {
+            throw new IllegalArgumentException("maxResponseBytes must be between 1 and " + (Integer.MAX_VALUE - 8));
         }
         this.maxResponseBytes = maxResponseBytes;
     }
@@ -83,8 +82,9 @@ final class JdkHttpTransport implements HttpTransport {
 
         private final long limit;
         private final CompletableFuture<String> result = new CompletableFuture<>();
-        private final List<ByteBuffer> parts = new ArrayList<>();
-        private long received;
+        // Bytes copied out as they come: holding the delivered buffers would cost a buffer per chunk.
+        private byte[] body = new byte[8192];
+        private int received;
         private Flow.@Nullable Subscription subscription;
 
         Bounded(long limit) {
@@ -108,35 +108,31 @@ final class JdkHttpTransport implements HttpTransport {
                 return;
             }
             for (ByteBuffer item : items) {
-                received += item.remaining();
-                if (received > limit) {
-                    parts.clear();
+                int n = item.remaining();
+                if (received + (long) n > limit) {
+                    body = new byte[0];
                     Objects.requireNonNull(subscription).cancel();
-                    result.completeExceptionally(
-                            new IOException("the response body is longer than " + limit + " bytes"));
+                    result.completeExceptionally(new ResponseTooLargeException(limit));
                     return;
                 }
-                parts.add(item);
+                if (received + n > body.length) {
+                    body = Arrays.copyOf(body, (int) Math.min(limit, Math.max(2L * body.length, received + n)));
+                }
+                item.get(body, received, n);
+                received += n;
             }
         }
 
         @Override
         public void onError(Throwable failure) {
-            parts.clear();
+            body = new byte[0];
             result.completeExceptionally(failure);
         }
 
         @Override
         public void onComplete() {
-            byte[] all = new byte[Math.toIntExact(received)];
-            int at = 0;
-            for (ByteBuffer part : parts) {
-                int n = part.remaining();
-                part.get(all, at, n);
-                at += n;
-            }
-            parts.clear();
-            result.complete(new String(all, StandardCharsets.UTF_8));
+            result.complete(new String(body, 0, received, StandardCharsets.UTF_8));
+            body = new byte[0];
         }
     }
 }

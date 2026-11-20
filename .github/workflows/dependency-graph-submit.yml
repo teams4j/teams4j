@@ -1,7 +1,8 @@
 name: Dependency graph submit
 
 # Submits the graph a pull request generated. Runs in the default branch's context and checks out
-# nothing: the pull request's code never runs with this token.
+# nothing: the pull request's code never runs with this token. Same-repository runs only: a fork
+# edits the producer's own guard.
 on:
   workflow_run: # zizmor: ignore[dangerous-triggers] only downloads the uploaded graph; no checkout, no build
     workflows: [Dependency submission]
@@ -12,7 +13,10 @@ permissions: {}
 jobs:
   submit:
     name: submit the pull request's dependency graph
-    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       actions: read

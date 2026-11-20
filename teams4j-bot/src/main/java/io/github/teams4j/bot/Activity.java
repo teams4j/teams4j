@@ -1,8 +1,10 @@
 package io.github.teams4j.bot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jspecify.annotations.Nullable;
@@ -52,7 +54,6 @@ public record Activity(
         @Nullable CardValue channelData,
         @Nullable CardValue raw) {
 
-    private static final Pattern AT_TAG = Pattern.compile("<at>.*?</at>", Pattern.DOTALL);
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     public Activity {
@@ -279,15 +280,33 @@ public record Activity(
             return null;
         }
         String stripped = text;
+        Set<String> seen = new HashSet<>();
         for (Mention mention : mentions()) {
-            if (mention.text() != null) {
-                stripped = stripped.replace(mention.text(), "");
+            String m = mention.text();
+            if (m != null && !m.isEmpty() && seen.add(m)) {
+                stripped = stripped.replace(m, "");
             }
         }
-        return WHITESPACE
-                .matcher(AT_TAG.matcher(stripped).replaceAll(""))
-                .replaceAll(" ")
-                .trim();
+        return WHITESPACE.matcher(stripAtTags(stripped)).replaceAll(" ").trim();
+    }
+
+    // A scan, not a regex: a lazy <at>.*?</at> rescans to the end from every unclosed <at>.
+    private static String stripAtTags(String s) {
+        StringBuilder out = null;
+        int from = 0;
+        int open;
+        while ((open = s.indexOf("<at>", from)) >= 0) {
+            int close = s.indexOf("</at>", open + 4);
+            if (close < 0) {
+                break;
+            }
+            if (out == null) {
+                out = new StringBuilder(s.length());
+            }
+            out.append(s, from, open);
+            from = close + 5;
+        }
+        return out == null ? s : out.append(s, from, s.length()).toString();
     }
 
     /**

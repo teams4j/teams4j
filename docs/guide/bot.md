@@ -63,7 +63,9 @@ send; its issuers are accepted for your registration's own tenant and for the Mi
 behind Teams, and an Entra token's `tid` must be the tenant its issuer names. Entra issues a token
 for your app's audience to any client its tenant lets ask, so an Entra token must also have been
 requested by your app itself (`azp`, or `appid` in v1) -- as the Emulator's and the Playground's
-are -- or by an app named in `allowedCallers`. Each issuer's keys are
+are -- or by an app named in `allowedCallers`. It must be an app token, not a user's (`scp`), and since it
+carries no `serviceurl` claim its activity may only name a loopback `serviceUrl`: a reply carries
+your bot's Connector token. Each issuer's keys are
 fetched from its OpenID metadata document and cached (12 hours); a token naming a key id the cache
 lacks refreshes that set, at most once an hour, which is how rotation is followed. `builder(credentials)` passes the
 tenant along; `builder(appId)` with no `tenantId` is right for a multi-tenant registration.
@@ -77,7 +79,7 @@ whose message names the check. **Log the message, return a bare `401`.**
 | `issuers` | `defaultIssuers(tenantId)` | Each accepted `iss` with the metadata document naming its keys. Replace for another cloud; `issuer(iss, uri)` adds one, or points one at a stub in tests |
 | `clockSkew` | 5 min | Tolerance on `exp` and `nbf` |
 | `keyCacheTtl` | 12 h | How long a fetched key set is trusted |
-| `allowedCallers` | — | App ids, besides your own, whose Entra tokens are accepted: another agent, a skill host |
+| `allowedCallers` | — | App ids, besides your own, whose app-only Entra tokens are accepted: another agent, a skill host. Without a `serviceurl` claim their activity may only name a loopback `serviceUrl` |
 | `allowAnonymous` | off | **Development only.** A request with no `Authorization` header passes, as `VerifiedToken.isAnonymous()`, if its `serviceUrl` is a loopback address -- a reply may still carry the bot's token; a header that is present is still verified. For a local emulator such as the Agents Playground |
 
 `ActivityReceiver` is the two steps in one call: parse the body, verify the header against it. Parse

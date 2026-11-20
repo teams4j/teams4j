@@ -1,5 +1,7 @@
 package io.github.teams4j.bot;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
@@ -56,6 +58,26 @@ public final class ActivityEndpoint {
     public ActivityEndpoint(ActivityReceiver receiver, JsonCodec codec) {
         this.receiver = Objects.requireNonNull(receiver, "receiver");
         this.codec = Objects.requireNonNull(codec, "codec");
+    }
+
+    /**
+     * As {@link #handle(String, String, ActivityHandler)}, reading the body through
+     * {@link ActivityReceiver#readBody}: an oversized body is answered {@code 413} before it is buffered.
+     */
+    public Response handle(@Nullable String authorizationHeader, InputStream body, ActivityHandler handler)
+            throws IOException {
+        Objects.requireNonNull(body, "body");
+        String text;
+        try {
+            text = receiver.readBody(body);
+        } catch (BodyTooLargeException e) {
+            LOG.log(
+                    System.Logger.Level.WARNING,
+                    "teams4j: rejected a request to the bot endpoint: {0}",
+                    e.getMessage());
+            return new Response(413, null);
+        }
+        return handle(authorizationHeader, text, handler);
     }
 
     /** Verifies, hands the activity to the handler, and maps what comes back. Never throws for a bad request. */

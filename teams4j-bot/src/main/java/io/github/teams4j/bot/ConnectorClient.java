@@ -334,6 +334,8 @@ public final class ConnectorClient {
     // Far above Teams' own ceiling (a team of 25,000 members, 500 a page), and the end of a
     // Connector that never stops paging.
     static final int MAX_MEMBER_PAGES = 1000;
+    static final int MAX_MEMBERS = 100_000;
+    static final int MAX_CONTINUATION_TOKEN_LENGTH = 4096;
 
     private CompletableFuture<List<TeamsChannelAccount>> collect(
             ConversationReference to, @Nullable String continuationToken, List<TeamsChannelAccount> into) {
@@ -349,10 +351,18 @@ public final class ConnectorClient {
         // Async, so a Connector that answers at once does not deepen the stack page by page.
         return getPagedMembersAsync(to, continuationToken).thenComposeAsync(paged -> {
             into.addAll(paged.members());
+            if (into.size() > MAX_MEMBERS) {
+                return CompletableFuture.failedFuture(new IllegalStateException(
+                        "getMembers stopped after " + into.size() + " members: more than " + MAX_MEMBERS));
+            }
             if (!paged.hasMore()) {
                 return CompletableFuture.completedFuture(List.copyOf(into));
             }
             String next = Objects.requireNonNull(paged.continuationToken());
+            if (next.length() > MAX_CONTINUATION_TOKEN_LENGTH) {
+                return CompletableFuture.failedFuture(new IllegalStateException(
+                        "getMembers stopped: a continuation token is longer than " + MAX_CONTINUATION_TOKEN_LENGTH));
+            }
             boolean repeated = !seen.add(next);
             if (repeated || page >= MAX_MEMBER_PAGES) {
                 return CompletableFuture.failedFuture(new IllegalStateException("getMembers stopped after " + page

@@ -122,8 +122,28 @@ class TeamsBotAutoConfigurationTest {
                 .run(context -> assertThat(context)
                         .hasFailed()
                         .getFailure()
-                        .rootCause()
-                        .hasMessageStartingWith("teams4j.bot.allow-anonymous cannot be combined with credentials"));
+                        .hasMessageContaining("cannot be combined with credentials"));
+    }
+
+    @Test
+    void allowAnonymousWithASecretFailsEvenWithTheApplicationsOwnConnectorClient() {
+        runner.withPropertyValues(CREDENTIALS)
+                .withPropertyValues("teams4j.bot.allow-anonymous=true")
+                .withUserConfiguration(OwnTransport.class, OwnConnector.class)
+                .run(context -> assertThat(context)
+                        .hasFailed()
+                        .getFailure()
+                        .hasMessageContaining("cannot be combined with credentials"));
+    }
+
+    @Test
+    void anAnonymousVerifierOfTheApplicationsOwnWithASecretFailsAtStartup() {
+        runner.withPropertyValues(CREDENTIALS)
+                .withUserConfiguration(OwnTransport.class, OwnAnonymousVerifier.class)
+                .run(context -> assertThat(context)
+                        .hasFailed()
+                        .getFailure()
+                        .hasMessageContaining("cannot be combined with credentials"));
     }
 
     @Test
@@ -232,6 +252,22 @@ class TeamsBotAutoConfigurationTest {
                 .withClassLoader(new org.springframework.boot.test.context.FilteredClassLoader(
                         org.springframework.web.servlet.DispatcherServlet.class))
                 .run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(TeamsBotController.class));
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class OwnConnector {
+        @Bean
+        ConnectorClient connectorClient(BotCredentials credentials) {
+            return ConnectorClient.builder(credentials).build();
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class OwnAnonymousVerifier {
+        @Bean
+        BotTokenVerifier botTokenVerifier() {
+            return BotTokenVerifier.builder("app-id").allowAnonymous().build();
+        }
     }
 
     @Configuration(proxyBeanMethods = false)

@@ -189,6 +189,11 @@ public final class BotTokenVerifier {
         return new Builder(credentials.appId()).tenantId(credentials.tenantId());
     }
 
+    /** Whether a request with no {@code Authorization} header is accepted; see {@link Builder#allowAnonymous()}. */
+    public boolean allowsAnonymous() {
+        return allowAnonymous;
+    }
+
     /**
      * Verifies the header and returns what it says.
      *
@@ -272,16 +277,23 @@ public final class BotTokenVerifier {
             if (caller == null || !allowedCallers.contains(caller.toLowerCase(Locale.ROOT))) {
                 throw new TokenVerificationException("token caller is not allowed: " + quote(caller));
             }
+            // A user's token for the bot's own registration is not the channel.
+            if (Json.str(claims, "scp") != null) {
+                throw new TokenVerificationException("a delegated (user) token cannot speak for the channel");
+            }
         }
         String claimedServiceUrl = Json.str(claims, "serviceurl");
-        // The Bot Framework binds every token to one Connector. An Entra token from an allowed caller --
-        // the Emulator's, the Playground's in authenticated mode -- carries no such claim; one that does
-        // is still compared.
-        boolean claimRequired = issuerTenant == null;
-        if (serviceUrl != null
-                && (claimedServiceUrl != null || claimRequired)
-                && !sameServiceUrl(claimedServiceUrl, serviceUrl)) {
-            throw new TokenVerificationException("token serviceurl does not match the activity");
+        // The Bot Framework binds every token to one Connector. An Entra token carries no such claim, so
+        // its activity may only name this machine: a reply carries the bot's Connector token.
+        if (serviceUrl != null) {
+            if (claimedServiceUrl != null || issuerTenant == null) {
+                if (!sameServiceUrl(claimedServiceUrl, serviceUrl)) {
+                    throw new TokenVerificationException("token serviceurl does not match the activity");
+                }
+            } else if (!isLoopback(serviceUrl)) {
+                throw new TokenVerificationException(
+                        "a token without a serviceurl claim may only name a loopback serviceUrl");
+            }
         }
         return new VerifiedToken(appId, claimedServiceUrl, issuer, expiresAt, claims);
     }
@@ -602,7 +614,9 @@ public final class BotTokenVerifier {
          * Other applications whose Entra tokens may call this bot, by app id: another agent, a skill
          * host. The bot's own app id is always allowed, which covers the Emulator and the Playground.
          * An Entra token whose {@code azp} (v2) or {@code appid} (v1) is neither is refused, since
-         * Entra issues tokens for the bot's audience to any client its tenant lets ask.
+         * Entra issues tokens for the bot's audience to any client its tenant lets ask. A delegated
+         * (user) token is refused, and an Entra token without a {@code serviceurl} claim may only name
+         * a loopback {@code serviceUrl}: replies carry the bot's Connector token.
          */
         public Builder allowedCallers(Collection<String> appIds) {
             for (String id : Objects.requireNonNull(appIds, "appIds")) {

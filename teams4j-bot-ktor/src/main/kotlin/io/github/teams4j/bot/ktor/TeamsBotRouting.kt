@@ -14,11 +14,13 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.log
 import io.ktor.server.request.contentLength
 import io.ktor.server.request.header
-import io.ktor.server.request.receiveText
+import io.ktor.server.request.receiveChannel
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
+import io.ktor.utils.io.readRemaining
+import kotlinx.io.readByteArray
 
 /**
  * The messaging endpoint as a Ktor route: `POST [path]`, the request verified through [receiver],
@@ -53,16 +55,23 @@ public fun Route.teamsBot(
 ): Route {
     val endpoint = ActivityEndpoint(receiver, codec)
     return post(path) {
-        // A character is at most three UTF-8 bytes, so a declared length past this cannot fit.
+        // A character is at most three UTF-8 bytes, so a body past this cannot fit; read no further.
+        val maxBytes = receiver.maxBodyBytes()
         val declared = call.request.contentLength()
-        if (declared != null && declared > MAX_UTF8_BYTES_PER_CHAR * receiver.maxBodyLength()) {
-            call.application.log.warn("teams4j: rejected a request to the bot endpoint: {} bytes declared", declared)
+        val bytes =
+            if (declared != null && declared > maxBytes) {
+                null
+            } else {
+                call.receiveChannel().readRemaining(maxBytes + 1).readByteArray()
+            }
+        if (bytes == null || bytes.size > maxBytes) {
+            call.application.log.warn("teams4j: rejected a request to the bot endpoint: more than {} bytes", maxBytes)
             call.respond(HttpStatusCode.PayloadTooLarge)
             return@post
         }
         val activity =
             try {
-                receiver.receiveAwait(call.request.header(HttpHeaders.Authorization), call.receiveText())
+                receiver.receiveAwait(call.request.header(HttpHeaders.Authorization), bytes.decodeToString())
             } catch (e: TokenVerificationException) {
                 call.application.log.warn("teams4j: rejected a request to the bot endpoint: {}", e.message)
                 call.respond(HttpStatusCode.Unauthorized)
@@ -86,5 +95,3 @@ public fun Route.teamsBot(
         }
     }
 }
-
-private const val MAX_UTF8_BYTES_PER_CHAR = 3L

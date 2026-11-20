@@ -1,5 +1,8 @@
 package io.github.teams4j.bot;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,6 +61,26 @@ public final class ActivityReceiver {
     /** The longest body accepted, in characters. */
     public int maxBodyLength() {
         return maxBodyLength;
+    }
+
+    /** The most bytes a body within {@link #maxBodyLength()} can take in UTF-8: three per character. */
+    public long maxBodyBytes() {
+        return 3L * maxBodyLength;
+    }
+
+    /**
+     * Reads a request body as UTF-8, stopping past {@link #maxBodyBytes()}: an adapter reads through
+     * this, so an oversized body is refused before it is buffered.
+     *
+     * @throws BodyTooLargeException if the stream holds more than {@link #maxBodyBytes()}
+     */
+    public String readBody(InputStream in) throws IOException {
+        long max = maxBodyBytes();
+        byte[] bytes = in.readNBytes((int) Math.min(max + 1, Integer.MAX_VALUE - 8));
+        if (bytes.length > max) {
+            throw BodyTooLargeException.ofBytes(max, maxBodyLength);
+        }
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     /**

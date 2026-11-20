@@ -170,6 +170,19 @@ class ActivityTest {
         assertThat(a.textWithoutMentions()).isEqualTo("status");
     }
 
+    /** Unclosed tags stay, and cost a scan, not a rescan from each one: a regex took seconds here. */
+    @Test
+    void unclosedMentionTagsAreLeftInLinearTime() {
+        String text = "<at>".repeat(250_000);
+        Activity a = Activity.message(text);
+
+        long start = System.nanoTime();
+        assertThat(a.textWithoutMentions()).isEqualTo(text);
+        assertThat(System.nanoTime() - start).isLessThan(1_000_000_000L);
+        assertThat(Activity.message("a <at>x</at> b <at>y</at> c <at>").textWithoutMentions())
+                .isEqualTo("a b c <at>");
+    }
+
     @Test
     void aTargetedRequestIsFlaggedOnTheRecipient() {
         Activity a = Activity.parse(

@@ -3,11 +3,15 @@ package io.github.teams4j.bot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jspecify.annotations.Nullable;
@@ -76,6 +80,41 @@ class ActivityEndpointTest {
         assertThat(endpoint.handle(null, "{\"type\":\"message\"}", activity -> null)
                         .status())
                 .as("short enough: on to the token, which is missing")
+                .isEqualTo(401);
+    }
+
+    /** A stream is read no further than the limit allows: an endless body is refused, not buffered. */
+    @Test
+    void aStreamedBodyIsCutOffAtTheLimit() throws Exception {
+        BotTokenVerifier verifier = BotTokenVerifier.builder(APP_ID)
+                .transport(new FakeTransport())
+                .jsonCodec(new JacksonJsonCodec())
+                .build();
+        ActivityEndpoint endpoint = new ActivityEndpoint(
+                new ActivityReceiver(verifier, new JacksonJsonCodec(), 64), new JacksonJsonCodec());
+        AtomicLong read = new AtomicLong();
+        InputStream endless = new InputStream() {
+            @Override
+            public int read() {
+                read.incrementAndGet();
+                return ' ';
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) {
+                java.util.Arrays.fill(b, off, off + len, (byte) ' ');
+                read.addAndGet(len);
+                return len;
+            }
+        };
+
+        assertThat(endpoint.handle(null, endless, activity -> null).status()).isEqualTo(413);
+        assertThat(read.get()).as("read no further than the limit").isLessThanOrEqualTo(3 * 64 + 1);
+        assertThat(endpoint.handle(
+                                null,
+                                new ByteArrayInputStream("{\"type\":\"message\"}".getBytes(StandardCharsets.UTF_8)),
+                                activity -> null)
+                        .status())
                 .isEqualTo(401);
     }
 

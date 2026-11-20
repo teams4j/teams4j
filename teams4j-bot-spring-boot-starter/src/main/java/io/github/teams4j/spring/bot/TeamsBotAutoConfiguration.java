@@ -3,6 +3,7 @@ package io.github.teams4j.spring.bot;
 import java.util.Objects;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -116,6 +117,23 @@ public class TeamsBotAutoConfiguration {
         return builder.build();
     }
 
+    /**
+     * Refuses anonymous inbound next to credentials, whichever beans supply them: a request without a
+     * token would get a reply carrying the bot's real one.
+     */
+    @Bean
+    static SmartInitializingSingleton teams4jBotAnonymousGuard(
+            ObjectProvider<BotTokenVerifier> verifier, ObjectProvider<BotCredentials> credentials) {
+        return () -> {
+            BotTokenVerifier v = verifier.getIfAvailable();
+            if (v != null && v.allowsAnonymous() && credentials.getIfAvailable() != null) {
+                throw new IllegalStateException("teams4j.bot.allow-anonymous (or a BotTokenVerifier that allows"
+                        + " anonymous requests) cannot be combined with credentials (teams4j.bot.app-secret or a"
+                        + " BotCredentials bean): remove the secret for local emulator runs");
+            }
+        };
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public ActivityReceiver activityReceiver(
@@ -133,11 +151,6 @@ public class TeamsBotAutoConfiguration {
             ObjectProvider<HttpTransport> transport) {
         BotCredentials chosen = credentials.getIfAvailable();
         ConnectorClient.Builder builder;
-        if (chosen != null && properties.isAllowAnonymous()) {
-            // A request without a token would get a reply carrying the bot's real one.
-            throw new IllegalStateException("teams4j.bot.allow-anonymous cannot be combined with credentials"
-                    + " (teams4j.bot.app-secret or a BotCredentials bean): remove the secret for local emulator runs");
-        }
         if (chosen != null) {
             builder = ConnectorClient.builder(chosen);
         } else if (properties.isAllowAnonymous()) {

@@ -127,8 +127,8 @@ if (apiBaseline != null) {
             failOnModification.set(true)
             // The old jar alone is fetched; its dependencies are irrelevant to what changed here.
             ignoreMissingClasses.set(true)
-            // Auto-configuration @Bean methods are wiring Spring calls, not API, as in Spring Boot itself.
-            classExcludes.add("*AutoConfiguration")
+            // Auto-configuration @Bean methods and controller handlers are wiring Spring calls, not API.
+            classExcludes.addAll("*AutoConfiguration", "*Controller")
             txtOutputFile.set(layout.buildDirectory.file("reports/japicmp/${project.name}.txt"))
         }
         tasks.named("check") { dependsOn(apiCompatibility) }
