@@ -110,6 +110,7 @@ public class TeamsBotAutoConfiguration {
         if (properties.isAllowAnonymous()) {
             builder.allowAnonymous();
         }
+        builder.allowedCallers(properties.getAllowedCallers());
         codec.ifAvailable(builder::jsonCodec);
         transport.ifAvailable(builder::transport);
         return builder.build();
@@ -117,9 +118,9 @@ public class TeamsBotAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ActivityReceiver activityReceiver(BotTokenVerifier verifier, ObjectProvider<JsonCodec> codec) {
-        JsonCodec chosen = codec.getIfAvailable();
-        return chosen == null ? new ActivityReceiver(verifier) : new ActivityReceiver(verifier, chosen);
+    public ActivityReceiver activityReceiver(
+            BotTokenVerifier verifier, TeamsBotProperties properties, ObjectProvider<JsonCodec> codec) {
+        return new ActivityReceiver(verifier, codec.getIfAvailable(JsonCodec::discover), properties.getMaxBodyLength());
     }
 
     @Bean
@@ -132,6 +133,11 @@ public class TeamsBotAutoConfiguration {
             ObjectProvider<HttpTransport> transport) {
         BotCredentials chosen = credentials.getIfAvailable();
         ConnectorClient.Builder builder;
+        if (chosen != null && properties.isAllowAnonymous()) {
+            // A request without a token would get a reply carrying the bot's real one.
+            throw new IllegalStateException("teams4j.bot.allow-anonymous cannot be combined with credentials"
+                    + " (teams4j.bot.app-secret or a BotCredentials bean): remove the secret for local emulator runs");
+        }
         if (chosen != null) {
             builder = ConnectorClient.builder(chosen);
         } else if (properties.isAllowAnonymous()) {

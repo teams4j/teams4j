@@ -426,6 +426,18 @@ class ConnectorClientTest {
                 .withHeader("Authorization", equalTo("Bearer t1")));
     }
 
+    /** A Connector that never stops paging must not make getMembers loop and grow without end. */
+    @Test
+    void aRepeatedContinuationTokenStopsThePaging() {
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/pagedmembers"))
+                .willReturn(aResponse().withStatus(200).withBody("{\"continuationToken\":\"x\",\"members\":[]}")));
+        server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/pagedmembers?continuationToken=x"))
+                .willReturn(aResponse().withStatus(200).withBody("{\"continuationToken\":\"x\",\"members\":[]}")));
+
+        assertThatThrownBy(() -> client().build().getMembers(where()))
+                .hasMessageContaining("repeated a continuation token");
+    }
+
     @Test
     void looksUpOneMemberAndA404IsAConnectorException() {
         server.stubFor(get(urlEqualTo(CONVERSATION_PATH + "/members/29%3A1"))

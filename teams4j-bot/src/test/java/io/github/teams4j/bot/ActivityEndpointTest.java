@@ -60,6 +60,25 @@ class ActivityEndpointTest {
         assertThat(seen.get()).isNotNull().extracting(Activity::text).isEqualTo("hi");
     }
 
+    /** The parse runs before the token is checked, so the body is measured first. */
+    @Test
+    void aBodyOverTheLimitIs413AndIsNotParsed() {
+        BotTokenVerifier verifier = BotTokenVerifier.builder(APP_ID)
+                .transport(new FakeTransport())
+                .jsonCodec(new JacksonJsonCodec())
+                .build();
+        ActivityEndpoint endpoint = new ActivityEndpoint(
+                new ActivityReceiver(verifier, new JacksonJsonCodec(), 64), new JacksonJsonCodec());
+
+        assertThat(endpoint.handle(null, "[" + "0,".repeat(100) + "0]", activity -> null)
+                        .status())
+                .isEqualTo(413);
+        assertThat(endpoint.handle(null, "{\"type\":\"message\"}", activity -> null)
+                        .status())
+                .as("short enough: on to the token, which is missing")
+                .isEqualTo(401);
+    }
+
     @Test
     void anInvokeAnswersWithTheResponsesStatusAndBody() {
         ActivityEndpoint.Response answer = endpoint()

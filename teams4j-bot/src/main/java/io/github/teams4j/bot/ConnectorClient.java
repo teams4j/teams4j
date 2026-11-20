@@ -7,10 +7,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.DoubleSupplier;
@@ -329,13 +331,34 @@ public final class ConnectorClient {
         return collect(to, null, new ArrayList<>());
     }
 
+    // Far above Teams' own ceiling (a team of 25,000 members, 500 a page), and the end of a
+    // Connector that never stops paging.
+    static final int MAX_MEMBER_PAGES = 1000;
+
     private CompletableFuture<List<TeamsChannelAccount>> collect(
             ConversationReference to, @Nullable String continuationToken, List<TeamsChannelAccount> into) {
-        return getPagedMembersAsync(to, continuationToken).thenCompose(page -> {
-            into.addAll(page.members());
-            return page.hasMore()
-                    ? collect(to, page.continuationToken(), into)
-                    : CompletableFuture.completedFuture(List.copyOf(into));
+        return collect(to, continuationToken, into, new HashSet<>(), 1);
+    }
+
+    private CompletableFuture<List<TeamsChannelAccount>> collect(
+            ConversationReference to,
+            @Nullable String continuationToken,
+            List<TeamsChannelAccount> into,
+            Set<String> seen,
+            int page) {
+        // Async, so a Connector that answers at once does not deepen the stack page by page.
+        return getPagedMembersAsync(to, continuationToken).thenComposeAsync(paged -> {
+            into.addAll(paged.members());
+            if (!paged.hasMore()) {
+                return CompletableFuture.completedFuture(List.copyOf(into));
+            }
+            String next = Objects.requireNonNull(paged.continuationToken());
+            boolean repeated = !seen.add(next);
+            if (repeated || page >= MAX_MEMBER_PAGES) {
+                return CompletableFuture.failedFuture(new IllegalStateException("getMembers stopped after " + page
+                        + " pages: the Connector " + (repeated ? "repeated a continuation token" : "kept paging")));
+            }
+            return collect(to, next, into, seen, page + 1);
         });
     }
 

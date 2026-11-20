@@ -1,6 +1,7 @@
 package io.github.teams4j.http;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +50,45 @@ class JdkHttpTransportTest {
             assertThat(lines.get(0)).endsWith(" HTTP/1.1");
             assertThat(lines).noneMatch(line -> line.toLowerCase(Locale.ROOT).startsWith("upgrade:"));
             assertThat(lines).noneMatch(line -> line.toLowerCase(Locale.ROOT).startsWith("http2-settings:"));
+        }
+    }
+
+    /** A remote server chooses how much it sends; past the limit the exchange fails instead of buffering it. */
+    @Test
+    void aResponseBodyOverTheLimitFailsTheExchange() throws Exception {
+        try (ServerSocket server = new ServerSocket(0)) {
+            CompletableFuture<Void> serving = CompletableFuture.runAsync(() -> serveBody(server, 64 * 1024));
+            HttpTransport transport = HttpTransport.jdk(HttpClient.newBuilder().build(), 1024);
+
+            CompletableFuture<HttpExchange.Response> sent = transport.send(new HttpExchange.Request(
+                    "GET",
+                    URI.create("http://127.0.0.1:" + server.getLocalPort() + "/big"),
+                    Map.of(),
+                    null,
+                    Duration.ofSeconds(5)));
+
+            assertThatThrownBy(() -> sent.get(10, TimeUnit.SECONDS))
+                    .hasCauseInstanceOf(IOException.class)
+                    .hasMessageContaining("longer than 1024 bytes");
+            serving.get(10, TimeUnit.SECONDS);
+        }
+    }
+
+    private static void serveBody(ServerSocket server, int length) {
+        try (Socket socket = server.accept()) {
+            BufferedReader in =
+                    new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+            String line;
+            while ((line = in.readLine()) != null && !line.isEmpty()) {
+                // the request head is not looked at
+            }
+            OutputStream out = socket.getOutputStream();
+            out.write(("HTTP/1.1 200 OK\r\nContent-Length: " + length + "\r\nConnection: close\r\n\r\n")
+                    .getBytes(StandardCharsets.US_ASCII));
+            out.write(new byte[length]);
+            out.flush();
+        } catch (IOException ignored) {
+            // the client may hang up once it has seen enough
         }
     }
 

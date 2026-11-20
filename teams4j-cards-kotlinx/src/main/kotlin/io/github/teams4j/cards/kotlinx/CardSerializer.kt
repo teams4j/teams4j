@@ -65,6 +65,16 @@ public abstract class CardSerializer<T : Any>(
             )
 }
 
+// Jackson's StreamReadConstraints default. BigInteger/BigDecimal parsing is quadratic in the length,
+// and an activity is parsed before its token is verified.
+internal const val MAX_NUMBER_LENGTH = 1000
+
+internal fun checkNumberLength(text: String) {
+    if (text.length > MAX_NUMBER_LENGTH) {
+        throw SerializationException("a number is longer than $MAX_NUMBER_LENGTH characters")
+    }
+}
+
 /** Null and JSON's null are the same absence here, and neither is worth putting in the output. */
 internal fun JsonElement?.orNull(): JsonElement? = if (this == null || this is JsonNull) null else this
 
@@ -91,6 +101,7 @@ internal fun JsonElement.readNumber(): Number {
     val text =
         (this as? JsonPrimitive)?.takeIf { !it.isString && it.booleanOrNull == null }?.content
             ?: refuse("a number")
+    checkNumberLength(text)
     return text.toIntOrNull() ?: text.toLongOrNull() ?: text.toBigIntegerOrNull() ?: text.toBigDecimalOrNull()
         ?: refuse("a number")
 }

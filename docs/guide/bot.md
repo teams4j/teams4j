@@ -60,7 +60,10 @@ Two kinds of issuer are accepted by default. The **Bot Framework** (`https://api
 signs what Azure Bot Service delivers, which is every request from Teams. **Microsoft Entra** signs
 tokens minted for your app directly, which is what the Agents SDK's tooling and agent-to-agent calls
 send; its issuers are accepted for your registration's own tenant and for the Microsoft tenants
-behind Teams, and an Entra token's `tid` must be the tenant its issuer names. Each issuer's keys are
+behind Teams, and an Entra token's `tid` must be the tenant its issuer names. Entra issues a token
+for your app's audience to any client its tenant lets ask, so an Entra token must also have been
+requested by your app itself (`azp`, or `appid` in v1) -- as the Emulator's and the Playground's
+are -- or by an app named in `allowedCallers`. Each issuer's keys are
 fetched from its OpenID metadata document and cached (12 hours); a token naming a key id the cache
 lacks refreshes that set, at most once an hour, which is how rotation is followed. `builder(credentials)` passes the
 tenant along; `builder(appId)` with no `tenantId` is right for a multi-tenant registration.
@@ -74,10 +77,13 @@ whose message names the check. **Log the message, return a bare `401`.**
 | `issuers` | `defaultIssuers(tenantId)` | Each accepted `iss` with the metadata document naming its keys. Replace for another cloud; `issuer(iss, uri)` adds one, or points one at a stub in tests |
 | `clockSkew` | 5 min | Tolerance on `exp` and `nbf` |
 | `keyCacheTtl` | 12 h | How long a fetched key set is trusted |
+| `allowedCallers` | — | App ids, besides your own, whose Entra tokens are accepted: another agent, a skill host |
 | `allowAnonymous` | off | **Development only.** A request with no `Authorization` header passes, as `VerifiedToken.isAnonymous()`, if its `serviceUrl` is a loopback address -- a reply may still carry the bot's token; a header that is present is still verified. For a local emulator such as the Agents Playground |
 
 `ActivityReceiver` is the two steps in one call: parse the body, verify the header against it. Parse
-first, because the `serviceUrl` check needs the activity.
+first, because the `serviceUrl` check needs the activity. Because that parse runs before the token is
+checked, a body over `maxBodyLength` (1 MiB of characters by default, a constructor argument) is
+refused with `BodyTooLargeException` unparsed; the endpoint answers it `413`.
 
 ### What arrives
 
@@ -242,7 +248,7 @@ install: Teams routes a tenant to one region.
 
 `ActivityEndpoint` is the messaging endpoint minus the framework: header and body in, status and
 body out. It answers `401` when the request is not from the Bot Framework (the reason is logged,
-never sent), `400` for a body that is not JSON, `200` with an empty body for every activity your
+never sent), `413` for a body over the receiver's limit, `400` for a body that is not JSON, `200` with an empty body for every activity your
 `ActivityHandler` accepts, and the `InvokeResponse`'s own status and body for an invoke. A servlet
 is a few lines around it, and so are the two adapters.
 
@@ -289,7 +295,7 @@ BotTokenVerifier verifier = BotTokenVerifier.builder(appId).allowAnonymous().bui
 ConnectorClient connector = ConnectorClient.builder(appId).tokenProvider(TokenProvider.none()).build();
 ```
 
-or, on the starter, `teams4j.bot.allow-anonymous=true` with no `app-secret`. The app id is whatever
+or, on the starter, `teams4j.bot.allow-anonymous=true` with no `app-secret` (with one, startup fails). The app id is whatever
 the Playground's `bot.id` is, `00000000-0000-0000-0000-00000000000011` unless you have a
 `.m365agentsplayground.yml`. The Playground is plain HTTP, and its Node server drops a connection
 that asks to upgrade to HTTP/2, which the JDK client does on plain HTTP by default; teams4j's JDK

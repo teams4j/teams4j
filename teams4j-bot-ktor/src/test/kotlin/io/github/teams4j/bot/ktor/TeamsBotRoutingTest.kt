@@ -116,6 +116,17 @@ class TeamsBotRoutingTest {
         }
 
     @Test
+    fun `a body over the receiver's limit is 413 and never parsed`() =
+        testApplication {
+            routing {
+                teamsBot(ActivityReceiver(BotTokenVerifier.builder(appId).build(), codec, 64), codec = codec) { null }
+            }
+            val long = client.post("/api/messages") { setBody("[" + "0,".repeat(100) + "0]") }
+
+            assertThat(long.status).isEqualTo(HttpStatusCode.PayloadTooLarge)
+        }
+
+    @Test
     fun `a body that is not json is 400`() =
         app {
             val response =

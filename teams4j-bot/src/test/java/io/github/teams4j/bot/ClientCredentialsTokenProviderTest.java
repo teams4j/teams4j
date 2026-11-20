@@ -61,6 +61,39 @@ class ClientCredentialsTokenProviderTest {
                         + "&scope=https://api.botframework.com/.default");
     }
 
+    /** A transport that throws instead of failing its future must not leave the fetch in flight forever. */
+    @Test
+    void aTransportThatThrowsDoesNotWedgeTheProvider() {
+        AtomicReference<Integer> calls = new AtomicReference<>(0);
+        transport.on(java.net.URI.create(MULTI_TENANT), () -> {
+            if (calls.getAndUpdate(n -> n + 1) == 0) {
+                throw new NoClassDefFoundError("simulated");
+            }
+            return FakeTransport.json(200, "{\"expires_in\":3599,\"access_token\":\"t1\"}");
+        });
+        ClientCredentialsTokenProvider provider = provider(BotCredentials.of("app", "secret"));
+
+        assertThatThrownBy(() -> provider.accessToken().join()).hasCauseInstanceOf(NoClassDefFoundError.class);
+        assertThat(provider.accessToken()
+                        .orTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
+                        .join())
+                .isEqualTo("t1");
+    }
+
+    /** A transport that never answers is cut off, and the next call fetches again. */
+    @Test
+    void aTransportThatNeverAnswersDoesNotWedgeTheProvider() {
+        ClientCredentialsTokenProvider provider = new ClientCredentialsTokenProvider(
+                BotCredentials.of("app", "secret"),
+                request -> new java.util.concurrent.CompletableFuture<>(),
+                new JacksonJsonCodec(),
+                clock,
+                Duration.ofMillis(50));
+
+        assertThatThrownBy(() -> provider.accessToken().join())
+                .hasCauseInstanceOf(java.util.concurrent.TimeoutException.class);
+    }
+
     @Test
     void aSingleTenantRegistrationUsesItsOwnAuthority() {
         transport.on(SINGLE_TENANT, 200, "{\"expires_in\":3599,\"access_token\":\"t1\"}");

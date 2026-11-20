@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jspecify.annotations.Nullable;
@@ -53,14 +54,23 @@ final class ClientCredentialsTokenProvider implements TokenProvider {
         if (existing != null) {
             return existing;
         }
-        fetch().whenComplete((token, failure) -> {
-            inFlight.set(null);
-            if (failure != null) {
-                mine.completeExceptionally(failure);
-            } else {
-                mine.complete(token);
-            }
-        });
+        CompletableFuture<String> started;
+        try {
+            started = fetch();
+        } catch (RuntimeException | Error e) {
+            // Thrown rather than failed: still this fetch's failure, or `inFlight` is never cleared.
+            started = CompletableFuture.failedFuture(e);
+        }
+        // A transport that ignores the request timeout must not hold `inFlight` forever either.
+        started.orTimeout(timeout.multipliedBy(2).toMillis(), TimeUnit.MILLISECONDS)
+                .whenComplete((token, failure) -> {
+                    inFlight.set(null);
+                    if (failure != null) {
+                        mine.completeExceptionally(Retrying.unwrap(failure));
+                    } else {
+                        mine.complete(token);
+                    }
+                });
         return mine;
     }
 

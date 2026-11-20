@@ -1,10 +1,13 @@
 package io.github.teams4j.spring.bot;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import io.github.teams4j.bot.ActivityReceiver;
 import io.github.teams4j.bot.BotTokenVerifier;
 import io.github.teams4j.bot.ConnectorClient;
 import io.github.teams4j.teams.profile.ValidationMode;
@@ -63,9 +66,19 @@ public class TeamsBotProperties {
     /**
      * Development only. Accept a request with no {@code Authorization} header, as a local emulator
      * such as the Agents Playground sends; a header that is present is still verified. Never where
-     * the endpoint is reachable from the internet.
+     * the endpoint is reachable from the internet. Refused together with {@code app-secret}: an
+     * unauthenticated request must not get a reply that carries the bot's token.
      */
     private boolean allowAnonymous = false;
+
+    /**
+     * Other applications, by app id, whose Entra-issued tokens may call the bot: another agent, a
+     * skill host. The bot's own app id is always allowed.
+     */
+    private List<String> allowedCallers = new ArrayList<>();
+
+    /** The longest request body accepted, in characters; a longer one is answered {@code 413} unparsed. */
+    private int maxBodyLength = ActivityReceiver.DEFAULT_MAX_BODY_LENGTH;
 
     public @Nullable String getAppId() {
         return appId;
@@ -169,5 +182,21 @@ public class TeamsBotProperties {
 
     public void setAllowAnonymous(boolean allowAnonymous) {
         this.allowAnonymous = allowAnonymous;
+    }
+
+    public List<String> getAllowedCallers() {
+        return allowedCallers;
+    }
+
+    public void setAllowedCallers(List<String> allowedCallers) {
+        this.allowedCallers = allowedCallers;
+    }
+
+    public int getMaxBodyLength() {
+        return maxBodyLength;
+    }
+
+    public void setMaxBodyLength(int maxBodyLength) {
+        this.maxBodyLength = maxBodyLength;
     }
 }

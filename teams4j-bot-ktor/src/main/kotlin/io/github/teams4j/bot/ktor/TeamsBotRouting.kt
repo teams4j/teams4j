@@ -3,6 +3,7 @@ package io.github.teams4j.bot.ktor
 import io.github.teams4j.bot.Activity
 import io.github.teams4j.bot.ActivityEndpoint
 import io.github.teams4j.bot.ActivityReceiver
+import io.github.teams4j.bot.BodyTooLargeException
 import io.github.teams4j.bot.InvokeResponse
 import io.github.teams4j.bot.TokenVerificationException
 import io.github.teams4j.bot.kotlin.receiveAwait
@@ -11,6 +12,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.log
+import io.ktor.server.request.contentLength
 import io.ktor.server.request.header
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
@@ -35,7 +37,8 @@ import io.ktor.server.routing.post
  * ```
  *
  * What is answered follows [ActivityEndpoint]: `401` for a request that is not from the Bot
- * Framework (the reason goes to the application log), `400` for a body that is not JSON, `200`
+ * Framework (the reason goes to the application log), `413` for a body over the receiver's
+ * [ActivityReceiver.maxBodyLength], `400` for a body that is not JSON, `200`
  * with an empty body when the handler returns null, and the [InvokeResponse]'s own status and body
  * otherwise. The handler suspends, so the waiting -- key fetch, Connector calls -- costs no thread;
  * an exception from it propagates to Ktor's status pages.
@@ -50,6 +53,13 @@ public fun Route.teamsBot(
 ): Route {
     val endpoint = ActivityEndpoint(receiver, codec)
     return post(path) {
+        // A character is at most three UTF-8 bytes, so a declared length past this cannot fit.
+        val declared = call.request.contentLength()
+        if (declared != null && declared > MAX_UTF8_BYTES_PER_CHAR * receiver.maxBodyLength()) {
+            call.application.log.warn("teams4j: rejected a request to the bot endpoint: {} bytes declared", declared)
+            call.respond(HttpStatusCode.PayloadTooLarge)
+            return@post
+        }
         val activity =
             try {
                 receiver.receiveAwait(call.request.header(HttpHeaders.Authorization), call.receiveText())
@@ -57,8 +67,12 @@ public fun Route.teamsBot(
                 call.application.log.warn("teams4j: rejected a request to the bot endpoint: {}", e.message)
                 call.respond(HttpStatusCode.Unauthorized)
                 return@post
-            } catch (e: IllegalArgumentException) {
-                call.application.log.warn("teams4j: the bot endpoint received a body that is not JSON: {}", e.message)
+            } catch (e: BodyTooLargeException) {
+                call.application.log.warn("teams4j: rejected a request to the bot endpoint: {}", e.message)
+                call.respond(HttpStatusCode.PayloadTooLarge)
+                return@post
+            } catch (ignored: IllegalArgumentException) {
+                call.application.log.warn("teams4j: the bot endpoint received a body that is not JSON")
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
@@ -72,3 +86,5 @@ public fun Route.teamsBot(
         }
     }
 }
+
+private const val MAX_UTF8_BYTES_PER_CHAR = 3L

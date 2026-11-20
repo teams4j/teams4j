@@ -20,8 +20,20 @@ public interface HttpTransport {
      */
     CompletableFuture<HttpExchange.Response> send(HttpExchange.Request request);
 
-    /** A transport over the JDK client. */
+    /** The default response body limit of {@link #jdk(HttpClient)}: 16 MiB. */
+    long DEFAULT_MAX_RESPONSE_BYTES = 16L * 1024 * 1024;
+
+    /**
+     * A transport over the JDK client. A response body over {@link #DEFAULT_MAX_RESPONSE_BYTES} fails
+     * the exchange with an {@link java.io.IOException}, and the whole exchange is bounded by twice the
+     * request timeout, so a remote server cannot hold the caller or its memory without end.
+     */
     static HttpTransport jdk(HttpClient client) {
-        return new JdkHttpTransport(client);
+        return new JdkHttpTransport(client, DEFAULT_MAX_RESPONSE_BYTES);
+    }
+
+    /** As {@link #jdk(HttpClient)}, with another response body limit in bytes. */
+    static HttpTransport jdk(HttpClient client, long maxResponseBytes) {
+        return new JdkHttpTransport(client, maxResponseBytes);
     }
 }

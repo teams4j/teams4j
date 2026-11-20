@@ -13,12 +13,16 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,7 +43,8 @@ import io.github.teams4j.http.HttpTransport;
  * <p>The token is the {@code Authorization: Bearer} header. What is checked: it is an {@code RS256}
  * JWT, issued by an accepted issuer, signed by a key from that issuer's published key set, addressed
  * to this bot ({@code aud} = app id), inside its validity window (with skew), bound to the tenant its
- * issuer names when it is an Entra token, and -- when the activity's {@code serviceUrl} is given --
+ * issuer names when it is an Entra token and requested by the bot itself or an
+ * {@linkplain Builder#allowedCallers allowed caller}, and -- when the activity's {@code serviceUrl} is given --
  * carrying a matching {@code serviceurl} claim, so a token for one Connector cannot drive replies to
  * another.
  *
@@ -81,6 +86,8 @@ public final class BotTokenVerifier {
             "^https://(?:sts\\.windows\\.net/([0-9a-f-]{36})/|login\\.microsoftonline\\.(?:com|us)/([0-9a-f-]{36})/v2\\.0)$",
             Pattern.CASE_INSENSITIVE);
 
+    private static final int MAX_QUOTED = 200;
+
     private static final Pattern LOOPBACK_V4 = Pattern.compile("^127(?:\\.\\d{1,3}){3}$");
 
     /**
@@ -121,6 +128,7 @@ public final class BotTokenVerifier {
     private final String appId;
     private final Map<String, KeySet> byIssuer;
     private final boolean allowAnonymous;
+    private final Set<String> allowedCallers;
     private final JsonCodec codec;
     private final Duration clockSkew;
     private final Clock clock;
@@ -136,6 +144,10 @@ public final class BotTokenVerifier {
         this.clockSkew = b.clockSkew;
         this.clock = b.clock;
         this.allowAnonymous = b.allowAnonymous;
+        Set<String> callers = new HashSet<>();
+        callers.add(appId.toLowerCase(Locale.ROOT));
+        b.allowedCallers.forEach(c -> callers.add(c.toLowerCase(Locale.ROOT)));
+        this.allowedCallers = Set.copyOf(callers);
 
         Map<String, URI> issuers = b.issuers != null ? new LinkedHashMap<>(b.issuers) : defaultIssuers(b.tenantId);
         issuers.putAll(b.issuerOverrides);
@@ -215,7 +227,7 @@ public final class BotTokenVerifier {
             }
             keys = byIssuer.get(iss.toLowerCase(Locale.ROOT));
             if (keys == null) {
-                throw new TokenVerificationException("token issuer is not accepted: " + iss);
+                throw new TokenVerificationException("token issuer is not accepted: " + quote(iss));
             }
             issuer = iss;
         } catch (TokenVerificationException e) {
@@ -250,9 +262,21 @@ public final class BotTokenVerifier {
         if (issuerTenant != null && tid != null && !tid.equalsIgnoreCase(issuerTenant)) {
             throw new TokenVerificationException("token tenant does not match its issuer");
         }
+        if (issuerTenant != null) {
+            // Entra issues tokens for this audience to any client the tenant allows; only the bot itself
+            // (the Emulator, the Playground) or a caller named in allowedCallers may speak for the channel.
+            String caller = Json.str(claims, "azp");
+            if (caller == null) {
+                caller = Json.str(claims, "appid");
+            }
+            if (caller == null || !allowedCallers.contains(caller.toLowerCase(Locale.ROOT))) {
+                throw new TokenVerificationException("token caller is not allowed: " + quote(caller));
+            }
+        }
         String claimedServiceUrl = Json.str(claims, "serviceurl");
-        // The Bot Framework binds every token to one Connector. An Entra token -- the Emulator's, the
-        // Playground's in authenticated mode -- carries no such claim; one that does is still compared.
+        // The Bot Framework binds every token to one Connector. An Entra token from an allowed caller --
+        // the Emulator's, the Playground's in authenticated mode -- carries no such claim; one that does
+        // is still compared.
         boolean claimRequired = issuerTenant == null;
         if (serviceUrl != null
                 && (claimedServiceUrl != null || claimRequired)
@@ -260,6 +284,23 @@ public final class BotTokenVerifier {
             throw new TokenVerificationException("token serviceurl does not match the activity");
         }
         return new VerifiedToken(appId, claimedServiceUrl, issuer, expiresAt, claims);
+    }
+
+    /** Unverified token text for a log line: control characters escaped, length capped. */
+    static String quote(@Nullable String s) {
+        if (s == null) {
+            return "(none)";
+        }
+        StringBuilder out = new StringBuilder("\"");
+        s.codePoints().limit(MAX_QUOTED).forEach(c -> {
+            if (Character.isISOControl(c) || c == 0x2028 || c == 0x2029 || c == '"' || c == '\\') {
+                out.append(String.format(Locale.ROOT, "\\u%04x", c));
+            } else {
+                out.appendCodePoint(c);
+            }
+        });
+        return out.append(s.codePointCount(0, s.length()) > MAX_QUOTED ? "...\"" : "\"")
+                .toString();
     }
 
     /** Trailing slashes and case are noise; a different host or path is not. */
@@ -342,7 +383,7 @@ public final class BotTokenVerifier {
                 }
                 if (!mayRefreshOnMiss(current, now)) {
                     return CompletableFuture.failedFuture(
-                            new TokenVerificationException("token key id is unknown: " + kid));
+                            new TokenVerificationException("token key id is unknown: " + quote(kid)));
                 }
             }
             return fetch().thenCompose(fetched -> {
@@ -352,7 +393,7 @@ public final class BotTokenVerifier {
                 }
                 // The fetch itself is the one refresh; a miss after it is final.
                 return CompletableFuture.failedFuture(
-                        new TokenVerificationException("token key id is unknown: " + kid));
+                        new TokenVerificationException("token key id is unknown: " + quote(kid)));
             });
         }
 
@@ -403,7 +444,7 @@ public final class BotTokenVerifier {
             CompletableFuture<HttpExchange.Response> sent;
             try {
                 sent = transport.send(request);
-            } catch (RuntimeException e) {
+            } catch (RuntimeException | Error e) {
                 // Thrown rather than failed: still a failure of this fetch, or `fetching` is never cleared.
                 sent = CompletableFuture.failedFuture(e);
             }
@@ -504,6 +545,7 @@ public final class BotTokenVerifier {
         private @Nullable Map<String, URI> issuers;
         private final Map<String, URI> issuerOverrides = new LinkedHashMap<>();
         private boolean allowAnonymous;
+        private final Set<String> allowedCallers = new LinkedHashSet<>();
         private @Nullable HttpTransport transport;
         private @Nullable JsonCodec codec;
         private Duration clockSkew = Duration.ofMinutes(5);
@@ -553,6 +595,22 @@ public final class BotTokenVerifier {
          */
         public Builder allowAnonymous() {
             this.allowAnonymous = true;
+            return this;
+        }
+
+        /**
+         * Other applications whose Entra tokens may call this bot, by app id: another agent, a skill
+         * host. The bot's own app id is always allowed, which covers the Emulator and the Playground.
+         * An Entra token whose {@code azp} (v2) or {@code appid} (v1) is neither is refused, since
+         * Entra issues tokens for the bot's audience to any client its tenant lets ask.
+         */
+        public Builder allowedCallers(Collection<String> appIds) {
+            for (String id : Objects.requireNonNull(appIds, "appIds")) {
+                if (id == null || id.isBlank()) {
+                    throw new IllegalArgumentException("an allowed caller must be an app id");
+                }
+                allowedCallers.add(id);
+            }
             return this;
         }
 

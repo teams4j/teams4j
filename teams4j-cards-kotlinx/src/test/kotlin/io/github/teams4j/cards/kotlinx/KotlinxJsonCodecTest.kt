@@ -33,4 +33,22 @@ class KotlinxJsonCodecTest {
         assertThatThrownBy { codec.read("""{"x":${"7".repeat(400_000)}}""") }
             .isInstanceOf(IllegalArgumentException::class.java)
     }
+
+    /** The typed model's numbers go through readNumber, which must hold the same limit. */
+    @Test
+    @Timeout(5)
+    fun aLongerNumberInATypedCardIsRefused() {
+        val properties =
+            listOf(""""type":"Input.Number","id":"n","max"""", """"type":"TextBlock","text":"x","maxLines"""")
+        for (property in properties) {
+            assertThatThrownBy { CardJson.decode(card(property, "9".repeat(400_000))) }
+                .hasMessageContaining("longer than 1000")
+        }
+        CardJson.decode(card(properties[0], "9".repeat(1000)))
+    }
+
+    private fun card(
+        property: String,
+        number: String,
+    ): String = """{"type":"AdaptiveCard","version":"1.5","body":[{$property:$number}]}"""
 }

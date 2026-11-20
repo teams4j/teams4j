@@ -114,7 +114,8 @@ an application with the starter on its classpath and no bot configured must stil
 without a secret fails startup; that is a misconfiguration, and startup is where to learn it. The one
 exception is `allow-anonymous`, the [local emulator mode](./bot#local-development-the-agents-playground):
 with it on and no secret, there are no `BotCredentials`, the verifier lets a request without a token
-through, and the `ConnectorClient` sends none.
+through, and the `ConnectorClient` sends none. `allow-anonymous` together with a secret fails startup:
+a request without a token must not get a reply that carries the bot's real one.
 
 With the app id set, the context holds `BotCredentials`, `BotTokenVerifier`, `ActivityReceiver`,
 `ConnectorClient` and `ActivityEndpoint`, each replaceable by a bean of your own. In a Spring MVC
@@ -141,7 +142,9 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 | `connect-timeout` | `5s` | Ignored when an `HttpTransport` bean is present |
 | `clock-skew` | `5m` | Tolerance on inbound tokens' `exp` and `nbf` |
 | `key-cache-ttl` | `12h` | How long a fetched signing key set is trusted |
-| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header and a loopback `serviceUrl`, for a local emulator such as the Agents Playground; with no `app-secret`, send none either |
+| `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header and a loopback `serviceUrl`, for a local emulator such as the Agents Playground, and send none either. Refused together with `app-secret` |
+| `allowed-callers` | — | App ids of other applications whose Entra-issued tokens may call the bot (another agent, a skill host). The bot's own app id is always allowed |
+| `max-body-length` | `1048576` | The longest request body accepted, in characters; a longer one is answered `413` before it is parsed |
 
 ## In tests
 

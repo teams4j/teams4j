@@ -25,6 +25,6 @@ jobs:
       - name: Dependency review
         uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
         with:
-          # Wait for dependency-submission.yml to submit the graph.
+          # Wait for dependency-graph-submit.yml to submit the graph.
           retry-on-snapshot-warnings: true
           retry-on-snapshot-warnings-timeout: 600

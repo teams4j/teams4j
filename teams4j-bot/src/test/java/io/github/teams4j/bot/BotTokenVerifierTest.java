@@ -115,8 +115,9 @@ class BotTokenVerifierTest {
         return token(
                 "k2",
                 k2,
-                "{\"iss\":\"" + iss + "\",\"aud\":\"" + APP_ID + "\",\"tid\":\"" + tid + "\",\"serviceurl\":\""
-                        + SERVICE_URL + "\",\"nbf\":" + nbf + ",\"exp\":" + (nbf + 3600) + "}");
+                "{\"iss\":\"" + iss + "\",\"aud\":\"" + APP_ID + "\",\"azp\":\"" + APP_ID + "\",\"tid\":\"" + tid
+                        + "\",\"serviceurl\":\"" + SERVICE_URL + "\",\"nbf\":" + nbf + ",\"exp\":" + (nbf + 3600)
+                        + "}");
     }
 
     @Test
@@ -205,6 +206,26 @@ class BotTokenVerifierTest {
         assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId()).isEqualTo(APP_ID);
     }
 
+    /** An Error thrown from the transport -- a linkage failure, a deep stack -- is no different. */
+    @Test
+    void aTransportThatThrowsAnErrorDoesNotWedgeTheKeySet() throws Exception {
+        BotTokenVerifier verifier = verifier();
+        AtomicReference<Boolean> thrown = new AtomicReference<>(false);
+        transport.on(METADATA, () -> {
+            if (!thrown.getAndSet(true)) {
+                throw new NoClassDefFoundError("simulated");
+            }
+            return FakeTransport.json(200, "{\"jwks_uri\":\"" + JWKS + "\"}");
+        });
+
+        Throwable first =
+                org.assertj.core.api.Assertions.catchThrowable(() -> verifier.verify(token("k1", k1), SERVICE_URL));
+        assertThat(first instanceof NoClassDefFoundError || first.getCause() instanceof NoClassDefFoundError)
+                .as(String.valueOf(first))
+                .isTrue();
+        assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId()).isEqualTo(APP_ID);
+    }
+
     @Test
     void aForgedSignatureIsRefused() throws Exception {
         // k2's private key, claiming to be k1.
@@ -283,6 +304,53 @@ class BotTokenVerifierTest {
         assertThat(verifier().verify(token("k1", k1), null).serviceUrl()).isEqualTo(SERVICE_URL);
     }
 
+    /** Entra gives a token for the bot's audience to any client its tenant lets ask; only the bot itself or a named caller may use one. */
+    @Test
+    void anEntraTokenMustComeFromTheBotItselfOrAnAllowedCaller() throws Exception {
+        long nbf = now.get().getEpochSecond();
+        java.util.function.Function<String, String> claims = caller -> "{\"iss\":\"" + ENTRA_V2 + "\",\"aud\":\""
+                + APP_ID + "\",\"tid\":\"" + TENANT + "\"" + caller + ",\"nbf\":" + nbf + ",\"exp\":" + (nbf + 3600)
+                + "}";
+        String foreign = token("k2", k2, claims.apply(",\"azp\":\"other-app\""));
+        String foreignV1 = token(
+                "k2",
+                k2,
+                "{\"iss\":\"" + ENTRA_V1 + "\",\"aud\":\"" + APP_ID + "\",\"appid\":\"other-app\",\"nbf\":" + nbf
+                        + ",\"exp\":" + (nbf + 3600) + "}");
+        String noCaller = token("k2", k2, claims.apply(""));
+        String self = token("k2", k2, claims.apply(",\"azp\":\"APP-ID\""));
+
+        BotTokenVerifier strict =
+                builder(BotTokenVerifier.builder(APP_ID).tenantId(TENANT)).build();
+        for (String refused : List.of(foreign, foreignV1, noCaller)) {
+            assertThatThrownBy(() -> strict.verify(refused, "https://attacker.example/"))
+                    .isInstanceOf(TokenVerificationException.class)
+                    .hasMessageContaining("caller is not allowed");
+        }
+        assertThat(strict.verify(self, SERVICE_URL).issuer())
+                .as("app ids compare ignoring case")
+                .isEqualTo(ENTRA_V2);
+
+        BotTokenVerifier withCaller = builder(
+                        BotTokenVerifier.builder(APP_ID).tenantId(TENANT).allowedCallers(List.of("other-app")))
+                .build();
+        assertThat(withCaller.verify(foreign, SERVICE_URL).issuer()).isEqualTo(ENTRA_V2);
+        assertThat(withCaller.verify(foreignV1, SERVICE_URL).issuer()).isEqualTo(ENTRA_V1);
+    }
+
+    /** Unverified claims reach the log through the reason: one rejected request, one log line. */
+    @Test
+    void aRejectionReasonQuotesTheUnverifiedClaim() throws Exception {
+        long nbf = now.get().getEpochSecond();
+        String forged = token(
+                "k1",
+                k1,
+                "{\"iss\":\"x\\r\\nSEVERE: forged\\u2028\",\"aud\":\"" + APP_ID + "\",\"exp\":" + (nbf + 60) + "}");
+        assertThatThrownBy(() -> verifier().verify(forged, SERVICE_URL))
+                .hasMessage("token issuer is not accepted: \"x\\u000d\\u000aSEVERE: forged\\u2028\"");
+        assertThat(BotTokenVerifier.quote("a".repeat(500))).hasSize(205).endsWith("...\"");
+    }
+
     /** The Emulator and the Playground mint Entra tokens for the app id with no {@code serviceurl}; the Bot Framework never omits it. */
     @Test
     void anEntraTokenMayLackTheServiceUrlClaimButABotFrameworkTokenMayNot() throws Exception {
@@ -292,8 +360,8 @@ class BotTokenVerifierTest {
         String entraWithoutClaim = token(
                 "k2",
                 k2,
-                "{\"iss\":\"" + ENTRA_V2 + "\",\"aud\":\"" + APP_ID + "\",\"tid\":\"" + TENANT + "\",\"nbf\":" + nbf
-                        + ",\"exp\":" + (nbf + 3600) + "}");
+                "{\"iss\":\"" + ENTRA_V2 + "\",\"aud\":\"" + APP_ID + "\",\"azp\":\"" + APP_ID + "\",\"tid\":\""
+                        + TENANT + "\",\"nbf\":" + nbf + ",\"exp\":" + (nbf + 3600) + "}");
         String botFrameworkWithoutClaim = token(
                 "k1",
                 k1,

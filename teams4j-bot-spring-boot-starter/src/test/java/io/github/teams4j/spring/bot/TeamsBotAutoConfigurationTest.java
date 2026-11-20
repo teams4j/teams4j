@@ -113,20 +113,26 @@ class TeamsBotAutoConfigurationTest {
                 });
     }
 
-    /** With a secret as well, the credentials are back and so is the token; only the verifier relaxes. */
+    /** With a secret as well, an unauthenticated request would get a reply carrying the real token: refused. */
     @Test
-    void allowAnonymousWithASecretKeepsTheCredentials() {
+    void allowAnonymousWithASecretFailsAtStartup() {
         runner.withPropertyValues(CREDENTIALS)
                 .withPropertyValues("teams4j.bot.allow-anonymous=true")
                 .withUserConfiguration(OwnTransport.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(BotCredentials.class);
-                    context.getBean(ConnectorClient.class)
-                            .sendActivity(
-                                    ConversationReference.of("https://smba.example/apac", "a:1"),
-                                    Activity.message("hi"));
-                    assertThat(context.getBean(OwnTransport.class).lastHeaders).containsKey("Authorization");
-                });
+                .run(context -> assertThat(context)
+                        .hasFailed()
+                        .getFailure()
+                        .rootCause()
+                        .hasMessageStartingWith("teams4j.bot.allow-anonymous cannot be combined with credentials"));
+    }
+
+    @Test
+    void theBodyLimitAndAllowedCallersAreBound() {
+        runner.withPropertyValues(CREDENTIALS)
+                .withPropertyValues("teams4j.bot.max-body-length=4096", "teams4j.bot.allowed-callers=other-app")
+                .run(context -> assertThat(
+                                context.getBean(ActivityReceiver.class).maxBodyLength())
+                        .isEqualTo(4096));
     }
 
     @Test
