@@ -51,13 +51,9 @@ tasks.named("printVersion") {
     doLast { println(v) }
 }
 
-// The public ABI of every published module, dumped to `api/*.api` and committed.
-//
-// japicmp is the usual answer here and was the first choice, but it compares against a previously
-// released artifact and there is none: it would do nothing until 0.2.0, which is one release too
-// late to catch the mistake it exists to catch. This compares against a file in the tree instead,
-// so it works from the first commit and a change to what consumers can see arrives as a diff in a
-// pull request -- the same reason the generated model is committed rather than built on demand.
+// The public ABI of the Kotlin modules, dumped to `api/*.api` and committed, so a change to what
+// consumers can see arrives as a diff in a pull request. The Java modules are gated by japicmp
+// against the last release instead (publish-conventions, `-PapiBaseline`).
 //
 // `apiCheck` runs as part of `check`. After an intended API change, `./gradlew apiDump` rewrites
 // the files and the diff is the thing to read before committing.
