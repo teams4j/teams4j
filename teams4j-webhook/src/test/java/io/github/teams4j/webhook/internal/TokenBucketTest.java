@@ -21,6 +21,15 @@ class TokenBucketTest {
     }
 
     @Test
+    void anUnusableRateIsRefused() {
+        for (double rate : new double[] {0, -1, Double.NaN, Double.POSITIVE_INFINITY, 1e-300}) {
+            assertThatThrownBy(() -> bucket(rate))
+                    .as(String.valueOf(rate))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Test
     void theFirstPermitIsFree() {
         assertThat(bucket(4).reserve()).isZero();
     }

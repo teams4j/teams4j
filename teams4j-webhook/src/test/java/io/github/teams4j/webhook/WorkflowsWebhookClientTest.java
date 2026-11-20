@@ -277,6 +277,24 @@ class WorkflowsWebhookClientTest {
             assertThat(stubbed().build().send(card()).attempts()).isEqualTo(2);
         }
 
+        /** The POST may have landed; repeating it could post the card twice. */
+        @Test
+        void aTimedOutRequestIsNotRetried() {
+            AtomicLong calls = new AtomicLong();
+            WorkflowsWebhookClient client = stubbed()
+                    .transport(request -> {
+                        calls.incrementAndGet();
+                        return java.util.concurrent.CompletableFuture.failedFuture(
+                                new java.net.http.HttpTimeoutException("timed out"));
+                    })
+                    .build();
+
+            assertThatThrownBy(() -> client.send(card())).isInstanceOf(WebhookTransportException.class);
+            assertThatThrownBy(() -> client.sendAsync(card()).join())
+                    .hasCauseInstanceOf(WebhookTransportException.class);
+            assertThat(calls).hasValue(2);
+        }
+
         @Test
         void aClientErrorIsNotRetried() {
             server.stubFor(post(urlEqualTo(PATH))

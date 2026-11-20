@@ -89,7 +89,8 @@ independently; with three of them, set `permitsPerSecond` to around 1.3.
 A 429 or 5xx response, or a transport failure, is retried up to `maxAttempts` (default 3, the first
 attempt included) with exponential backoff and full jitter, starting under `initialBackoff` (500 ms)
 and capped at `maxBackoff` (30 s). A `Retry-After` header is honoured when present, in either seconds
-or HTTP-date form.
+or HTTP-date form. A timeout is the exception: the POST may have landed, and repeating it could post
+the card twice, so it fails at once.
 
 If the server asks for a `Retry-After` longer than `maxBackoff`, the client does **not** wait. It
 throws `WebhookResponseException` with `retryAfter()` set, handing the scheduling decision back to
@@ -125,7 +126,7 @@ lets you catch only what you would handle differently.
 | `PayloadTooLargeException` | Over 28 KB. `sizeBytes()`, `limitBytes()` | No. Shrink the card |
 | `WebhookRateLimitException` | `FAIL_FAST` mode and the pacer said wait. `retryAfter()` | Yes, after `retryAfter()` |
 | `WebhookResponseException` | A non-2xx after the retries were used up. `statusCode()`, `body()`, `attempts()`, `retryAfter()` | Depends on the status |
-| `WebhookTransportException` | Connection failure or timeout after the retries. `attempts()` | Yes |
+| `WebhookTransportException` | Connection failure after the retries, or a timeout (not retried: it may have been delivered). `attempts()` | Yes, if a duplicate is acceptable |
 
 A successful send returns `WebhookResponse` with `statusCode()`, `body()` and `attempts()`. The
 endpoint answers `202 Accepted`, not `200`, and as the measurements above show, `202` means "queued",

@@ -3,6 +3,7 @@ package io.github.teams4j.webhook;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
@@ -28,7 +29,9 @@ import io.github.teams4j.cards.WebhookAction;
 import io.github.teams4j.cards.dsl.CardBuilder;
 import io.github.teams4j.http.HttpExchange;
 import io.github.teams4j.http.HttpTransport;
+import io.github.teams4j.http.ResponseTooLargeException;
 import io.github.teams4j.http.RetryPolicy;
+import io.github.teams4j.http.internal.Durations;
 import io.github.teams4j.teams.profile.Severity;
 import io.github.teams4j.teams.profile.TeamsLimits;
 import io.github.teams4j.teams.profile.TeamsProfileValidator;
@@ -266,6 +269,9 @@ public final class WorkflowsWebhookClient {
             try {
                 response = exchange(request, attempt);
             } catch (IOException e) {
+                if (!retryable(e)) {
+                    throw new WebhookTransportException("the webhook request failed", e, attempt);
+                }
                 RetryPolicy.Decision decision = retryPolicy.decideAfterTransportFailure(attempt);
                 if (decision instanceof RetryPolicy.Decision.Retry retry) {
                     sleep(retry.delay());
@@ -422,9 +428,14 @@ public final class WorkflowsWebhookClient {
 
         private void onFailure(int attempt, @Nullable Throwable failure) {
             Throwable cause = unwrap(failure);
-            if (!(cause instanceof IOException)) {
+            if (!(cause instanceof IOException io)) {
                 // The blocking path retries IOException and lets everything else out untouched.
                 result.completeExceptionally(cause);
+                return;
+            }
+            if (!retryable(io)) {
+                result.completeExceptionally(
+                        new WebhookTransportException("the webhook request failed", cause, attempt));
                 return;
             }
             RetryPolicy.Decision decision = retryPolicy.decideAfterTransportFailure(attempt);
@@ -478,6 +489,14 @@ public final class WorkflowsWebhookClient {
                 }
             });
         }
+    }
+
+    /**
+     * A timed-out POST may have been delivered, so repeating it could post the card twice; an
+     * oversized response would come back the same.
+     */
+    private static boolean retryable(IOException e) {
+        return !(e instanceof HttpTimeoutException) && !(e instanceof ResponseTooLargeException);
     }
 
     /** Strips the {@link CompletionException} the future machinery wraps a cause in. */
@@ -613,6 +632,7 @@ public final class WorkflowsWebhookClient {
          * one webhook, since each paces itself independently.
          */
         public Builder permitsPerSecond(double permitsPerSecond) {
+            TokenBucket.checkRate(permitsPerSecond);
             this.permitsPerSecond = permitsPerSecond;
             return this;
         }
@@ -628,7 +648,7 @@ public final class WorkflowsWebhookClient {
 
         /** The backoff ceiling for the first retry, doubling thereafter. Defaults to 500ms. */
         public Builder initialBackoff(Duration initialBackoff) {
-            this.initialBackoff = Objects.requireNonNull(initialBackoff, "initialBackoff");
+            this.initialBackoff = Durations.backoff("initialBackoff", initialBackoff);
             return this;
         }
 
@@ -637,19 +657,19 @@ public final class WorkflowsWebhookClient {
          * longer than this stops the retrying rather than blocking the caller for it.
          */
         public Builder maxBackoff(Duration maxBackoff) {
-            this.maxBackoff = Objects.requireNonNull(maxBackoff, "maxBackoff");
+            this.maxBackoff = Durations.backoff("maxBackoff", maxBackoff);
             return this;
         }
 
         /** Per-request timeout. Defaults to 10s. */
         public Builder requestTimeout(Duration requestTimeout) {
-            this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout");
+            this.requestTimeout = Durations.timeout("requestTimeout", requestTimeout);
             return this;
         }
 
         /** Connection timeout for the default transport. Defaults to 10s; ignored with your own. */
         public Builder connectTimeout(Duration connectTimeout) {
-            this.connectTimeout = Objects.requireNonNull(connectTimeout, "connectTimeout");
+            this.connectTimeout = Durations.timeout("connectTimeout", connectTimeout);
             return this;
         }
 
@@ -664,6 +684,9 @@ public final class WorkflowsWebhookClient {
          * caller and a notification that never arrives under a successful response.
          */
         public Builder maxPayloadBytes(int maxPayloadBytes) {
+            if (maxPayloadBytes < 1) {
+                throw new IllegalArgumentException("maxPayloadBytes must be positive but was " + maxPayloadBytes);
+            }
             this.maxPayloadBytes = maxPayloadBytes;
             return this;
         }

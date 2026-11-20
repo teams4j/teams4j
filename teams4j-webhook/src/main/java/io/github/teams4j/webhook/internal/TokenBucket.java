@@ -23,6 +23,8 @@ import java.util.function.LongSupplier;
  */
 public final class TokenBucket {
 
+    private static final double MIN_RATE = 1.0 / 86_400;
+
     private final long intervalNanos;
     private final LongSupplier nanoTime;
 
@@ -34,12 +36,18 @@ public final class TokenBucket {
      * @param nanoTime a monotonic clock, {@code System::nanoTime} outside tests
      */
     public TokenBucket(double permitsPerSecond, LongSupplier nanoTime) {
-        if (permitsPerSecond <= 0) {
-            throw new IllegalArgumentException("permitsPerSecond must be positive but was " + permitsPerSecond);
-        }
+        checkRate(permitsPerSecond);
         this.intervalNanos = (long) Math.ceil(1_000_000_000L / permitsPerSecond);
         this.nanoTime = nanoTime;
         this.nextFreeNanos = nanoTime.getAsLong();
+    }
+
+    /** Finite, and between one a day and one a nanosecond, so the interval neither overflows nor rounds to nothing. */
+    public static void checkRate(double permitsPerSecond) {
+        if (!(permitsPerSecond >= MIN_RATE && permitsPerSecond <= 1e9)) {
+            throw new IllegalArgumentException(
+                    "permitsPerSecond must be between " + MIN_RATE + " and 1e9 but was " + permitsPerSecond);
+        }
     }
 
     /**
