@@ -57,6 +57,9 @@ jobs:
           if [ "$changed" = false ]; then
             exit 0
           fi
+          # A fence longer than any backtick run in the diff, so upstream text cannot close it
+          longest="$( (grep -oE '`+' spec.diff || true) | awk '{ if (length > m) m = length } END { print m + 0 }')"
+          fence="$(printf '%*s' "$(( longest < 3 ? 3 : longest + 1 ))" '' | tr ' ' '`')"
           {
             echo "The vendored Activity Protocol TypeSpec differs from \`microsoft/Agents\` main at \`$upstream_sha\`."
             echo
@@ -66,9 +69,10 @@ jobs:
             echo
             echo '<details><summary>Diff</summary>'
             echo
-            echo '```diff'
+            echo "${fence}diff"
             head -c 60000 spec.diff
-            echo '```'
+            echo
+            echo "$fence"
             echo '</details>'
             echo
             echo 'To refresh: copy the three files, update the commit and date in `MANIFEST.md`, run'
@@ -83,7 +87,7 @@ jobs:
           TITLE: 'Activity Protocol spec drifted from upstream'
         run: |
           set -euo pipefail
-          number="$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number // empty')"
+          number="$(gh issue list --state open --author app/github-actions --search "in:title \"$TITLE\"" --json number --jq '.[0].number // empty')"
           if [ -n "$number" ]; then
             gh issue edit "$number" --body-file body.md
           else
