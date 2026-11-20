@@ -62,7 +62,8 @@ input.
 A card the schema rejects is read by each library's own rules. Jackson converts a scalar where its
 defaults do (`1` into `true`, `"3"` into a number); kotlinx wants each value to have its JSON type.
 Either way, a value of the wrong shape, such as an array where a string belongs, fails the card rather
-than being dropped.
+than being dropped. Both refuse what is not standard JSON (`TRUE`, `+1`, `01`, `.5`) and nesting
+deeper than 128 levels (`CardJson.MAX_NESTING_DEPTH` on the Jackson side).
 
 The two write the same card the same way **but not byte for byte**: property order can differ. The
 webhook client's 28 KB check counts the bytes that actually go out, so it is always right; just do not

@@ -352,6 +352,10 @@ default wraps the JDK `HttpClient`; `Builder.httpClient(HttpClient)` supplies a 
 `Builder.transport(HttpTransport)` supplies anything else -- an application with a shared OkHttp pool
 implements the interface in a dozen lines and every teams4j client uses it.
 
+The default caps a response body at 16 MiB and the whole exchange at twice the request timeout; a
+custom transport must bound both itself, or a slow or hostile server can hold the caller and its
+memory. Do not log request header values or bodies: they carry the bot's token and client secret.
+
 ## From a coroutine
 
 ```kotlin
