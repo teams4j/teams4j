@@ -10,7 +10,7 @@ claimed.
 | Java 21+ | bonus | Exhaustive `switch` and record patterns over the sealed model. The jar targets 17, but sealed information lives in the class file, so it works at *your* compile time: drop a case and you get a compile error. Java 17 consumers get the closed hierarchy and `instanceof` patterns |
 | Spring Boot (starters) | **3.5.x, 4.1.x** | One artifact each for both. CI runs both starters' tests on 3.5.16 and 4.1.1 and builds the examples against both |
 | Adaptive Cards | **1.5** | The model covers the full 1.6 schema, but **1.5 is the ceiling Teams renders**: on a real tenant a 1.6 card is rejected and falls back to `fallbackText` (2026-09-01). The DSL defaults to 1.5 |
-| JSON binding | **Jackson 2.18+** or **kotlinx.serialization 1.11+** | The model requires neither; see [JSON binding](./json-binding). `teams4j-cards-jackson` names 2.18 as a lower bound and nothing else: your own Jackson version wins. CI runs the tests on 2.18 and on the newest 2.x |
+| JSON binding | **Jackson 2.18+** or **kotlinx.serialization 1.13+** | The model requires neither; see [JSON binding](./json-binding). `teams4j-cards-jackson` names 2.18 as a lower bound and nothing else: your own Jackson version wins. CI runs the tests on 2.18 and on the newest 2.x |
 | Coroutines | **kotlinx-coroutines 1.11+** | Only for `teams4j-webhook-kotlin`, `teams4j-bot-kotlin` and `teams4j-bot-ktor` |
 | Ktor | **3.0+** | Only for `teams4j-bot-ktor`, which depends on `ktor-server-core` alone. 3.0 is the lower bound in the POM; CI runs the tests on 3.0 and on the newest 3.x |
 | Nullness | **JSpecify `@NullMarked`** | Every module, without adding a runtime dependency. Below |
