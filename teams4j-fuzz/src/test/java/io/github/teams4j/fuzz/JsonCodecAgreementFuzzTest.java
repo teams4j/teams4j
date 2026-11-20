@@ -2,6 +2,7 @@ package io.github.teams4j.fuzz;
 
 import java.nio.charset.StandardCharsets;
 
+import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import com.code_intelligence.jazzer.junit.FuzzTest;
 import org.jspecify.annotations.Nullable;
 
@@ -22,8 +23,8 @@ class JsonCodecAgreementFuzzTest {
     private static final JsonCodec KOTLINX = new KotlinxJsonCodec();
 
     @FuzzTest
-    void read(byte[] data) {
-        String text = new String(data, StandardCharsets.UTF_8);
+    void read(FuzzedDataProvider data) {
+        String text = new String(data.consumeRemainingAsBytes(), StandardCharsets.UTF_8);
         CardValue viaJackson = read(JACKSON, text);
         CardValue viaKotlinx = read(KOTLINX, text);
         if (viaJackson == null || viaKotlinx == null) {

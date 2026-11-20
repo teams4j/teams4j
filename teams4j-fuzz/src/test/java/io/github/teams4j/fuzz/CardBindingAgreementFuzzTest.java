@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import com.code_intelligence.jazzer.junit.FuzzTest;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,8 +44,8 @@ class CardBindingAgreementFuzzTest {
     private static final Schema CARD_SCHEMA = cardSchema();
 
     @FuzzTest
-    void read(byte[] data) {
-        String text = new String(data, StandardCharsets.UTF_8);
+    void read(FuzzedDataProvider data) {
+        String text = new String(data.consumeRemainingAsBytes(), StandardCharsets.UTF_8);
         if (!isJsonToBoth(text)) {
             return;
         }

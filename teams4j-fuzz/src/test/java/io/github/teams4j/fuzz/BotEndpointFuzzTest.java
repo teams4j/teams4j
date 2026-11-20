@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import com.code_intelligence.jazzer.junit.FuzzTest;
 
 import io.github.teams4j.bot.Activity;
@@ -47,13 +48,13 @@ class BotEndpointFuzzTest {
     private static final ActivityEndpoint ENDPOINT = endpoint();
 
     @FuzzTest
-    void body(byte[] data) {
-        answer(TOKEN, new String(data, StandardCharsets.UTF_8));
+    void body(FuzzedDataProvider data) {
+        answer(TOKEN, new String(data.consumeRemainingAsBytes(), StandardCharsets.UTF_8));
     }
 
     @FuzzTest
-    void authorizationHeader(byte[] data) {
-        answer(new String(data, StandardCharsets.UTF_8), BODY);
+    void authorizationHeader(FuzzedDataProvider data) {
+        answer(new String(data.consumeRemainingAsBytes(), StandardCharsets.UTF_8), BODY);
     }
 
     private static void answer(String authorization, String body) {
