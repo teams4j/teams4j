@@ -166,7 +166,8 @@ public class TeamsBotAutoConfiguration {
                 .initialBackoff(properties.getInitialBackoff())
                 .maxBackoff(properties.getMaxBackoff())
                 .requestTimeout(properties.getRequestTimeout())
-                .connectTimeout(properties.getConnectTimeout());
+                .connectTimeout(properties.getConnectTimeout())
+                .serviceUrlHosts(properties.getServiceUrlHosts());
         codec.ifAvailable(builder::jsonCodec);
         cardWriter.ifAvailable(builder::cardWriter);
         transport.ifAvailable(builder::transport);

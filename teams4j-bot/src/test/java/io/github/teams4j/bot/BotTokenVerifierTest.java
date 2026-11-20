@@ -190,6 +190,46 @@ class BotTokenVerifierTest {
                 .isEqualTo(APP_ID);
     }
 
+    @Test
+    void aFailingKeyEndpointIsNotFetchedPerRequestAndExpiredKeysServeMeanwhile() throws Exception {
+        BotTokenVerifier verifier = verifier();
+        verifier.verify(token("k1", k1), SERVICE_URL);
+        now.set(now.get().plus(Duration.ofHours(13)));
+        jwks = "not json";
+
+        // The set expired and its refresh failed: within the grace its keys still verify.
+        assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId()).isEqualTo(APP_ID);
+        for (int i = 0; i < 10; i++) {
+            assertThatThrownBy(() -> verifier.verify(token("k9", k1), SERVICE_URL))
+                    .isInstanceOf(TokenVerificationException.class);
+        }
+        assertThat(transport.requests)
+                .as("one failed refresh, not one per request")
+                .hasSize(4);
+    }
+
+    @Test
+    void theDurationsAreBounded() {
+        BotTokenVerifier.Builder b = BotTokenVerifier.builder(APP_ID);
+        assertThatThrownBy(() -> b.clockSkew(Duration.ofSeconds(-1))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> b.keyCacheTtl(Duration.ZERO)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> b.requestTimeout(Duration.ofSeconds(Long.MAX_VALUE)))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void quoteEscapesBidiAndFormatCharacters() {
+        String text = "a" + (char) 0x202E + "b" + (char) 0x200B + "c";
+        assertThat(BotTokenVerifier.quote(text)).isEqualTo("\"a\\u202eb\\u200bc\"");
+    }
+
+    @Test
+    void loopbackNeedsAnHttpScheme() {
+        assertThat(BotTokenVerifier.isLoopback("http://localhost:3978")).isTrue();
+        assertThat(BotTokenVerifier.isLoopback("ftp://localhost/")).isFalse();
+        assertThat(BotTokenVerifier.isLoopback("file://localhost/etc/passwd")).isFalse();
+    }
+
     /** A transport that throws instead of failing its future must not leave the fetch in flight forever. */
     @Test
     void aTransportThatThrowsDoesNotWedgeTheKeySet() throws Exception {
@@ -204,6 +244,7 @@ class BotTokenVerifierTest {
 
         assertThatThrownBy(() -> verifier.verify(token("k1", k1), SERVICE_URL))
                 .isInstanceOf(RejectedExecutionException.class);
+        now.set(now.get().plusSeconds(31)); // past the failure backoff
         assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId()).isEqualTo(APP_ID);
     }
 
@@ -224,6 +265,7 @@ class BotTokenVerifierTest {
         assertThat(first instanceof NoClassDefFoundError || first.getCause() instanceof NoClassDefFoundError)
                 .as(String.valueOf(first))
                 .isTrue();
+        now.set(now.get().plusSeconds(31)); // past the failure backoff
         assertThat(verifier.verify(token("k1", k1), SERVICE_URL).appId()).isEqualTo(APP_ID);
     }
 
@@ -532,7 +574,7 @@ class BotTokenVerifierTest {
     @Test
     void withoutAnonymousAccessAMissingHeaderIsRefused() {
         assertThatThrownBy(() -> verifier().verify(null, SERVICE_URL)).hasMessageContaining("no Authorization");
-        assertThatThrownBy(() -> verifier().verify("  ", SERVICE_URL)).hasMessageContaining("no Authorization");
+        assertThatThrownBy(() -> verifier().verify("  ", SERVICE_URL)).isInstanceOf(TokenVerificationException.class);
     }
 
     @Test
@@ -544,7 +586,8 @@ class BotTokenVerifierTest {
         assertThat(anonymous.isAnonymous()).isTrue();
         assertThat(anonymous.appId()).isEqualTo(APP_ID);
         assertThat(anonymous.serviceUrl()).isNull();
-        assertThat(verifier.verify("", PLAYGROUND_URL).isAnonymous()).isTrue();
+        // Present but blank is a wrong header, not a missing one.
+        assertThatThrownBy(() -> verifier.verify("", PLAYGROUND_URL)).isInstanceOf(TokenVerificationException.class);
         assertThat(verifier.verify(null, null).isAnonymous()).isTrue();
 
         // A header that is there is checked in full.

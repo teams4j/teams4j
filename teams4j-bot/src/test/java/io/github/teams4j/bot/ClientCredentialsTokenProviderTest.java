@@ -61,6 +61,34 @@ class ClientCredentialsTokenProviderTest {
                         + "&scope=https://api.botframework.com/.default");
     }
 
+    @Test
+    void invalidatingAnOlderTokenKeepsTheCurrentOne() {
+        transport.on(MULTI_TENANT, 200, "{\"expires_in\":3599,\"access_token\":\"t1\"}");
+        ClientCredentialsTokenProvider provider = provider(BotCredentials.of("app", "secret"));
+        provider.accessToken().join();
+
+        provider.invalidate("t0");
+        provider.accessToken().join();
+        assertThat(transport.requests).as("t1 survived").hasSize(1);
+
+        provider.invalidate("t1");
+        provider.accessToken().join();
+        assertThat(transport.requests).hasSize(2);
+    }
+
+    @Test
+    void anAbsurdExpiryIsClamped() {
+        transport.on(MULTI_TENANT, 200, "{\"expires_in\":99999999999999999999,\"access_token\":\"t1\"}");
+        ClientCredentialsTokenProvider provider = provider(BotCredentials.of("app", "secret"));
+        provider.accessToken().join();
+
+        now.set(now.get().plus(Duration.ofDays(2)));
+        provider.accessToken().join();
+        assertThat(transport.requests)
+                .as("refetched after a day, not cached forever")
+                .hasSize(2);
+    }
+
     /** A transport that throws instead of failing its future must not leave the fetch in flight forever. */
     @Test
     void aTransportThatThrowsDoesNotWedgeTheProvider() {

@@ -78,7 +78,7 @@ whose message names the check. **Log the message, return a bare `401`.**
 | `tenantId` | — | Adds your tenant's Entra issuers. Set by `builder(credentials)` |
 | `issuers` | `defaultIssuers(tenantId)` | Each accepted `iss` with the metadata document naming its keys. Replace for another cloud; `issuer(iss, uri)` adds one, or points one at a stub in tests |
 | `clockSkew` | 5 min | Tolerance on `exp` and `nbf` |
-| `keyCacheTtl` | 12 h | How long a fetched key set is trusted |
+| `keyCacheTtl` | 12 h | How long a fetched key set is trusted. If a refresh fails, the expired set still serves for up to 24 h and the endpoint is not fetched again for 30 s |
 | `allowedCallers` | — | App ids, besides your own, whose app-only Entra tokens are accepted: another agent, a skill host. Without a `serviceurl` claim their activity may only name a loopback `serviceUrl` |
 | `allowAnonymous` | off | **Development only.** A request with no `Authorization` header passes, as `VerifiedToken.isAnonymous()`, if its `serviceUrl` is a loopback address -- a reply may still carry the bot's token; a header that is present is still verified. For a local emulator such as the Agents Playground |
 
@@ -179,6 +179,10 @@ connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().t
   never did in measurement; the policy is the same either way.
 - **`403 BotNotInConversationRoster`** is `BotNotInConversationException`, a subclass of
   `ConnectorException`, so it can be caught on its own. Not retried.
+- **`serviceUrl`**: the token goes only to https hosts in `serviceUrlHosts` (default
+  `ConnectorClient.DEFAULT_SERVICE_URL_HOSTS`: the public Connector, Bot Framework channels and the
+  government clouds) or to a loopback address; any other call fails with `IllegalArgumentException`
+  before it is sent. `createConversation` ignores a returned `serviceUrl` outside that list.
 
 ### Credentials
 
@@ -250,7 +254,7 @@ install: Teams routes a tenant to one region.
 
 `ActivityEndpoint` is the messaging endpoint minus the framework: header and body in, status and
 body out. It answers `401` when the request is not from the Bot Framework (the reason is logged,
-never sent), `413` for a body over the receiver's limit, `400` for a body that is not JSON, `200` with an empty body for every activity your
+never sent), `413` for a body over the receiver's limit, `400` for a body that is not JSON, `503` when the signing keys cannot be fetched, `200` with an empty body for every activity your
 `ActivityHandler` accepts, and the `InvokeResponse`'s own status and body for an invoke. A servlet
 is a few lines around it, and so are the two adapters.
 

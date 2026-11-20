@@ -13,6 +13,6 @@ public final class BotNotInConversationException extends ConnectorException {
     public static final String ERROR_CODE = "BotNotInConversationRoster";
 
     BotNotInConversationException(String operation, String body, int attempts) {
-        super(operation, 403, body, attempts, null, ERROR_CODE);
+        super(operation, 403, body, attempts, null, ERROR_CODE, "");
     }
 }

@@ -80,7 +80,7 @@ final class Retrying {
         CompletableFuture<HttpExchange.Response> exchange;
         try {
             exchange = attempt.apply(n);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | Error e) {
             result.completeExceptionally(e);
             return;
         }
@@ -146,7 +146,8 @@ final class Retrying {
             }
             try {
                 next.accept(value, failure);
-            } catch (RuntimeException e) {
+            } catch (RuntimeException | Error e) {
+                // An Error too: otherwise it ends a dropped future and `result` never completes.
                 result.completeExceptionally(e);
             }
         });
@@ -168,6 +169,9 @@ final class Retrying {
             Throwable cause = e.getCause();
             if (cause instanceof RuntimeException runtime) {
                 throw runtime;
+            }
+            if (cause instanceof Error error) {
+                throw error;
             }
             throw new BotTransportException(operation + " failed", cause == null ? e : cause, 0);
         }

@@ -145,6 +145,7 @@ Everything sits under `teams4j.bot.`; defaults mirror the builders and are asser
 | `key-cache-ttl` | `12h` | How long a fetched signing key set is trusted |
 | `allow-anonymous` | `false` | **Development only.** Accept a request with no `Authorization` header and a loopback `serviceUrl`, for a local emulator such as the Agents Playground, and send none either. Refused together with `app-secret` |
 | `allowed-callers` | — | App ids of other applications whose Entra-issued tokens may call the bot (another agent, a skill host). The bot's own app id is always allowed. Their activities may only name a loopback `serviceUrl`, and user (delegated) tokens are refused |
+| `service-url-hosts` | public Connector, Bot Framework, gov clouds | Hosts the Connector client sends its token to; a leading dot matches subdomains. Loopback is always allowed |
 | `max-body-length` | `1048576` | The longest request body accepted, in characters; a longer one is answered `413` before it is parsed |
 
 ## In tests

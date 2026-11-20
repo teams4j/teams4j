@@ -21,9 +21,12 @@ public class ConnectorException extends BotException {
             String body,
             int attempts,
             @Nullable Duration retryAfter,
-            @Nullable String errorCode) {
+            @Nullable String errorCode,
+            String hint) {
+        // The body is remote text of up to 16 MiB: quoted and capped in the message, whole in body().
         super(operation + " returned " + statusCode + " after " + attempts + (attempts == 1 ? " attempt" : " attempts")
-                + (errorCode == null ? "" : " (" + errorCode + ")") + (body.isBlank() ? "" : ": " + body));
+                + (errorCode == null ? "" : " (" + BotTokenVerifier.quote(errorCode) + ")")
+                + (body.isBlank() ? "" : ": " + ConnectorClient.quoteBody(body)) + hint);
         this.statusCode = statusCode;
         this.body = body;
         this.attempts = attempts;

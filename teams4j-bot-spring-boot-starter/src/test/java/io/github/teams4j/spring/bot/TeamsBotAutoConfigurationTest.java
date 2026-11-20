@@ -236,7 +236,7 @@ class TeamsBotAutoConfigurationTest {
                 .run(context -> {
                     context.getBean(ConnectorClient.class)
                             .sendActivity(
-                                    ConversationReference.of("https://smba.example/apac", "a:1"),
+                                    ConversationReference.of("https://smba.trafficmanager.net/apac", "a:1"),
                                     Activity.message("hi"));
                     assertThat(context.getBean(OwnTransport.class).requests.get())
                             .as("the token and the activity")

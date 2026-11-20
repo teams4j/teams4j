@@ -359,6 +359,76 @@ class ConnectorClientTest {
     }
 
     @Test
+    void aCreateThatNamesAForeignServiceUrlKeepsTheOneItCalled() {
+        server.stubFor(post(urlEqualTo("/v3/conversations"))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("{\"id\":\"a:new\",\"serviceUrl\":\"https://evil.example/\"}")));
+
+        ConversationResourceResponse created = client().build()
+                .createConversation(URI.create(server.baseUrl()), ConversationParameters.personal("29:u", "t"));
+
+        assertThat(created.reference().serviceUrl()).isEqualTo(URI.create(server.baseUrl()));
+    }
+
+    @Test
+    void aServiceUrlOutsideTheAllowedHostsGetsNoToken() {
+        ConnectorClient client = client().build();
+        for (String url : List.of(
+                "https://evil.example/",
+                "http://smba.trafficmanager.net/amer/",
+                "https://smba.trafficmanager.net.evil.example/")) {
+            assertThatThrownBy(() ->
+                            client.sendActivity(ConversationReference.of(url, CONVERSATION), Activity.message("hi")))
+                    .as(url)
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+        assertThat(tokensIssued).hasValue(0);
+        assertThat(client.serviceUrlRefusal("https://smba.trafficmanager.net/amer/"))
+                .isNull();
+        assertThat(client.serviceUrlRefusal("https://webchat.botframework.com/"))
+                .isNull();
+        assertThat(client().serviceUrlHosts(List.of(".contoso.com"))
+                        .build()
+                        .serviceUrlRefusal("https://bot.contoso.com/"))
+                .isNull();
+    }
+
+    /** An Error in a continuation must fail the call, not leave it pending for ever. */
+    @Test
+    void anErrorDuringTheCallFailsIt() {
+        ConnectorClient client = client().transport(request -> {
+                    throw new StackOverflowError("simulated");
+                })
+                .build();
+
+        assertThatThrownBy(() -> client.sendActivityAsync(where(), Activity.message("hi"))
+                        .orTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
+                        .join())
+                .hasCauseInstanceOf(StackOverflowError.class);
+    }
+
+    @Test
+    void dotSegmentsAreEncoded() {
+        assertThat(ConnectorClient.segment(".")).isEqualTo("%2E");
+        assertThat(ConnectorClient.segment("..")).isEqualTo("%2E%2E");
+        assertThat(ConnectorClient.segment("a.b")).isEqualTo("a.b");
+    }
+
+    @Test
+    void aLongErrorBodyIsCappedInTheMessageButKeptWhole() {
+        String body = "x".repeat(5000);
+        server.stubFor(post(urlEqualTo(ACTIVITIES))
+                .willReturn(aResponse().withStatus(400).withBody(body)));
+
+        assertThatThrownBy(() -> client().build().sendActivity(where(), Activity.message("hi")))
+                .isInstanceOfSatisfying(ConnectorException.class, e -> {
+                    assertThat(e.getMessage()).hasSizeLessThan(1200);
+                    assertThat(e.body()).isEqualTo(body);
+                });
+    }
+
+    @Test
     void aCreateThatReturnsNoIdIsAnError() {
         server.stubFor(post(urlEqualTo("/v3/conversations"))
                 .willReturn(aResponse().withStatus(200).withBody("{}")));

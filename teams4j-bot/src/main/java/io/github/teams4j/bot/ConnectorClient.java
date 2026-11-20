@@ -7,9 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +29,7 @@ import io.github.teams4j.cards.dsl.CardBuilder;
 import io.github.teams4j.http.HttpExchange;
 import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.http.RetryPolicy;
+import io.github.teams4j.http.internal.Durations;
 import io.github.teams4j.teams.profile.Severity;
 import io.github.teams4j.teams.profile.TeamsProfileValidator;
 import io.github.teams4j.teams.profile.ValidationIssue;
@@ -66,6 +69,7 @@ public final class ConnectorClient {
     private final Retrying.Delayer delayer;
     private final Duration requestTimeout;
     private final ValidationMode validationMode;
+    private final List<String> serviceUrlHosts;
     private final TeamsProfileValidator validator = TeamsProfileValidator.forBot();
 
     private ConnectorClient(Builder b) {
@@ -94,7 +98,21 @@ public final class ConnectorClient {
         this.delayer = b.delayer;
         this.requestTimeout = b.requestTimeout;
         this.validationMode = b.validation;
+        this.serviceUrlHosts =
+                b.serviceUrlHosts.stream().map(h -> h.toLowerCase(Locale.ROOT)).toList();
     }
+
+    /**
+     * The hosts a {@code serviceUrl} may name by default: the public Bot Connector
+     * ({@code smba.trafficmanager.net}), the Bot Framework's own channels and the government clouds.
+     * An entry starting with a dot matches any subdomain. Loopback is always allowed.
+     */
+    public static final List<String> DEFAULT_SERVICE_URL_HOSTS = List.of(
+            "smba.trafficmanager.net",
+            ".botframework.com",
+            ".botframework.azure.us",
+            ".teams.microsoft.com",
+            ".teams.microsoft.us");
 
     /** Starts a client that mints its own tokens from the registration. */
     public static Builder builder(BotCredentials credentials) {
@@ -299,11 +317,14 @@ public final class ConnectorClient {
                     String id = Json.str(json, "id");
                     if (id == null) {
                         throw new IllegalStateException("createConversation returned no conversation id: "
-                                + outcome.response().body());
+                                + quoteBody(outcome.response().body()));
                     }
+                    // Adopted only if it is a Connector this client would send its token to anyway.
                     String returnedServiceUrl = Json.str(json, "serviceUrl");
-                    ConversationReference reference = ConversationReference.of(
-                            returnedServiceUrl != null ? returnedServiceUrl : base.toString(), id);
+                    String adopted = returnedServiceUrl != null && serviceUrlRefusal(returnedServiceUrl) == null
+                            ? returnedServiceUrl
+                            : base.toString();
+                    ConversationReference reference = ConversationReference.of(adopted, id);
                     return new ConversationResourceResponse(id, Json.str(json, "activityId"), reference);
                 });
     }
@@ -420,7 +441,7 @@ public final class ConnectorClient {
                     String body = succeeded(operation, outcome);
                     CardValue json = safeRead(body);
                     if (json == null) {
-                        throw new IllegalStateException(operation + " did not return JSON: " + body);
+                        throw new IllegalStateException(operation + " did not return JSON: " + quoteBody(body));
                     }
                     return json;
                 });
@@ -442,8 +463,10 @@ public final class ConnectorClient {
     }
 
     /** Conversation ids carry {@code ;} and {@code @}, and a message id can carry anything. */
-    private static String segment(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+    static String segment(String value) {
+        String encoded = URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+        // "." and ".." would be dot segments, resolved away by the server or a proxy.
+        return encoded.equals(".") || encoded.equals("..") ? encoded.replace(".", "%2E") : encoded;
     }
 
     private CompletableFuture<ResourceResponse> call(
@@ -456,6 +479,11 @@ public final class ConnectorClient {
     /** One attempt: token, request, and on a 401 one refresh and one more request. No token, no header, no refresh. */
     private CompletableFuture<HttpExchange.Response> exchange(
             String method, URI uri, @Nullable String body, boolean refreshed) {
+        // Every call passes here, so this is where a forged serviceUrl is stopped before the token leaves.
+        String refusal = serviceUrlRefusal(uri.toString());
+        if (refusal != null) {
+            return CompletableFuture.failedFuture(new IllegalArgumentException(refusal));
+        }
         return tokens.accessToken().thenCompose(token -> {
             Map<String, String> headers = new LinkedHashMap<>();
             if (!anonymous) {
@@ -469,7 +497,7 @@ public final class ConnectorClient {
                     .send(new HttpExchange.Request(method, uri, headers, body, requestTimeout))
                     .thenCompose(response -> {
                         if (response.statusCode() == 401 && !refreshed && !anonymous) {
-                            tokens.invalidate();
+                            tokens.invalidate(token);
                             return exchange(method, uri, body, true);
                         }
                         return CompletableFuture.completedFuture(response);
@@ -493,16 +521,50 @@ public final class ConnectorClient {
         if (status == 403 && BotNotInConversationException.ERROR_CODE.equals(errorCode)) {
             throw new BotNotInConversationException(operation, response.body(), outcome.attempts());
         }
-        String body = response.body();
+        String hint = "";
         if (status == 401 && anonymous) {
-            body = body + " -- this client sends no token (TokenProvider.none()) and this Connector wants one.";
+            hint = " -- this client sends no token (TokenProvider.none()) and this Connector wants one.";
         } else if (status == 401) {
             // The token endpoint issued a token and the Connector refused it: almost always a single-tenant
             // registration whose token came from the shared authority, or the other way round.
-            body = body + " -- the token was issued but not accepted. A single-tenant registration needs its"
+            hint = " -- the token was issued but not accepted. A single-tenant registration needs its"
                     + " tenant id (BotCredentials.singleTenant); a multi-tenant one must not have one.";
         }
-        throw new ConnectorException(operation, status, body, outcome.attempts(), outcome.retryAfter(), errorCode);
+        throw new ConnectorException(
+                operation, status, response.body(), outcome.attempts(), outcome.retryAfter(), errorCode, hint);
+    }
+
+    static String quoteBody(String body) {
+        return BotTokenVerifier.quote(body, ClientCredentialsTokenProvider.MAX_BODY_IN_MESSAGE);
+    }
+
+    /**
+     * Why the client refuses to call this URL, or null when it may: https to an allowed Connector
+     * host, or a loopback address (a local emulator) over either scheme.
+     */
+    @Nullable
+    String serviceUrlRefusal(String url) {
+        if (BotTokenVerifier.isLoopback(url)) {
+            return null;
+        }
+        URI uri;
+        try {
+            uri = URI.create(url.trim());
+        } catch (IllegalArgumentException e) {
+            return "serviceUrl is not a URI: " + BotTokenVerifier.quote(url);
+        }
+        String host = uri.getHost();
+        if (!"https".equalsIgnoreCase(uri.getScheme()) || host == null || uri.getUserInfo() != null) {
+            return "serviceUrl must be https: " + BotTokenVerifier.quote(url);
+        }
+        String lower = host.toLowerCase(Locale.ROOT);
+        for (String allowed : serviceUrlHosts) {
+            if (allowed.startsWith(".") ? lower.endsWith(allowed) : lower.equals(allowed)) {
+                return null;
+            }
+        }
+        return "serviceUrl host is not an allowed Connector (ConnectorClient.Builder.serviceUrlHosts): "
+                + BotTokenVerifier.quote(host);
     }
 
     private @Nullable CardValue safeRead(String body) {
@@ -530,6 +592,7 @@ public final class ConnectorClient {
         private Clock clock = Clock.systemUTC();
         private DoubleSupplier random = () -> ThreadLocalRandom.current().nextDouble();
         private Retrying.Delayer delayer = Retrying.SCHEDULER;
+        private List<String> serviceUrlHosts = DEFAULT_SERVICE_URL_HOSTS;
 
         private Builder(String appId, @Nullable BotCredentials credentials) {
             this.appId = Objects.requireNonNull(appId, "appId");
@@ -584,22 +647,39 @@ public final class ConnectorClient {
         }
 
         public Builder initialBackoff(Duration initialBackoff) {
-            this.initialBackoff = Objects.requireNonNull(initialBackoff, "initialBackoff");
+            this.initialBackoff = Durations.backoff("initialBackoff", initialBackoff);
             return this;
         }
 
         public Builder maxBackoff(Duration maxBackoff) {
-            this.maxBackoff = Objects.requireNonNull(maxBackoff, "maxBackoff");
+            this.maxBackoff = Durations.backoff("maxBackoff", maxBackoff);
             return this;
         }
 
         public Builder requestTimeout(Duration requestTimeout) {
-            this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout");
+            this.requestTimeout = Durations.timeout("requestTimeout", requestTimeout);
             return this;
         }
 
         public Builder connectTimeout(Duration connectTimeout) {
-            this.connectTimeout = Objects.requireNonNull(connectTimeout, "connectTimeout");
+            this.connectTimeout = Durations.timeout("connectTimeout", connectTimeout);
+            return this;
+        }
+
+        /**
+         * The hosts a {@code serviceUrl} may name, replacing {@link #DEFAULT_SERVICE_URL_HOSTS}; a
+         * leading dot matches any subdomain. A call to any other host fails before the token is sent,
+         * so an activity cannot steer the bot's token elsewhere. Loopback is always allowed.
+         */
+        public Builder serviceUrlHosts(Collection<String> hosts) {
+            List<String> copy = new ArrayList<>();
+            for (String host : Objects.requireNonNull(hosts, "hosts")) {
+                if (host == null || host.isBlank() || host.equals(".")) {
+                    throw new IllegalArgumentException("a serviceUrl host must be a host name");
+                }
+                copy.add(host.trim());
+            }
+            this.serviceUrlHosts = List.copyOf(copy);
             return this;
         }
 

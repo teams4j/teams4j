@@ -16,6 +16,14 @@ public interface TokenProvider {
     default void invalidate() {}
 
     /**
+     * Called after a {@code 401} with the token that was refused. By default {@link #invalidate()};
+     * a cache shared by concurrent requests overrides it to keep a token fetched since.
+     */
+    default void invalidate(String rejected) {
+        invalidate();
+    }
+
+    /**
      * Development only. No token at all: the client sends no {@code Authorization} header, which is
      * what a local emulator's Connector -- the Agents Playground in anonymous mode -- expects. The
      * real Connector answers {@code 401} to it. Pairs with {@code ConnectorClient.builder(appId)}.

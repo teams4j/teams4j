@@ -11,6 +11,7 @@ import java.security.KeyPair;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -62,6 +63,20 @@ class ActivityEndpointTest {
         assertThat(answer).isEqualTo(ActivityEndpoint.Response.OK);
         assertThat(answer.body()).isNull();
         assertThat(seen.get()).isNotNull().extracting(Activity::text).isEqualTo("hi");
+    }
+
+    /** Keys that cannot be fetched are the bot's outage, not the sender's fault: 503, so it retries. */
+    @Test
+    void anUnreachableKeyEndpointIs503() {
+        BotTokenVerifier verifier = BotTokenVerifier.builder(APP_ID)
+                .transport(request -> CompletableFuture.failedFuture(new java.net.ConnectException("refused")))
+                .jsonCodec(new JacksonJsonCodec())
+                .issuer(TestTokens.ISSUER, METADATA)
+                .build();
+        ActivityEndpoint endpoint =
+                new ActivityEndpoint(new ActivityReceiver(verifier, new JacksonJsonCodec()), new JacksonJsonCodec());
+
+        assertThat(endpoint.handle(token(), MESSAGE, activity -> null).status()).isEqualTo(503);
     }
 
     /** The parse runs before the token is checked, so the body is measured first. */

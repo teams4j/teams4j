@@ -35,6 +35,7 @@ import io.github.teams4j.cards.CardValue;
 import io.github.teams4j.cards.JsonCodec;
 import io.github.teams4j.http.HttpExchange;
 import io.github.teams4j.http.HttpTransport;
+import io.github.teams4j.http.internal.Durations;
 
 /**
  * Checks that a request to the bot's endpoint really came from the Bot Framework, or from Microsoft
@@ -208,8 +209,8 @@ public final class BotTokenVerifier {
 
     public CompletableFuture<VerifiedToken> verifyAsync(
             @Nullable String authorizationHeader, @Nullable String serviceUrl) {
-        if (authorizationHeader == null || authorizationHeader.isBlank()) {
-            // A header that is present but wrong is never excused; only its absence is.
+        if (authorizationHeader == null) {
+            // A header that is present but wrong -- blank included -- is never excused; only its absence is.
             if (!allowAnonymous) {
                 return CompletableFuture.failedFuture(new TokenVerificationException("no Authorization header"));
             }
@@ -300,18 +301,25 @@ public final class BotTokenVerifier {
 
     /** Unverified token text for a log line: control characters escaped, length capped. */
     static String quote(@Nullable String s) {
+        return quote(s, MAX_QUOTED);
+    }
+
+    /** Remote text for a log line or message: control and format (bidi) characters escaped, {@code max} code points kept. */
+    static String quote(@Nullable String s, int max) {
         if (s == null) {
             return "(none)";
         }
         StringBuilder out = new StringBuilder("\"");
-        s.codePoints().limit(MAX_QUOTED).forEach(c -> {
-            if (Character.isISOControl(c) || c == 0x2028 || c == 0x2029 || c == '"' || c == '\\') {
+        s.codePoints().limit(max).forEach(c -> {
+            if (Character.isISOControl(c) || Character.getType(c) == Character.FORMAT || c == 0x2028 || c == 0x2029) {
                 out.append(String.format(Locale.ROOT, "\\u%04x", c));
+            } else if (c == '"' || c == '\\') {
+                out.append('\\').appendCodePoint(c);
             } else {
                 out.appendCodePoint(c);
             }
         });
-        return out.append(s.codePointCount(0, s.length()) > MAX_QUOTED ? "...\"" : "\"")
+        return out.append(s.codePointCount(0, s.length()) > max ? "...\"" : "\"")
                 .toString();
     }
 
@@ -323,15 +331,17 @@ public final class BotTokenVerifier {
         return strip(claimed).equalsIgnoreCase(strip(actual));
     }
 
-    /** Literal loopback hosts only: nothing is resolved. */
+    /** Literal loopback hosts over http or https only: nothing is resolved. */
     static boolean isLoopback(String url) {
-        String host;
+        URI uri;
         try {
-            host = URI.create(url.trim()).getHost();
+            uri = URI.create(url.trim());
         } catch (IllegalArgumentException e) {
             return false;
         }
-        if (host == null) {
+        String host = uri.getHost();
+        String scheme = uri.getScheme();
+        if (host == null || !("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))) {
             return false;
         }
         host = host.toLowerCase(Locale.ROOT);
@@ -357,7 +367,15 @@ public final class BotTokenVerifier {
         // Bot Framework's own SDK refreshes on a miss at most this often too.
         private static final Duration MISS_REFRESH_INTERVAL = Duration.ofHours(1);
 
+        // After a failed fetch, requests fail (or use a stale key) for this long instead of each fetching.
+        private static final Duration FAILURE_BACKOFF = Duration.ofSeconds(30);
+
+        // How long past its TTL a key set may still serve while the endpoint is failing.
+        private static final Duration STALE_GRACE = Duration.ofHours(24);
+
         private record Keys(Map<String, PublicKey> byId, Instant fetchedAt) {}
+
+        private record Failed(Instant at, Throwable cause) {}
 
         private final URI openIdMetadata;
         private final HttpTransport transport;
@@ -369,6 +387,7 @@ public final class BotTokenVerifier {
         private final AtomicReference<@Nullable CompletableFuture<Keys>> fetching = new AtomicReference<>();
         // Set when a miss starts a refresh, success or not: a failing endpoint is not retried per request.
         private final AtomicReference<@Nullable Instant> lastMissRefresh = new AtomicReference<>();
+        private final AtomicReference<@Nullable Failed> lastFailure = new AtomicReference<>();
 
         KeySet(
                 URI openIdMetadata,
@@ -385,6 +404,8 @@ public final class BotTokenVerifier {
             this.requestTimeout = requestTimeout;
         }
 
+        // The derived future is dropped on purpose: `out` carries the outcome.
+        @SuppressWarnings("FutureReturnValueIgnored")
         CompletableFuture<PublicKey> keyFor(String kid) {
             Keys current = keys.get();
             Instant now = clock.instant();
@@ -398,15 +419,43 @@ public final class BotTokenVerifier {
                             new TokenVerificationException("token key id is unknown: " + quote(kid)));
                 }
             }
-            return fetch().thenCompose(fetched -> {
+            Failed failed = lastFailure.get();
+            if (failed != null && failed.at().plus(FAILURE_BACKOFF).isAfter(now)) {
+                // The endpoint just failed: no fetch per request, a stale key if one is still in grace.
+                PublicKey stale = stale(current, kid, now);
+                return stale != null
+                        ? CompletableFuture.completedFuture(stale)
+                        : CompletableFuture.failedFuture(failed.cause());
+            }
+            CompletableFuture<PublicKey> out = new CompletableFuture<>();
+            fetch().whenComplete((fetched, failure) -> {
+                if (failure != null) {
+                    PublicKey stale = stale(current, kid, clock.instant());
+                    if (stale != null) {
+                        out.complete(stale);
+                    } else {
+                        out.completeExceptionally(Retrying.unwrap(failure));
+                    }
+                    return;
+                }
                 PublicKey key = fetched.byId().get(kid);
                 if (key != null) {
-                    return CompletableFuture.completedFuture(key);
+                    out.complete(key);
+                } else {
+                    // The fetch itself is the one refresh; a miss after it is final.
+                    out.completeExceptionally(new TokenVerificationException("token key id is unknown: " + quote(kid)));
                 }
-                // The fetch itself is the one refresh; a miss after it is final.
-                return CompletableFuture.failedFuture(
-                        new TokenVerificationException("token key id is unknown: " + quote(kid)));
             });
+            return out;
+        }
+
+        /** A key from an expired set, while the endpoint is failing and the set is within its grace. */
+        private @Nullable PublicKey stale(@Nullable Keys current, String kid, Instant now) {
+            if (current == null
+                    || !current.fetchedAt().plus(ttl).plus(STALE_GRACE).isAfter(now)) {
+                return null;
+            }
+            return current.byId().get(kid);
         }
 
         private boolean mayRefreshOnMiss(Keys current, Instant now) {
@@ -441,8 +490,11 @@ public final class BotTokenVerifier {
                     .whenComplete((fetched, failure) -> {
                         fetching.set(null);
                         if (failure != null) {
-                            mine.completeExceptionally(Retrying.unwrap(failure));
+                            Throwable cause = Retrying.unwrap(failure);
+                            lastFailure.set(new Failed(clock.instant(), cause));
+                            mine.completeExceptionally(cause);
                         } else {
+                            lastFailure.set(null);
                             keys.set(fetched);
                             mine.complete(fetched);
                         }
@@ -603,7 +655,9 @@ public final class BotTokenVerifier {
          * {@link VerifiedToken#isAnonymous()}. Such a request may only name a loopback
          * {@code serviceUrl}, since a reply may still carry the bot's token. A header that is
          * present is verified as always. Never set this where the endpoint is reachable from the
-         * internet.
+         * internet, and never next to real credentials: a reply to an unauthenticated request would
+         * carry the bot's token. The Spring starter refuses that combination; elsewhere it is on the
+         * application.
          */
         public Builder allowAnonymous() {
             this.allowAnonymous = true;
@@ -644,18 +698,18 @@ public final class BotTokenVerifier {
 
         /** Tolerance on {@code exp} and {@code nbf}. Default five minutes. */
         public Builder clockSkew(Duration clockSkew) {
-            this.clockSkew = Objects.requireNonNull(clockSkew, "clockSkew");
+            this.clockSkew = Durations.between("clockSkew", clockSkew, Duration.ZERO, Duration.ofHours(1));
             return this;
         }
 
         /** How long fetched keys are trusted before a routine refresh. Default 12 hours. */
         public Builder keyCacheTtl(Duration keyCacheTtl) {
-            this.keyCacheTtl = Objects.requireNonNull(keyCacheTtl, "keyCacheTtl");
+            this.keyCacheTtl = Durations.between("keyCacheTtl", keyCacheTtl, Duration.ofMinutes(1), Duration.ofDays(7));
             return this;
         }
 
         public Builder requestTimeout(Duration requestTimeout) {
-            this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout");
+            this.requestTimeout = Durations.timeout("requestTimeout", requestTimeout);
             return this;
         }
 

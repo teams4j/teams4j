@@ -77,6 +77,12 @@ public class TeamsBotProperties {
      */
     private List<String> allowedCallers = new ArrayList<>();
 
+    /**
+     * The hosts an activity's {@code serviceUrl} may name; a leading dot matches any subdomain.
+     * Loopback is always allowed. Default {@link ConnectorClient#DEFAULT_SERVICE_URL_HOSTS}.
+     */
+    private List<String> serviceUrlHosts = new ArrayList<>(ConnectorClient.DEFAULT_SERVICE_URL_HOSTS);
+
     /** The longest request body accepted, in characters; a longer one is answered {@code 413} unparsed. */
     private int maxBodyLength = ActivityReceiver.DEFAULT_MAX_BODY_LENGTH;
 
@@ -190,6 +196,14 @@ public class TeamsBotProperties {
 
     public void setAllowedCallers(List<String> allowedCallers) {
         this.allowedCallers = allowedCallers;
+    }
+
+    public List<String> getServiceUrlHosts() {
+        return serviceUrlHosts;
+    }
+
+    public void setServiceUrlHosts(List<String> serviceUrlHosts) {
+        this.serviceUrlHosts = serviceUrlHosts;
     }
 
     public int getMaxBodyLength() {

@@ -46,9 +46,17 @@ final class Json {
         return v instanceof CardValue.Bool b ? b.value() : null;
     }
 
+    /** A whole number that fits a long; a fraction or an out-of-range value is absent, not truncated. */
     static @Nullable Long integer(@Nullable CardValue value, String key) {
         CardValue v = at(value, key);
-        return v instanceof CardValue.Num n ? n.value().longValue() : null;
+        if (!(v instanceof CardValue.Num n) || Math.abs((long) n.value().scale()) > MAX_PLAIN_SCALE) {
+            return null;
+        }
+        try {
+            return n.value().longValueExact();
+        } catch (ArithmeticException notALong) {
+            return null;
+        }
     }
 
     static List<CardValue> list(@Nullable CardValue value, String key) {

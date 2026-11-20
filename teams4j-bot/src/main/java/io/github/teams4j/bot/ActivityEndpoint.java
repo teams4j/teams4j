@@ -28,7 +28,8 @@ import io.github.teams4j.cards.JsonCodec;
  *
  * <p>What the answer is: {@code 401} for a request that is not from the Bot Framework (the reason
  * is logged, never sent), {@code 413} for a body over {@link ActivityReceiver#maxBodyLength()},
- * {@code 400} for a body that is not JSON, {@code 200} with an empty body
+ * {@code 400} for a body that is not JSON, {@code 503} when the signing keys cannot be fetched,
+ * {@code 200} with an empty body
  * for every activity the handler accepts, and the {@link InvokeResponse}'s own status and body for
  * an invoke. An exception from the handler propagates; see {@link ActivityHandler}.
  */
@@ -101,6 +102,13 @@ public final class ActivityEndpoint {
         } catch (IllegalArgumentException e) {
             LOG.log(System.Logger.Level.WARNING, "teams4j: the bot endpoint received a body that is not JSON");
             return new Response(400, null);
+        } catch (BotTransportException e) {
+            // The signing keys could not be fetched: the sender may retry, the request was not refused.
+            LOG.log(
+                    System.Logger.Level.WARNING,
+                    "teams4j: could not verify a request to the bot endpoint: {0}",
+                    e.getMessage());
+            return new Response(503, null);
         }
         return respond(handler.handle(activity));
     }
