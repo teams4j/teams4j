@@ -6,6 +6,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +32,7 @@ final class JdkHttpTransport implements HttpTransport {
         this.maxResponseBytes = maxResponseBytes;
     }
 
-    // The deadline task is dropped on purpose: it only ever fails `result`.
+    // The deadline future is dropped on purpose: it only ever fails `result`.
     @SuppressWarnings("FutureReturnValueIgnored")
     @Override
     public CompletableFuture<HttpExchange.Response> send(HttpExchange.Request request) {
@@ -65,16 +66,27 @@ final class JdkHttpTransport implements HttpTransport {
         });
         // The request timeout covers the wait for the headers only; a body dripped slowly after them
         // would hold the exchange, and its caller, without end.
-        long deadline = request.timeout().multipliedBy(2).toMillis();
-        CompletableFuture.runAsync(
-                () -> {
-                    if (result.completeExceptionally(new HttpTimeoutException(
+        long deadline = deadlineMillis(request.timeout());
+        // orTimeout unschedules itself once the timer completes, so a finished exchange is not held.
+        CompletableFuture<Void> timer = new CompletableFuture<Void>().orTimeout(deadline, TimeUnit.MILLISECONDS);
+        timer.whenComplete((ignored, timedOut) -> {
+            if (timedOut != null
+                    && result.completeExceptionally(new HttpTimeoutException(
                             "no complete response from " + request.uri().getHost() + " within " + deadline + " ms"))) {
-                        sent.cancel(true);
-                    }
-                },
-                CompletableFuture.delayedExecutor(deadline, TimeUnit.MILLISECONDS));
+                sent.cancel(true);
+            }
+        });
+        result.whenComplete((response, failure) -> timer.complete(null));
         return result;
+    }
+
+    /** Twice the timeout, saturating rather than overflowing. */
+    static long deadlineMillis(Duration timeout) {
+        try {
+            return timeout.multipliedBy(2).toMillis();
+        } catch (ArithmeticException e) {
+            return Long.MAX_VALUE;
+        }
     }
 
     /** The body as UTF-8 text, refused -- and the exchange cancelled -- once it passes the limit. */

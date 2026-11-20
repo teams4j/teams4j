@@ -36,6 +36,17 @@ public final class HttpExchange {
             Objects.requireNonNull(uri, "uri");
             headers = Map.copyOf(Objects.requireNonNull(headers, "headers"));
             Objects.requireNonNull(timeout, "timeout");
+            if (timeout.isNegative() || timeout.isZero()) {
+                throw new IllegalArgumentException("timeout must be positive but was " + timeout);
+            }
+        }
+
+        /** Method, origin and header names only: the URI, header values and body can carry secrets. */
+        @Override
+        public String toString() {
+            return "Request[" + method + " " + origin(uri) + ", headers="
+                    + headers.keySet().stream().sorted().toList() + ", body="
+                    + (body == null ? "none" : body.length() + " chars") + ", timeout=" + timeout + "]";
         }
     }
 
@@ -60,5 +71,16 @@ public final class HttpExchange {
             List<String> values = headers.get(name.toLowerCase(Locale.ROOT));
             return values == null || values.isEmpty() ? Optional.empty() : Optional.of(values.get(0));
         }
+
+        /** Status and header names only: header values and the body can carry secrets. */
+        @Override
+        public String toString() {
+            return "Response[" + statusCode + ", headers="
+                    + headers.keySet().stream().sorted().toList() + ", body=" + body.length() + " chars]";
+        }
+    }
+
+    private static String origin(URI uri) {
+        return uri.getScheme() + "://" + uri.getHost() + (uri.getPort() == -1 ? "" : ":" + uri.getPort());
     }
 }

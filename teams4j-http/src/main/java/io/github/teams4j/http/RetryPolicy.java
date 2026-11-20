@@ -10,6 +10,8 @@ import java.util.function.DoubleSupplier;
 
 import org.jspecify.annotations.Nullable;
 
+import io.github.teams4j.http.internal.Durations;
+
 /**
  * Decides whether a failed request is worth repeating, and how long to wait first.
  *
@@ -34,6 +36,11 @@ public final class RetryPolicy {
 
     public RetryPolicy(
             int maxAttempts, Duration initialBackoff, Duration maxBackoff, DoubleSupplier random, Clock clock) {
+        if (maxAttempts < 1) {
+            throw new IllegalArgumentException("maxAttempts must be at least 1");
+        }
+        Durations.backoff("initialBackoff", initialBackoff);
+        Durations.backoff("maxBackoff", maxBackoff);
         this.maxAttempts = maxAttempts;
         this.initialBackoff = initialBackoff;
         this.maxBackoff = maxBackoff;

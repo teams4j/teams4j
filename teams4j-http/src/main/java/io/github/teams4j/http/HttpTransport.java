@@ -9,6 +9,11 @@ import java.util.concurrent.CompletableFuture;
  * <p>The default is the JDK's {@link HttpClient} through {@link #jdk(HttpClient)}. An application
  * with a shared OkHttp or Ktor pool implements this once and passes it to the client builder.
  * Implementations are asynchronous by contract; a blocking client is wrapped in a future.
+ *
+ * <p>A custom implementation owns what {@link #jdk(HttpClient)} otherwise bounds: the response body
+ * size and the overall deadline. Without both, a slow or hostile server can hold the caller and its
+ * memory. Do not log {@link HttpExchange.Request} header values or bodies: they carry tokens and
+ * client secrets.
  */
 @FunctionalInterface
 public interface HttpTransport {

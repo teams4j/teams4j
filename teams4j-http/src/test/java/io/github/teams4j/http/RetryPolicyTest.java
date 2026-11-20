@@ -1,6 +1,7 @@
 package io.github.teams4j.http;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -19,6 +20,35 @@ class RetryPolicyTest {
 
     private static RetryPolicy policy(double randomValue) {
         return new RetryPolicy(3, Duration.ofMillis(500), Duration.ofSeconds(30), () -> randomValue, CLOCK);
+    }
+
+    @Test
+    void theSettingsAreBounded() {
+        assertThatThrownBy(() -> new RetryPolicy(0, Duration.ZERO, Duration.ZERO, () -> 0, CLOCK))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RetryPolicy(3, Duration.ofMillis(-1), Duration.ZERO, () -> 0, CLOCK))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RetryPolicy(3, Duration.ZERO, Duration.ofSeconds(Long.MAX_VALUE), () -> 0, CLOCK))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void anExchangeToStringHidesSecrets() {
+        HttpExchange.Request request = new HttpExchange.Request(
+                "POST",
+                java.net.URI.create("https://host.example:8443/hook?sig=SECRET"),
+                java.util.Map.of("Authorization", "Bearer SECRET"),
+                "client_secret=SECRET",
+                Duration.ofSeconds(1));
+        assertThat(request.toString())
+                .doesNotContain("SECRET")
+                .contains("POST https://host.example:8443", "Authorization");
+        assertThat(new HttpExchange.Response(200, java.util.Map.of("Set-Cookie", List.of("SECRET")), "SECRET")
+                        .toString())
+                .doesNotContain("SECRET");
+        assertThatThrownBy(
+                        () -> new HttpExchange.Request("GET", request.uri(), java.util.Map.of(), null, Duration.ZERO))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
