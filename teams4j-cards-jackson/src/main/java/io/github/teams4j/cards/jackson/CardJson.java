@@ -1,5 +1,7 @@
 package io.github.teams4j.cards.jackson;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,8 +39,19 @@ public final class CardJson {
                 .build();
     }
 
+    /**
+     * The deepest nesting read. Real cards stay far below it; deeper input only costs stack and,
+     * in a failure, an error message that names every level.
+     */
+    public static final int MAX_NESTING_DEPTH = 128;
+
     private static JsonMapper.Builder base() {
-        return JsonMapper.builder()
+        JsonFactory factory = JsonFactory.builder()
+                .streamReadConstraints(StreamReadConstraints.builder()
+                        .maxNestingDepth(MAX_NESTING_DEPTH)
+                        .build())
+                .build();
+        return JsonMapper.builder(factory)
                 // The schema pairs every enum with a case-insensitive pattern, so "Default" and
                 // "default" are both valid on the wire.
                 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)

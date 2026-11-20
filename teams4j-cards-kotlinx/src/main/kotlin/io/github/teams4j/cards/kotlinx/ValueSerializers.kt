@@ -14,7 +14,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonUnquotedLiteral
-import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import java.math.BigDecimal
@@ -37,10 +36,7 @@ import java.math.BigDecimal
 @OptIn(ExperimentalSerializationApi::class)
 private fun number(value: BigDecimal): JsonElement = JsonUnquotedLiteral(value.toString())
 
-private fun decimal(number: JsonPrimitive): BigDecimal {
-    checkNumberLength(number.content)
-    return BigDecimal(number.content)
-}
+private fun decimal(number: JsonPrimitive): BigDecimal = BigDecimal(number.strictNumber() ?: number.refuse("a number"))
 
 /** The open value at `Action.Submit.data` and `Action.Execute.data`. */
 public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
@@ -58,7 +54,7 @@ public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
         when (element) {
             is JsonNull -> CardValue.NULL
             is JsonPrimitive -> {
-                val bool = element.booleanOrNull
+                val bool = element.strictBoolean()
                 when {
                     element.isString -> CardValue.of(element.content)
                     bool != null -> CardValue.of(bool)
@@ -84,7 +80,7 @@ public object DimensionSerializer : CardSerializer<Dimension>("Dimension") {
         }
         element.readShorthand()?.let { return Dimension.Text(it) }
         val number =
-            (element as? JsonPrimitive)?.takeIf { it.booleanOrNull == null } ?: element.refuse("a number or a string")
+            (element as? JsonPrimitive)?.takeIf { it.strictBoolean() == null } ?: element.refuse("a number or a string")
         return Dimension.Numeric(decimal(number))
     }
 }

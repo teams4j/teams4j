@@ -37,10 +37,10 @@ public object CardActionSerializer : CardSerializer<CardAction>("CardAction") {
             "Action.Submit" -> ActionSubmitSerializer.fromJson(element)
             "Action.ToggleVisibility" -> ActionToggleVisibilitySerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a CardAction is one of ${byType.keys}",
+                "${describe(element)} has no type; a CardAction is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a CardAction; known types are ${byType.keys}",
+                "${quoted(type)} is not a CardAction; known types are ${byType.keys}",
             )
         }
     }
@@ -124,10 +124,10 @@ public object CardItemSerializer : CardSerializer<CardItem>("CardItem") {
             "Table" -> TableSerializer.fromJson(element)
             "TextBlock" -> TextBlockSerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a CardItem is one of ${byType.keys}",
+                "${describe(element)} has no type; a CardItem is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a CardItem; known types are ${byType.keys}",
+                "${quoted(type)} is not a CardItem; known types are ${byType.keys}",
             )
         }
     }
@@ -157,10 +157,10 @@ public object SelectActionSerializer : CardSerializer<SelectAction>("SelectActio
             "Action.Submit" -> ActionSubmitSerializer.fromJson(element)
             "Action.ToggleVisibility" -> ActionToggleVisibilitySerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a SelectAction is one of ${byType.keys}",
+                "${describe(element)} has no type; a SelectAction is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a SelectAction; known types are ${byType.keys}",
+                "${quoted(type)} is not a SelectAction; known types are ${byType.keys}",
             )
         }
     }
@@ -226,10 +226,10 @@ public object CardElementSerializer : CardSerializer<CardElement>("CardElement")
             "Table" -> TableSerializer.fromJson(element)
             "TextBlock" -> TextBlockSerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a CardElement is one of ${byType.keys}",
+                "${describe(element)} has no type; a CardElement is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a CardElement; known types are ${byType.keys}",
+                "${quoted(type)} is not a CardElement; known types are ${byType.keys}",
             )
         }
     }
@@ -298,10 +298,10 @@ public object ToggleableItemSerializer : CardSerializer<ToggleableItem>("Togglea
             "Table" -> TableSerializer.fromJson(element)
             "TextBlock" -> TextBlockSerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a ToggleableItem is one of ${byType.keys}",
+                "${describe(element)} has no type; a ToggleableItem is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a ToggleableItem; known types are ${byType.keys}",
+                "${quoted(type)} is not a ToggleableItem; known types are ${byType.keys}",
             )
         }
     }
@@ -324,7 +324,7 @@ public object InlineSerializer : CardSerializer<Inline>("Inline") {
             "TextRun" -> TextRunSerializer.fromJson(element)
             null -> TextRunSerializer.fromJson(element)
             else -> throw SerializationException(
-                "$type is not a Inline; known types are ${byType.keys}",
+                "${quoted(type)} is not a Inline; known types are ${byType.keys}",
             )
         }
     }
@@ -360,10 +360,10 @@ public object InputSerializer : CardSerializer<Input>("Input") {
             "Input.Time" -> InputTimeSerializer.fromJson(element)
             "Input.Toggle" -> InputToggleSerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a Input is one of ${byType.keys}",
+                "${describe(element)} has no type; a Input is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a Input; known types are ${byType.keys}",
+                "${quoted(type)} is not a Input; known types are ${byType.keys}",
             )
         }
     }
@@ -393,10 +393,10 @@ public object WebhookActionSerializer : CardSerializer<WebhookAction>("WebhookAc
             "Action.ToggleVisibility" -> ActionToggleVisibilitySerializer.fromJson(element)
             "Action.Execute" -> ActionExecuteSerializer.fromJson(element)
             null -> if (element is JsonNull) null else throw SerializationException(
-                "$element has no type; a WebhookAction is one of ${byType.keys}",
+                "${describe(element)} has no type; a WebhookAction is one of ${byType.keys}",
             )
             else -> throw SerializationException(
-                "$type is not a WebhookAction; known types are ${byType.keys}",
+                "${quoted(type)} is not a WebhookAction; known types are ${byType.keys}",
             )
         }
     }

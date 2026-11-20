@@ -14,7 +14,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonUnquotedLiteral
-import kotlinx.serialization.json.booleanOrNull
 
 /**
  * A serializer for a card type, written against the JSON tree rather than against an encoder.
@@ -49,7 +48,7 @@ public abstract class CardSerializer<T : Any>(
     final override fun deserialize(decoder: Decoder): T {
         val element = jsonDecoder(decoder).decodeJsonElement()
         return fromJson(element)
-            ?: throw SerializationException("$element is not a $name")
+            ?: throw SerializationException("${describe(element)} is not a $name")
     }
 
     private fun jsonEncoder(encoder: Encoder): JsonEncoder =
@@ -89,19 +88,47 @@ internal fun JsonElement.asString(): String? = (this as? JsonPrimitive)?.takeIf 
 
 internal fun JsonElement.asObject(): JsonObject? = this as? JsonObject
 
-internal fun JsonElement.refuse(what: String): Nothing = throw SerializationException("$this is not $what")
+internal fun JsonElement.refuse(what: String): Nothing = throw SerializationException("${describe(this)} is not $what")
+
+private const val MAX_DESCRIBED = 200
+
+/** An element for a message: its JSON text, cut short so a deep or long input cannot inflate the message. */
+internal fun describe(element: JsonElement): String =
+    element.toString().let { if (it.length > MAX_DESCRIBED) it.take(MAX_DESCRIBED) + "..." else it }
+
+/** Input text for a message, JSON-escaped so CR, LF and quotes cannot forge a log line. */
+internal fun quoted(text: String): String = describe(JsonPrimitive(text))
+
+private val JSON_NUMBER = Regex("-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")
+
+/** `true` or `false` exactly: kotlinx alone also reads `TRUE`, which Jackson refuses. */
+internal fun JsonPrimitive.strictBoolean(): Boolean? =
+    if (isString) {
+        null
+    } else {
+        when (content) {
+            "true" -> true
+            "false" -> false
+            else -> null
+        }
+    }
+
+/** An RFC 8259 number's text: kotlinx alone also reads `+1`, `01` and `.5`, which Jackson refuses. */
+internal fun JsonPrimitive.strictNumber(): String? {
+    if (isString || this is JsonNull) {
+        return null
+    }
+    checkNumberLength(content)
+    return content.takeIf { JSON_NUMBER.matches(it) }
+}
 
 internal fun JsonElement.readString(): String = readShorthand() ?: refuse("a string")
 
-internal fun JsonElement.readBoolean(): Boolean =
-    (this as? JsonPrimitive)?.takeIf { !it.isString }?.booleanOrNull ?: refuse("a boolean")
+internal fun JsonElement.readBoolean(): Boolean = (this as? JsonPrimitive)?.strictBoolean() ?: refuse("a boolean")
 
 /** As Integer, Long or BigInteger when integral and BigDecimal otherwise, as the Jackson binding reads it. */
 internal fun JsonElement.readNumber(): Number {
-    val text =
-        (this as? JsonPrimitive)?.takeIf { !it.isString && it.booleanOrNull == null }?.content
-            ?: refuse("a number")
-    checkNumberLength(text)
+    val text = (this as? JsonPrimitive)?.strictNumber() ?: refuse("a number")
     return text.toIntOrNull() ?: text.toLongOrNull() ?: text.toBigIntegerOrNull() ?: text.toBigDecimalOrNull()
         ?: refuse("a number")
 }

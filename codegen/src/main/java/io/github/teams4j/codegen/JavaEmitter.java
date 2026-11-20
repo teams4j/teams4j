@@ -631,6 +631,8 @@ final class JavaEmitter {
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
                 .replace("@", "&#64;")
+                // "*/" would end the Javadoc comment early.
+                .replace("*/", "*&#47;")
                 .replace("$", "$$");
     }
 

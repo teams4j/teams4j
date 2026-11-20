@@ -317,7 +317,7 @@ final class KotlinxEmitter {
                     .append("Serializer.fromJson(element)\n");
         } else {
             out.append("            null -> if (element is JsonNull) null else throw SerializationException(\n");
-            out.append("                \"$element has no type; a ")
+            out.append("                \"${describe(element)} has no type; a ")
                     .append(name)
                     .append(" is one of ${byType.keys}\",\n            )\n");
         }
@@ -325,7 +325,7 @@ final class KotlinxEmitter {
         // would be the more forgiving choice and the wrong one: the bindings have to mean the same
         // thing by a card, and an unknown element type is settled as unsupported.
         out.append("            else -> throw SerializationException(\n");
-        out.append("                \"$type is not a ")
+        out.append("                \"${quoted(type)} is not a ")
                 .append(name)
                 .append("; known types are ${byType.keys}\",\n            )\n");
         out.append("        }\n");

@@ -47,6 +47,31 @@ class KotlinxJsonCodecTest {
         CardJson.decode(card(properties[0], "9".repeat(1000)))
     }
 
+    /** Literals Jackson refuses are refused here too, so the bindings read the same documents. */
+    @Test
+    fun nonStandardLiteralsAreRefused() {
+        for (literal in listOf("TRUE", "False", "+1", "01", ".5", "1.")) {
+            assertThatThrownBy { codec.read("""{"x":$literal}""") }
+                .`as`(literal)
+                .isInstanceOf(IllegalArgumentException::class.java)
+        }
+        assertThat(codec.read("""[true,false,-0.5,1e3]""")).isNotNull()
+    }
+
+    @Test
+    fun nestingPastTheLimitIsRefused() {
+        assertThatThrownBy { codec.read("[".repeat(200) + "]".repeat(200)) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+        assertThat(codec.read("[".repeat(100) + "]".repeat(100))).isNotNull()
+    }
+
+    @Test
+    fun anUnknownTypeIsQuotedInTheMessage() {
+        assertThatThrownBy { CardJson.decode("""{"type":"AdaptiveCard","body":[{"type":"X\r\nforged"}]}""") }
+            .message()
+            .doesNotContain("\r", "\n")
+    }
+
     private fun card(
         property: String,
         number: String,
