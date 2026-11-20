@@ -63,6 +63,17 @@ signing {
     }
 }
 
+// A release must not reach a repository unsigned because the key happened to be missing.
+val releaseVersion = !project.version.toString().endsWith("SNAPSHOT")
+val signingConfigured = signing.isRequired
+tasks.withType<PublishToMavenRepository>().configureEach {
+    doFirst {
+        if (releaseVersion && !signingConfigured) {
+            throw GradleException("a release version is published only signed: configure signing.gnupg.keyName or SIGNING_KEY")
+        }
+    }
+}
+
 // Binary-compatibility gate for the published Java modules.
 //
 // The Kotlin plugin's ABI validation (kotlin-conventions) covers the Kotlin modules by dumping

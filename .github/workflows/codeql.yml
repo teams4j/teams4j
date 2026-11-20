@@ -18,6 +18,8 @@ jobs:
   analyze:
     name: analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
+    # Builds PR code with security-events: write. Accepted: a fork's PR gets a read-only token
+    # regardless, and same-repo branches come from people who can already push.
     permissions:
       contents: read
       security-events: write # upload the SARIF results

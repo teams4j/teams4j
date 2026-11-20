@@ -56,8 +56,9 @@ jobs:
         with:
           persist-credentials: false
 
+      # Hash-pinned (Scorecard PinnedDependencies); regenerate with the command at the top of the file.
       - name: Install Semgrep
-        run: pip install semgrep==1.176.0
+        run: pip install --require-hashes --no-deps -r .github/requirements/semgrep.txt
 
       - name: Run Semgrep
         run: >
