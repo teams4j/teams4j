@@ -22,6 +22,8 @@ val cardSchema = rootProject.layout.projectDirectory.file("codegen/schemas/adapt
 tasks.withType<Test>().configureEach {
     inputs.file(cardSchema)
     systemProperty("teams4j.cardSchema", cardSchema.asFile.path)
+    // Jazzer appends its agent to the boot class path, which turns CDS off with a VM warning anyway.
+    jvmArgs("-Xshare:off")
 }
 
 // `test` runs each fuzz test in regression mode: over the committed inputs under

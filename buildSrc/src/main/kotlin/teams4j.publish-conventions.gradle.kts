@@ -65,9 +65,9 @@ signing {
 
 // Binary-compatibility gate for the published Java modules.
 //
-// binary-compatibility-validator, wired in the root build, covers the Kotlin modules by dumping
-// their ABI to a committed file. It registers no tasks where the Kotlin plugin is absent, which is
-// most of this library, so the Java modules are compared the way the Java ecosystem does it:
+// The Kotlin plugin's ABI validation (kotlin-conventions) covers the Kotlin modules by dumping
+// their ABI to a committed file. It does nothing where the Kotlin plugin is absent, which is most
+// of this library, so the Java modules are compared the way the Java ecosystem does it:
 // against the previously released artifact.
 //
 // Not on the Kotlin modules: japicmp reads bytecode, where an `internal` declaration is public, so

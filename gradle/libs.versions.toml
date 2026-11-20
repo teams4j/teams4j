@@ -56,14 +56,10 @@ nullaway = "0.14.2"
 ktlint = "1.6.0"
 detekt = "2.0.0-alpha.6"
 # API docs for the Kotlin modules; the Java modules use javadoc. Its HTML fills their javadoc jar.
-dokka = "2.2.0"
+dokka = "2.3.0"
 
-# Public-ABI gate. Dumps the API to committed .api files, so a change to what consumers can
-# see arrives as a reviewable diff instead of being noticed after release.
-binaryCompatibilityValidator = "0.18.2"
-
-# Binary-compatibility gate for the Java modules, which binary-compatibility-validator does not
-# cover -- it registers tasks only where the Kotlin plugin is applied.
+# Binary-compatibility gate for the Java modules, which the Kotlin plugin's ABI validation does not
+# cover.
 japicmp = "0.4.6"
 
 [libraries]
@@ -121,4 +117,3 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 [plugins]
 jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 git-version = { id = "com.palantir.git-version", version.ref = "gitVersion" }
-binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }

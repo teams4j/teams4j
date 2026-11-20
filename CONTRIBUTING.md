@@ -184,7 +184,7 @@ What the build enforces beyond formatting:
   project-wide (`CanonicalDuration`); the reason sits next to the `disable(...)` call.
 - **detekt covers Kotlin** with deltas in `config/detekt.yml`, each carrying its reason.
 - **The public ABI is guarded twice.** Kotlin modules dump theirs to committed `api/*.api`
-  files — after an intended API change, run `./gradlew apiDump` and read the diff before
+  files — after an intended API change, run `./gradlew updateKotlinAbi` and read the diff before
   committing it. Java modules are compared against the previous release with japicmp:
   `./gradlew check -PapiBaseline=<last release>` (`0.2.0` at the time of writing).
 - **Comments are in English.** This is a public project; the working language of the code is

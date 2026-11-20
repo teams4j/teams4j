@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -32,6 +33,15 @@ kotlin {
         // without a matching serializer would have produced null instead of a compile error.
         allWarningsAsErrors.set(true)
     }
+
+    // Public ABI in committed `api/*.api`; after an intended change, `./gradlew updateKotlinAbi`.
+    @OptIn(ExperimentalAbiValidation::class)
+    abiValidation()
+}
+
+@OptIn(ExperimentalAbiValidation::class)
+tasks.named("check") {
+    dependsOn(kotlin.abiValidation.checkTaskProvider)
 }
 
 tasks.named<KotlinCompile>("compileKotlin") {
@@ -97,7 +107,14 @@ tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
     // Replacing the source rather than calling exclude(): a Detekt task matches exclude patterns
     // against the path *relative to each source root*, and src/generated/kotlin is itself a root,
     // so "**/src/generated/**" matches nothing.
-    setSource(files("src/main/kotlin", "src/test/kotlin"))
+    // Per task: type resolution uses that source set's classpath only.
+    setSource(
+        when (name) {
+            "detektMain" -> files("src/main/kotlin")
+            "detektTest" -> files("src/test/kotlin")
+            else -> files("src/main/kotlin", "src/test/kotlin")
+        },
+    )
     jvmTarget.set(javaRelease.toString())
     reports {
         html.required.set(false)

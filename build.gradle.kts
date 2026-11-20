@@ -8,7 +8,6 @@ plugins {
     base
     alias(libs.plugins.git.version)
     alias(libs.plugins.jreleaser)
-    alias(libs.plugins.binary.compatibility.validator)
 }
 
 // The version is the nearest `vX.Y.Z` tag, so a release is a tag and nothing in the tree changes.
@@ -49,17 +48,6 @@ tasks.named("printVersion") {
     // A local, not the script-level val: a lambda that reaches for the script is not serialisable.
     val v = derivedVersion
     doLast { println(v) }
-}
-
-// The public ABI of the Kotlin modules, dumped to `api/*.api` and committed, so a change to what
-// consumers can see arrives as a diff in a pull request. The Java modules are gated by japicmp
-// against the last release instead (publish-conventions, `-PapiBaseline`).
-//
-// `apiCheck` runs as part of `check`. After an intended API change, `./gradlew apiDump` rewrites
-// the files and the diff is the thing to read before committing.
-apiValidation {
-    // Build tooling, never published, so it has no public ABI to speak of.
-    ignoredProjects.add("codegen")
 }
 
 // Gradle also writes checksums for the .asc signatures, and JReleaser uploads the staging directory
