@@ -122,6 +122,18 @@ class ActivityTest {
     }
 
     @Test
+    void aPaddedServiceUrlIsTrimmedAndAnUnparsableOneIsNoReference() {
+        String json = "{\"type\":\"message\",\"serviceUrl\":\"%s\",\"conversation\":{\"id\":\"a:1\"}}";
+        assertThat(Objects.requireNonNull(Activity.parse(codec, json.formatted(" https://x/a/ "))
+                                .conversationReference())
+                        .serviceUrl()
+                        .toString())
+                .isEqualTo("https://x/a");
+        assertThat(Activity.parse(codec, json.formatted("https://x/a b")).conversationReference())
+                .isNull();
+    }
+
+    @Test
     void theInstallEventIsAConversationUpdateAddingTheBot() {
         Activity installed = Activity.parse(codec, """
                 {"type":"conversationUpdate","membersAdded":[{"id":"28:app-id"},{"id":"29:1abc"}],

@@ -20,9 +20,10 @@ public record ConversationReference(URI serviceUrl, String conversationId) {
         serviceUrl = normalise(serviceUrl);
     }
 
-    /** Parses the service URL. */
+    /** Parses the service URL, surrounding whitespace ignored as the token check ignores it. */
     public static ConversationReference of(String serviceUrl, String conversationId) {
-        return new ConversationReference(URI.create(Objects.requireNonNull(serviceUrl, "serviceUrl")), conversationId);
+        return new ConversationReference(
+                URI.create(Objects.requireNonNull(serviceUrl, "serviceUrl").trim()), conversationId);
     }
 
     /**

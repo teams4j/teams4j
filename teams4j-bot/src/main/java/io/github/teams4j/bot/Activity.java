@@ -310,14 +310,18 @@ public record Activity(
     }
 
     /**
-     * Where a reply to this conversation goes, or null when Teams sent no {@code serviceUrl} or
-     * no {@code conversation.id} -- an activity a bot cannot answer, to be ignored.
+     * Where a reply to this conversation goes, or null when Teams sent no parsable {@code serviceUrl}
+     * or no {@code conversation.id} -- an activity a bot cannot answer, to be ignored.
      */
     public @Nullable ConversationReference conversationReference() {
         if (serviceUrl == null || conversation == null || conversation.id() == null) {
             return null;
         }
-        return ConversationReference.of(serviceUrl, conversation.id());
+        try {
+            return ConversationReference.of(serviceUrl, conversation.id());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public Builder toBuilder() {
