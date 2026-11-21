@@ -8,11 +8,13 @@
 // bump is a Playground change to read about, not necessarily a bot bug.
 
 val bootVersion = property("bootVersion") as String
+// One starter per Boot line: teams4j-*-spring-boot3-starter or -boot4-starter.
+val bootLine = bootVersion.substringBefore('.')
 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:$bootVersion"))
     testImplementation(project(":bot-spring-boot"))
-    testImplementation("io.github.teams4j:teams4j-bot-spring-boot-starter")
+    testImplementation("io.github.teams4j:teams4j-bot-spring-boot$bootLine-starter")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core")

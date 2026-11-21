@@ -37,7 +37,7 @@ implementation("io.github.teams4j:teams4j-cards-jackson2")   // or teams4j-cards
 implementation("io.github.teams4j:teams4j-bot-kotlin")      // coroutines, optional
 
 // or a hosted endpoint, which brings teams4j-bot with it
-implementation("io.github.teams4j:teams4j-bot-spring-boot-starter")   // Spring Boot, with the Jackson binding
+implementation("io.github.teams4j:teams4j-bot-spring-boot4-starter")  // Spring Boot 4 (Jackson 3); -boot3- for Boot 3
 implementation("io.github.teams4j:teams4j-bot-ktor")                   // Ktor, binding of your choice
 ```
 

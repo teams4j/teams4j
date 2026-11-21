@@ -1,11 +1,16 @@
 # Spring Boot
 
-Two starters, one per client. The webhook starter auto-configures a `WorkflowsWebhookClient` from
-one property; the [bot starter](#bots) auto-configures a bot and its endpoint from three. Both bring
-the Jackson binding with them. One artifact each supports Spring Boot 3.5.x and 4.1.x.
+Two starters, one per client, each in a Boot 3 and a Boot 4 artifact. The webhook starter
+auto-configures a `WorkflowsWebhookClient` from one property; the [bot starter](#bots) auto-configures
+a bot and its endpoint from three.
+
+| Boot | Starters | JSON binding they bring |
+|---|---|---|
+| 4.1.x | `teams4j-webhook-spring-boot4-starter`, `teams4j-bot-spring-boot4-starter` | `teams4j-cards-jackson3` |
+| 3.5.x | `teams4j-webhook-spring-boot3-starter`, `teams4j-bot-spring-boot3-starter` | `teams4j-cards-jackson2` |
 
 ```kotlin
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 ```
 
 ## Configuration
@@ -71,7 +76,8 @@ HttpTransport httpTransport(HttpClient shared) {
 
 ### kotlinx.serialization instead of Jackson
 
-The starter registers the Jackson binding. To use kotlinx.serialization instead, define one bean.
+The starter registers its Jackson binding (Jackson 3 wins when both are present). To use
+kotlinx.serialization instead, define one bean.
 
 ```kotlin
 @Bean
@@ -79,7 +85,7 @@ fun cardWriter(): CardWriter = KotlinxCardWriter()
 ```
 
 That bean wins by `@ConditionalOnMissingBean`, like every other Boot default. If you want Jackson out
-of the dependency graph entirely, `exclude` `teams4j-cards-jackson2` from the starter as well; the
+of the dependency graph entirely, `exclude` the Jackson binding from the starter as well; the
 default `CardWriter` bean stops applying because its class is gone.
 
 ::: info Batch and scheduler applications
@@ -89,7 +95,7 @@ default `CardWriter` bean stops applying because its class is gone.
 ## Bots
 
 ```kotlin
-implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-bot-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 implementation("org.springframework.boot:spring-boot-starter-web")
 ```
 

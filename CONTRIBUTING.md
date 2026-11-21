@@ -21,14 +21,10 @@ Nothing else. The Gradle wrapper brings its own Gradle.
 
 `build` is what CI runs, so if it passes locally the build job will too.
 
-### The starters, against both Spring Boot lines
+### The starters
 
-Each starter artifact supports Boot 3.5.x and 4.1.x. CI runs both starters' tests against
-both lines; locally you pick one:
-
-```bash
-./gradlew :teams4j-webhook-spring-boot-starter:test :teams4j-bot-spring-boot-starter:test -PbootLine=4   # default is 3
-```
+Each starter has a `-boot3` and a `-boot4` module. The sources live in the `-boot3` one; the
+`-boot4` module compiles the same sources against Boot 4 and Jackson 3.
 
 ### Ktor, against the newest 3.x
 

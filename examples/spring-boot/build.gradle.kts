@@ -3,12 +3,14 @@ plugins {
 }
 
 val bootVersion = property("bootVersion") as String
+// One starter per Boot line: teams4j-*-spring-boot3-starter or -boot4-starter.
+val bootLine = bootVersion.substringBefore('.')
 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:$bootVersion"))
     // One dependency. The starter brings the client, the card model, the validator and a JSON
     // binding -- that last one is what a starter is for.
-    implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter")
+    implementation("io.github.teams4j:teams4j-webhook-spring-boot$bootLine-starter")
     implementation("org.springframework.boot:spring-boot-starter")
 }
 

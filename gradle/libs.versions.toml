@@ -27,10 +27,9 @@ jazzer = "0.30.0"
 # teams4j-fuzz only: decides which inputs are valid cards. 3.x is on Jackson 3, whose packages leave the
 # Jackson 2 under test alone.
 jsonSchemaValidator = "3.0.9"
-# Boot compile baseline: the lowest supported version. A consumer's Boot BOM raises it.
+# Compile baselines of the -boot3 and -boot4 starters; a consumer's Boot BOM raises them. Dependabot
+# keeps each line within its major (see .github/dependabot.yml).
 springBoot = "3.5.16"
-# The newer line; the starter's tests run against it with -PbootLine=4. Dependabot keeps each line
-# within its major (see .github/dependabot.yml).
 springBoot4 = "4.1.1"
 # Lowest supported Ktor, the only version the POM names; a consumer's own wins. The newest 3.x is
 # tested with -PktorLine=latest (teams4j-bot-ktor).
@@ -81,10 +80,11 @@ jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 javapoet = { module = "com.palantir.javapoet:javapoet", version.ref = "javapoet" }
 
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot" }
-# Test-only: the Boot 4 BOM. Listed here so Dependabot tracks the 4.x line too.
+# The Boot 4 BOM, for the -boot4 starters.
 spring-boot4-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot4" }
-# The starter's compile dependency. The version is pinned as a POM lower bound, so no BOM import is exported.
+# The starters' compile dependency, per Boot line. Pinned as a POM lower bound, so no BOM import is exported.
 spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "springBoot" }
+spring-boot4-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "springBoot4" }
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 # The bot starter's endpoint is a Spring MVC controller. Compile-only there: an application without

@@ -63,15 +63,15 @@ Central badge above.
 
 ```kotlin
 // Spring Boot: one dependency, one property (teams4j.webhook.url)
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 
 // Plain Java: the client plus the JSON binding you already use
 implementation("io.github.teams4j:teams4j-webhook:$version")
-implementation("io.github.teams4j:teams4j-cards-jackson2:$version")
+implementation("io.github.teams4j:teams4j-cards-jackson3:$version")   // or -jackson2, -kotlinx
 
 // A bot: three properties (teams4j.bot.app-id, app-secret, tenant-id) and one ActivityHandler bean.
 // teams4j-bot-ktor is the same endpoint as a Ktor route
-implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-bot-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 ```
 
 - [Getting started](https://teams4j.github.io/teams4j/guide/getting-started) — webhook URL, dependency, first card

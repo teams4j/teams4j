@@ -37,14 +37,14 @@ for the current release, listed at
 ```kotlin [Spring Boot]
 // build.gradle.kts — the starter brings the card model, the validator, the webhook client
 // and the Jackson binding. One property (below) is the whole configuration.
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 ```
 
 ```kotlin [Plain Java]
 // build.gradle.kts — the client, plus the JSON binding you already use. Without a binding
 // the client fails when you construct it, naming the artifact to add.
 implementation("io.github.teams4j:teams4j-webhook:$version")
-implementation("io.github.teams4j:teams4j-cards-jackson2:$version")
+implementation("io.github.teams4j:teams4j-cards-jackson3:$version")   // or -jackson2, -kotlinx
 ```
 
 ```kotlin [Kotlin]
@@ -59,7 +59,7 @@ implementation("io.github.teams4j:teams4j-cards-kotlinx:$version")
 ```xml [Maven]
 <dependency>
   <groupId>io.github.teams4j</groupId>
-  <artifactId>teams4j-webhook-spring-boot-starter</artifactId>
+  <artifactId>teams4j-webhook-spring-boot4-starter</artifactId>
   <version>${teams4j.version}</version>
 </dependency>
 ```

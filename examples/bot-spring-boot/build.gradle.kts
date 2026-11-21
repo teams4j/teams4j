@@ -3,12 +3,14 @@ plugins {
 }
 
 val bootVersion = property("bootVersion") as String
+// One starter per Boot line: teams4j-*-spring-boot3-starter or -boot4-starter.
+val bootLine = bootVersion.substringBefore('.')
 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:$bootVersion"))
     // One dependency for the bot: credentials, token verification, the Connector client, the JSON
     // binding, and -- with MVC below -- the messaging endpoint itself.
-    implementation("io.github.teams4j:teams4j-bot-spring-boot-starter")
+    implementation("io.github.teams4j:teams4j-bot-spring-boot$bootLine-starter")
     // Spring MVC and an embedded server. Without a web layer the starter still registers the bot
     // beans, just no endpoint; with it, the ActivityHandler bean below is the whole application.
     implementation("org.springframework.boot:spring-boot-starter-web")

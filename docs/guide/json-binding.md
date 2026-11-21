@@ -6,7 +6,7 @@ dependencies. Reading and writing live in separate modules, and you pick the one
 ::: code-group
 
 ```java [Jackson]
-ObjectMapper mapper = io.github.teams4j.cards.jackson2.CardJson.mapper();
+ObjectMapper mapper = io.github.teams4j.cards.jackson3.CardJson.mapper();   // or .jackson2 on Jackson 2
 AdaptiveCard card = mapper.readValue(json, AdaptiveCard.class);
 String out = mapper.writeValueAsString(card);
 ```
@@ -25,12 +25,16 @@ val out = io.github.teams4j.cards.kotlinx.CardJson.encode(card)
 | `teams4j-http` | **none** |
 | `teams4j-webhook` | **none** (the JDK `HttpClient` by default, plus a `CardWriter` found at runtime) |
 | `teams4j-bot` | **none** (the JDK `HttpClient` by default, plus a `CardWriter` and a `JsonCodec` found at runtime) |
-| `teams4j-cards-jackson2` | `jackson-databind` |
+| `teams4j-cards-jackson3` | `tools.jackson.core:jackson-databind` (Jackson 3) |
+| `teams4j-cards-jackson2` | `com.fasterxml.jackson.core:jackson-databind` (Jackson 2) |
 | `teams4j-cards-kotlinx` | `kotlinx-serialization-json` |
 
 The model's Jackson annotations are `compileOnly`: for a kotlinx-only consumer, Jackson appears nowhere.
 
 ## Jackson: two mappers
+
+The Jackson 2 and Jackson 3 bindings have the same API, in `io.github.teams4j.cards.jackson2` and
+`io.github.teams4j.cards.jackson3`.
 
 | Factory | Unknown properties | Use it for |
 |---|---|---|
@@ -72,14 +76,14 @@ method and a priority. Bindings are located with `ServiceLoader`:
 |---|---|
 | none | Fails **when you construct the client**, naming the artifacts to add and the `cardWriter(...)` option, not at the first send |
 | one | Uses it |
-| two or more | Uses the **highest priority** (Jackson) and warns via `System.Logger`. Jar order plays no part |
+| two or more | Uses the **highest priority** (Jackson 3, then Jackson 2) and warns via `System.Logger`. Jar order plays no part |
 
 The order is declared (`CardWriter.priority()`, 0–10, default 5). To choose explicitly, `builder(url).cardWriter(new KotlinxCardWriter())`.
 
 ```kotlin
-// with Jackson
+// with Jackson 3 (or teams4j-cards-jackson2 for Jackson 2)
 implementation("io.github.teams4j:teams4j-webhook")
-implementation("io.github.teams4j:teams4j-cards-jackson2")
+implementation("io.github.teams4j:teams4j-cards-jackson3")
 
 // or with kotlinx.serialization — Jackson appears nowhere
 implementation("io.github.teams4j:teams4j-webhook")

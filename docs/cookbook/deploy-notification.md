@@ -26,7 +26,7 @@ channel.** Inject it from an environment variable or a secret store; never commi
 [central.sonatype.com/namespace/io.github.teams4j](https://central.sonatype.com/namespace/io.github.teams4j).
 
 ```kotlin
-implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-webhook-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 ```
 
 The starter brings the card model, the validator, the webhook client and the Jackson binding. The only

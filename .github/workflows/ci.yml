@@ -74,40 +74,6 @@ jobs:
               exit 1
             }
 
-  starter-boot-matrix:
-    # One starter artifact covers every supported Boot line; a failure here is the signal to split it.
-    name: starters on Spring Boot ${{ matrix.boot }}.x
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        boot: ['3', '4']
-    steps:
-      - name: Harden runner
-        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          # The version is derived from the nearest release tag; a shallow clone has none.
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
-
-      - name: Test the starters against Boot ${{ matrix.boot }}.x
-        env:
-          BOOT_LINE: ${{ matrix.boot }}
-        run: >
-          ./gradlew :teams4j-webhook-spring-boot-starter:test :teams4j-bot-spring-boot-starter:test
-          -PbootLine="$BOOT_LINE"
-
   jackson-latest:
     # The POMs name the Jackson baseline; this proves the newest 2.x still works.
     name: tests on the newest Jackson 2.x and 3.x

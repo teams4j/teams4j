@@ -34,7 +34,7 @@ implementation("io.github.teams4j:teams4j-webhook:$version")
 implementation("io.github.teams4j:teams4j-cards-jackson2:$version")   // or teams4j-cards-kotlinx
 ```
 
-or, in Spring Boot, `teams4j-webhook-spring-boot-starter` and `teams4j.webhook.url`; see
+or, in Spring Boot, `teams4j-webhook-spring-boot4-starter` (or `-boot3-` on Boot 3) and `teams4j.webhook.url`; see
 [Spring Boot](../guide/spring-boot).
 
 ## 3. The card

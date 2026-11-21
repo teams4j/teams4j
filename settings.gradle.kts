@@ -27,12 +27,14 @@ include(":teams4j-http")
 // L1 - Workflows webhook client
 include(":teams4j-webhook")
 include(":teams4j-webhook-kotlin")
-include(":teams4j-webhook-spring-boot-starter")
+include(":teams4j-webhook-spring-boot3-starter")
+include(":teams4j-webhook-spring-boot4-starter")
 
 // L1 - Bot Framework: Activity model, Connector client, inbound token verification
 include(":teams4j-bot")
 include(":teams4j-bot-kotlin")
-include(":teams4j-bot-spring-boot-starter")
+include(":teams4j-bot-spring-boot3-starter")
+include(":teams4j-bot-spring-boot4-starter")
 include(":teams4j-bot-ktor")
 
 // BOM that aligns module versions

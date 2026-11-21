@@ -18,7 +18,7 @@ have to bring yourself.
 implementation("com.microsoft.bot:bot-integration-spring:4.14.3")
 
 // after
-implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:$version")
+implementation("io.github.teams4j:teams4j-bot-spring-boot4-starter:$version")   // Boot 3: -spring-boot3-starter
 implementation("org.springframework.boot:spring-boot-starter-web")
 ```
 

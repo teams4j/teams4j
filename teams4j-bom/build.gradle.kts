@@ -16,10 +16,12 @@ dependencies {
         api(project(":teams4j-http"))
         api(project(":teams4j-webhook"))
         api(project(":teams4j-webhook-kotlin"))
-        api(project(":teams4j-webhook-spring-boot-starter"))
+        api(project(":teams4j-webhook-spring-boot3-starter"))
+        api(project(":teams4j-webhook-spring-boot4-starter"))
         api(project(":teams4j-bot"))
         api(project(":teams4j-bot-kotlin"))
-        api(project(":teams4j-bot-spring-boot-starter"))
+        api(project(":teams4j-bot-spring-boot3-starter"))
+        api(project(":teams4j-bot-spring-boot4-starter"))
         api(project(":teams4j-bot-ktor"))
     }
 }
