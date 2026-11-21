@@ -6,13 +6,9 @@ plugins {
 subprojects {
     apply(plugin = "java")
 
-    // Java 17, the floor teams4j claims. Compiling these on 21 would let a 21-only signature
-    // through unnoticed.
+    // Java 17, the floor teams4j claims: the examples compile and run on it.
     extensions.configure<JavaPluginExtension> {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-    }
-    tasks.withType<JavaCompile>().configureEach {
-        options.release.set(17)
+        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
     }
 
     dependencies {

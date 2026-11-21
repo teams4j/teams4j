@@ -12,6 +12,10 @@ plugins {
 val javaRelease = 17
 val javaToolchain = 21
 
+// -PtestJdk=25 runs the tests on a newer JDK. Not lower: the tests use Java 21 switch patterns.
+val testJdk = providers.gradleProperty("testJdk").map(String::toInt).getOrElse(javaToolchain)
+check(testJdk >= javaToolchain) { "testJdk must be $javaToolchain or newer, got $testJdk" }
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(javaToolchain))
@@ -118,6 +122,7 @@ when (jacksonLine) {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(testJdk)) })
     testLogging {
         events("failed")
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL

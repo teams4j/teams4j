@@ -134,6 +134,37 @@ jobs:
       - name: Test against the newest Jackson 2.x
         run: ./gradlew test -PjacksonLine=latest
 
+  jdk-latest:
+    # Tests run on the toolchain (21); this runs them on the newest LTS too.
+    name: tests on JDK 25
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The version is derived from the nearest release tag; a shallow clone has none.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: |
+            25
+            21
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Point Gradle at JDK 25
+        run: echo 'org.gradle.java.installations.fromEnv=JAVA_HOME_25_X64' >> ~/.gradle/gradle.properties
+
+      - name: Test on JDK 25
+        run: ./gradlew test -PtestJdk=25
+
   ktor-latest:
     # The POM names the Ktor baseline; this proves the newest 3.x still works.
     name: bot-ktor on the newest Ktor 3.x
@@ -180,12 +211,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # 17 runs the examples (their toolchain); 21, the default, builds the library.
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: |
+            17
+            21
 
       - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      # Gradle finds a toolchain only where it is told to look.
+      - name: Point Gradle at JDK 17
+        run: echo 'org.gradle.java.installations.fromEnv=JAVA_HOME_17_X64' >> ~/.gradle/gradle.properties
 
       - name: Publish the artifacts the examples resolve
         run: ./gradlew publishToMavenLocal
