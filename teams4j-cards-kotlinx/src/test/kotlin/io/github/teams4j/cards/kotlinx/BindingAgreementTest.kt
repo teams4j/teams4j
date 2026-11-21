@@ -111,13 +111,19 @@ class BindingAgreementTest {
 
     private fun sortKeys(element: kotlinx.serialization.json.JsonElement): kotlinx.serialization.json.JsonElement =
         when (element) {
-            is kotlinx.serialization.json.JsonObject ->
+            is kotlinx.serialization.json.JsonObject -> {
                 kotlinx.serialization.json.JsonObject(
                     element.entries.sortedBy { it.key }.associate { it.key to sortKeys(it.value) },
                 )
-            is kotlinx.serialization.json.JsonArray ->
+            }
+
+            is kotlinx.serialization.json.JsonArray -> {
                 kotlinx.serialization.json.JsonArray(element.map { sortKeys(it) })
-            else -> element
+            }
+
+            else -> {
+                element
+            }
         }
 
     @Test

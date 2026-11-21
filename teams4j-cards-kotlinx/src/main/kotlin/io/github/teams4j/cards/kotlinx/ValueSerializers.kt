@@ -52,7 +52,10 @@ public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
 
     override fun fromJson(element: JsonElement): CardValue =
         when (element) {
-            is JsonNull -> CardValue.NULL
+            is JsonNull -> {
+                CardValue.NULL
+            }
+
             is JsonPrimitive -> {
                 val bool = element.strictBoolean()
                 when {
@@ -61,8 +64,14 @@ public object CardValueSerializer : CardSerializer<CardValue>("CardValue") {
                     else -> CardValue.of(decimal(element))
                 }
             }
-            is JsonArray -> CardValue.array(element.map { fromJson(it) })
-            is JsonObject -> CardValue.`object`(element.mapValues { (_, v) -> fromJson(v) })
+
+            is JsonArray -> {
+                CardValue.array(element.map { fromJson(it) })
+            }
+
+            is JsonObject -> {
+                CardValue.`object`(element.mapValues { (_, v) -> fromJson(v) })
+            }
         }
 }
 
