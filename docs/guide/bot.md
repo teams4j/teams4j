@@ -106,6 +106,9 @@ bot actually asks:
 | `reactionsAdded()` / `reactionsRemoved()` | On a `messageReaction`: what was pressed on the message `replyToId()` names |
 | `isEvent()` | A `meetingStart`, `meetingEnd` or read receipt; `name()` says which, `value()` carries the details |
 
+A channel `@mention` reaches the bot only when the app's bot scope includes `team` and the bot is not
+marked notification-only in the Developer Portal.
+
 ::: tip Store the conversation reference
 A bot may post only to conversations it is a member of, and the install event is the one time Teams
 hands over both the `serviceUrl` and the conversation id. A stored `ConversationReference` is what a
@@ -175,8 +178,7 @@ connector.updateActivity(where, sent.id(), connector.cardActivity(Cards.card().t
 - **Token**: acquired with the `client_credentials` grant and cached until a minute before expiry. A
   `401` refreshes it once and repeats the request.
 - **Retries**: `429` and `5xx` are retried with exponential backoff and full jitter, `Retry-After`
-  honoured (3 attempts by default). The Connector is documented as returning `429`, which the webhook
-  never did in measurement; the policy is the same either way.
+  honoured (3 attempts by default).
 - **`403 BotNotInConversationRoster`** is `BotNotInConversationException`, a subclass of
   `ConnectorException`, so it can be caught on its own. Not retried.
 - **`serviceUrl`**: the token goes only to https hosts in `serviceUrlHosts` (default
@@ -262,8 +264,7 @@ is a few lines around it, and so are the two adapters.
 Teams redelivers an activity whose endpoint has not answered within about 15 seconds, and the
 handler's return *is* the answer. A handler that queries a database and makes Connector calls can
 take seconds, so hand that work to an executor or a coroutine scope you own and return null at once;
-only an invoke has to finish before the response. The smoke bot does exactly this: `200`, then the
-work.
+only an invoke has to finish before the response.
 :::
 
 ### Spring Boot
@@ -291,7 +292,7 @@ The module depends on `ktor-server-core` alone, so the engine stays your choice.
 ### Local development: the Agents Playground
 
 The [Microsoft 365 Agents Playground](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/debug-your-agents-playground)
-(formerly the Teams App Test Tool) is a Teams client and a Bot Connector in one local process: it
+is a Teams client and a Bot Connector in one local process: it
 posts activities to your endpoint and renders what you send back, with no tunnel, no tenant and no
 registration. It sends **no token**, and expects none, so the bot needs its development-only mode on
 both sides:
@@ -317,20 +318,14 @@ npx -y @microsoft/m365agentsplayground -e http://localhost:3978/api/messages -c 
 [examples/README](https://github.com/teams4j/teams4j/tree/main/examples#without-a-tunnel-the-agents-playground).
 
 What it is not: Teams. It renders Adaptive Cards only, knows no typing indicator, message extension,
-dialog or SSO, and what it reports as `serviceUrl`, ids and tenant is mock data. Everything in
-[measurements](../reference/measurements) was taken against a tenant, and a bot should be seen in
-Teams before it ships. Never leave `allowAnonymous` or `TokenProvider.none()` on where the endpoint
+dialog or SSO, and what it reports as `serviceUrl`, ids and tenant is mock data. A bot should be seen
+in Teams before it ships. Never leave `allowAnonymous` or `TokenProvider.none()` on where the endpoint
 is reachable from the internet.
 
-Given `--client-id`, `--client-secret` and `--tenant-id`, the Playground authenticates instead, the
-way the old Emulator did: it mints an Entra token for your app id (no `serviceurl` claim, which the
+Given `--client-id`, `--client-secret` and `--tenant-id`, the Playground authenticates instead: it mints an Entra token for your app id (no `serviceurl` claim, which the
 verifier does not demand of an Entra issuer) and checks the token your bot sends back. That is the
 ordinary configuration -- `builder(credentials)` and no anonymous mode -- against the same local
-address. Read from the Playground's code and covered by unit tests, not yet exercised against a
-registration.
-
-The examples build carries a headless run of all this, `:playground-e2e`, opt-in because it needs
-Node: `./gradlew :playground-e2e:test -PplaygroundE2e`. A weekly workflow runs it.
+address. Not yet tested against a real registration.
 
 ## Exceptions
 
@@ -367,11 +362,3 @@ The `…Await` functions are the `…Async` futures awaited, so cancelling the c
 call. Named `…Await` for the reason `sendAwait` is on the webhook client: a member always wins
 resolution over an extension, so a `suspend fun send` would be silently shadowed.
 
-## Not here yet
-
-- **Single sign-on** (`signin/*` invokes, the Token Service): needs stored conversation state.
-- **Streaming replies**, **batch conversations**, **meeting APIs**: waiting for a concrete use.
-
-Within the Activity Protocol itself, the spec test in `teams4j-bot` names every Connector route and
-Activity field that is not modelled, so that gap is visible in the tree rather than here. Microsoft
-Graph is not planned; see [Compatibility](./compatibility.md#roadmap).

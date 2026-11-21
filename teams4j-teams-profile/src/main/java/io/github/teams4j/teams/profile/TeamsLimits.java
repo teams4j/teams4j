@@ -45,7 +45,7 @@ public final class TeamsLimits {
      * {@code Retry-After}. What does exist is worse. In one such run nine of the twelve cards never
      * reached the channel, with nothing in any response to say so, so this rate is worth keeping as
      * a pacing target even though the status code it was chosen to avoid never appears. See
-     * <a href="https://teams4j.github.io/teams4j/reference/measurements">the measurements page</a>.
+     * <a href="https://teams4j.github.io/teams4j/reference/limits">Teams limits</a>.
      */
     public static final int WEBHOOK_REQUESTS_PER_SECOND = 4;
 

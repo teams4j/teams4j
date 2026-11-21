@@ -1,12 +1,7 @@
 # teams4j examples
 
-Each directory is **a project that runs on its own**. Copy one and go.
-
-This directory is a **separate Gradle build**, not part of the library build, and it consumes
-the **published artifacts** rather than the sources. If the examples were wired into the
-source tree, nothing here would verify the POM, the dependency scopes, or the `ServiceLoader`
-registration — and those are exactly what a reader actually hits. (grpc-java and
-testcontainers-java lay their examples out the same way.)
+Each directory is **a project that runs on its own**. Copy one and go. This is a separate Gradle
+build that consumes the published artifacts; CI builds it on every change.
 
 ## Running them
 
@@ -19,12 +14,13 @@ cd .. && ./gradlew publishToMavenLocal && cd examples
 ```
 
 ```bash
+# From the channel: ⋯ → Workflows → "Post to a channel when a webhook request is received"
 export TEAMS_WEBHOOK_URL='https://...'      # never commit this: the URL *is* write access to the channel
 
 ./gradlew :java-plain:run
 ./gradlew :kotlin-coroutines:run
 ./gradlew :spring-boot:run
-./gradlew :spring-boot:run -PbootVersion=4.1.1
+./gradlew :spring-boot:run -PbootVersion=<Boot 4.x version>
 ```
 
 The two bot examples need a bot registration instead of a webhook URL, and a tunnel to your machine
@@ -60,9 +56,6 @@ and the Playground through `npx`, then reads what the Playground recorded. Opt-i
 ./gradlew :playground-e2e:test -PplaygroundE2e
 ```
 
-Create the webhook URL from the Teams channel via
-**⋯ → Workflows → "Post to a channel when a webhook request is received"**.
-
 ### Without a Teams channel
 
 `:spring-boot` will post to a loopback stub instead, which is enough to watch a card go over the
@@ -91,9 +84,3 @@ down with a check:
 ```bash
 ./gradlew :kotlin-coroutines:check   # fails if Jackson is on the runtime classpath
 ```
-
-## CI builds these examples
-
-The `examples` job in `.github/workflows/ci.yml` runs `publishToMavenLocal` and then this
-build with `-Pteams4jVersion` set to what was just published. A broken example turns the build red — code in the documentation that does not run is
-the worst possible failure, because that documentation is what decides adoption.

@@ -141,7 +141,7 @@ connector.sendActivity(ConversationReference.of(serviceUrl, conversationId), Act
 ```
 
 A reference taken from a channel *message* addresses that message's thread; `withoutMessageId()`
-gives the channel. See [Store the conversation reference](../guide/bot#what-arrives).
+gives the channel. See [What arrives](../guide/bot#what-arrives).
 
 ### Cards
 
@@ -215,10 +215,7 @@ none is planned as part of `teams4j-bot`:
 - **LUIS, QnA Maker, the AI library**: call your model directly.
 - **Channels other than Teams**: teams4j speaks to Teams only.
 
-And, from the protocol itself, not yet:
-
-- **Single sign-on** (`signin/*` invokes, the Token Service), **streaming replies**, **meeting APIs**;
-  see [Not here yet](../guide/bot#not-here-yet).
+Single sign-on, streaming replies and the meeting APIs are not covered yet.
 
 If your bot depends on one of these, port the rest first and keep that path where it is, or open an
 issue with the use case.

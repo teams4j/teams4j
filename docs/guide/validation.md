@@ -40,10 +40,8 @@ on containers and columns, `fallback` elements, table cells, rich-text inlines.
 
 ## The rules
 
-Ten rules, two of them errors. Every one was run against a real tenant on 2026-09-01, and the two
-that turned out to be false were deleted. The [validation rules reference](../reference/validation-rules)
-lists each rule with its severity, what it checks and what was observed;
-[Measurements](../reference/measurements) has the runs themselves.
+Ten rules, two of them errors. The [validation rules reference](../reference/validation-rules)
+lists each rule with its severity, what it checks and what was observed on a real tenant.
 
 The short version of why the two errors are errors:
 
@@ -72,16 +70,10 @@ adaptiveCard {
 
 :::
 
-On the Java side `WebhookAction` is a sealed interface that narrows `CardAction`, and `ActionSubmit`
-is outside its `permits` clause. On the Kotlin side the
-`actionSubmit` function is simply not generated into the `webhookActions { }` scope. Both are
-verified by running a real compiler in a test.
-
 **The guarantee reaches exactly one level deep.** A card nested inside `Action.ShowCard`, a
 container's `selectAction`, an action inside a table cell: none of these appear in any signature, so
-no type can constrain them. Constraining arbitrary depth would mean two parallel models, one for each
-context, and that collapses under its own weight. So the nested tree is the validator's job, and the
-client runs it right before sending. It takes both layers to be complete.
+no type can constrain them. The nested tree is the validator's job, and the client runs it right
+before sending.
 
 ## In tests
 

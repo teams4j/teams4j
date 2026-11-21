@@ -67,17 +67,11 @@ implementation("io.github.teams4j:teams4j-cards-kotlinx:$version")
 :::
 
 The only third-party library teams4j itself pulls in is the JSON binding you chose. HTTP is the JDK's
-`HttpClient` and logging is `System.Logger`. See [JSON binding](./json-binding) for why the model and
-the client stay neutral.
-
-Every release is on Maven Central; the same signed artifacts are mirrored to
-[GitHub Packages](https://github.com/teams4j/teams4j/packages) (`https://maven.pkg.github.com/teams4j/teams4j`).
-Reading from that mirror needs a GitHub token with `read:packages`, so it is for a build that already
-resolves from GitHub Packages, not a first choice.
+`HttpClient` and logging is `System.Logger`. See [JSON binding](./json-binding).
 
 ## 3. Build a card
 
-Both DSLs below produce the JSON on the third tab, and a test proves it on every build.
+Both DSLs below produce the JSON on the third tab.
 
 ::: code-group
 
@@ -111,7 +105,7 @@ teams.send(Cards.webhookCard()
 ```kotlin [Kotlin]
 val teams = WorkflowsWebhookClient.create(System.getenv("TEAMS_WEBHOOK_URL"))
 
-// From a coroutine: sendAwait, not send. The name differs for a reason (see the webhook guide).
+// From a coroutine: sendAwait, not send.
 teams.sendAwait(card)
 ```
 
@@ -141,13 +135,8 @@ class DeployNotifier {
 
 Share one client. The rate limiter lives on the instance, so a client per call paces nothing.
 
-Around that one call the client does four things, each of which came from a measurement rather than
-a guess. It validates the card against the Teams profile and refuses to send on an error. It measures
-the message against the 28 KB limit, because the endpoint accepts an oversized message with
-`202 Accepted` and then silently drops it. It paces requests, because simultaneous requests are also
-answered `202` and then partly discarded. And it retries 429 and 5xx with backoff. The
-[webhook guide](./webhook) covers each, and [Measurements](../reference/measurements) has the
-evidence.
+Around that one call the client validates the card, enforces the 28 KB limit, paces requests and
+retries 429 and 5xx; the [webhook guide](./webhook) covers each.
 
 ## 5. Do not let the notification become the failure
 

@@ -18,8 +18,7 @@ import java.util.function.LongSupplier;
  * <p>So the pacing is what keeps notifications from disappearing, and the retry path cannot stand in
  * for it: there is no failure to retry. The limiter is per instance, so several clients against one
  * webhook can still overlap — see <a
- * href="https://teams4j.github.io/teams4j/reference/measurements">the measurements page</a> for what
- * is and is not established.
+ * href="https://teams4j.github.io/teams4j/reference/limits">Teams limits</a>.
  */
 public final class TokenBucket {
 

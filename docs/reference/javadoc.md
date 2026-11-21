@@ -19,27 +19,3 @@ release's javadoc jar is also on Maven Central, next to the sources jar.
 | [`teams4j-bot-kotlin`](/api/teams4j-bot-kotlin/) | coroutine forms of the bot calls |
 | [`teams4j-bot-spring-boot-starter`](/api/teams4j-bot-spring-boot-starter/) | Spring Boot auto-configuration for a bot |
 | [`teams4j-bot-ktor`](/api/teams4j-bot-ktor/) | the bot endpoint as a Ktor route |
-
-## Where to start reading
-
-The Javadoc is written to carry the reasoning, not just the signatures, so a few classes are worth
-reading whole:
-
-- `WorkflowsWebhookClient` and its `Builder`: every option, its default, and the measurement behind it.
-- `TeamsProfileValidator`: the `RULE_*` constants each say what the rule is for.
-- `TeamsLimits`: each constant says where its value came from and whether it was measured.
-- `RateLimitMode` and `ValidationMode`: short, and they explain why the defaults are the defaults.
-- `CardValue` and `Dimension` in `teams4j-cards`: the open-value types.
-- `WebhookAction`: the marker whose `permits` clause is the compile-time guarantee.
-- `BotTokenVerifier` and `ConnectorClient` in `teams4j-bot`: what is checked on the way in, and what
-  happens around each call on the way out.
-
-## Building it locally
-
-```bash
-docs/scripts/api-docs.sh .        # the working tree; a tag such as v0.1.0 also works
-open docs/public/api/teams4j-webhook/index.html
-```
-
-The same script runs in the docs workflow with the latest tag. The build treats Javadoc warnings as
-errors, so the output is complete for every public type.

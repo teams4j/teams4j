@@ -84,10 +84,8 @@ Teams will render it; use a real channel once before shipping.
 
 ## In unit tests
 
-The library's own webhook tests run against a WireMock loopback stub the same way, with
-`allowPlainHttp()` in the fixtures and a separate test covering the https check itself. If you test
-your notification code against a stub, that is the pattern to copy. If you only want to know the card is
-right, skip the HTTP entirely:
+To test your notification code against a stub, use `allowPlainHttp()` as above. If you only want to know
+the card is right, skip the HTTP entirely:
 
 ```java
 assertThat(TeamsProfileValidator.forWebhook().validate(card)).isEmpty();

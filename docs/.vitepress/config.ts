@@ -54,7 +54,6 @@ export default defineConfig({
         items: [
           { text: 'Teams limits', link: '/reference/limits' },
           { text: 'Validation rules', link: '/reference/validation-rules' },
-          { text: 'Measurements', link: '/reference/measurements' },
           { text: 'API documentation', link: '/reference/javadoc' },
         ],
       },

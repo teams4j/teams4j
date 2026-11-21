@@ -23,8 +23,8 @@ leaked CI secret cannot publish anything. CI builds and tests; it never publishe
 ## Version
 
 The version is not in any file. It comes from the nearest `vX.Y.Z` tag (root `build.gradle.kts`,
-`com.palantir.git-version`): on the tag with a clean tree it is `0.1.0`; one commit later, or with
-uncommitted changes, it is `0.1.1-SNAPSHOT`. `./gradlew printVersion` shows it. So a release is a
+`com.palantir.git-version`): on the tag with a clean tree it is `X.Y.Z`; one commit later, or with
+uncommitted changes, it is `X.Y.(Z+1)-SNAPSHOT`. `./gradlew printVersion` shows it. So a release is a
 tag, and there is no release commit and no "back to SNAPSHOT" commit. Untracked files count as
 uncommitted changes (`git status --porcelain` must print nothing), so a stray note in the tree turns
 the release into a SNAPSHOT: move it out before tagging.
@@ -34,13 +34,13 @@ the release into a SNAPSHOT: move it out before tagging.
 Central rejects `-SNAPSHOT` versions, so a rehearsal is the release with the tag kept local.
 
 ```bash
-git tag -a v0.1.0 -m "0.1.0"
+git tag -a vX.Y.Z -m "X.Y.Z"
 ./gradlew clean build
 ./gradlew publishAllPublicationsToStagingRepository
 ./gradlew jreleaserDeploy            # stage UPLOAD: arrives in the Portal as VALIDATED
 ```
 
-In the Portal, inspect the deployment and press **Drop**. Then `git tag -d v0.1.0`; whatever the
+In the Portal, inspect the deployment and press **Drop**. Then `git tag -d vX.Y.Z`; whatever the
 rehearsal turned up becomes a commit and the tag is placed again afterwards. On a failure, JReleaser
 writes the useful part to `build/jreleaser/trace.log`.
 
@@ -51,9 +51,9 @@ writes the useful part to `build/jreleaser/trace.log`.
 #    (build/reports/japicmp/*.txt) is the breaking-changes section of the release notes
 ./gradlew check -PapiBaseline=<previous version>
 
-# 1. version: a tag on a clean tree. Uncommitted changes make it 0.1.1-SNAPSHOT, which Central rejects.
-git tag -a v0.1.0 -m "0.1.0"
-./gradlew printVersion               # 0.1.0
+# 1. version: a tag on a clean tree. Uncommitted changes make it a SNAPSHOT, which Central rejects.
+git tag -a vX.Y.Z -m "X.Y.Z"
+./gradlew printVersion               # X.Y.Z
 
 # 2. build, sign, stage, upload
 ./gradlew clean build
@@ -68,7 +68,7 @@ git tag -a v0.1.0 -m "0.1.0"
 ./gradlew publishAllPublicationsToGitHubPackagesRepository
 
 # 5. the tag is the release; push it
-git push origin main v0.1.0
+git push origin main vX.Y.Z
 
 # 6. release notes: the commits since the previous tag, one section per conventional-commit type
 #    (`feat:`, `fix:`, ...; `feat!:` marks a breaking change). Read the file: drop the sections a
@@ -76,72 +76,20 @@ git push origin main v0.1.0
 #    japicmp report (build/reports/japicmp/*.txt) under a heading of their own -- a commit type
 #    cannot tell a binary break from an addition.
 ./gradlew jreleaserChangelog         # build/jreleaser/release/CHANGELOG.md
-gh release create v0.1.0 --title 0.1.0 --notes-file build/jreleaser/release/CHANGELOG.md
+gh release create vX.Y.Z --title X.Y.Z --notes-file build/jreleaser/release/CHANGELOG.md
 ```
 
-The commit message is the release note, so a squashed commit carries a conventional-commit subject
-that says what changed for a consumer, not what was done to the tree.
+Pushing the tag also redeploys the site's API pages from the latest tag (the `github-pages`
+environment allows tags `v*`).
 
-Pushing the tag also runs the Docs workflow, which rebuilds the API pages of the site from the
-latest tag (`docs/scripts/api-docs.sh`), so the published Javadoc and Dokka follow the release
-rather than main. The `github-pages` environment has to allow tags `v*` to deploy (Settings →
-Environments → github-pages → Deployment branches and tags); with only `main` allowed, the 0.2.0 run
-built the site and was then refused at the deploy step. One-time:
+[Reproducible Central](https://github.com/jvm-repo-rebuild/reproducible-central) picks up new
+versions on its own. If the JDK or the rebuild command changes, copy the previous buildspec to the
+new version and open a PR with the `.buildspec` alone; their CI rebuilds it.
 
-```bash
-gh api -X POST repos/teams4j/teams4j/environments/github-pages/deployment-branch-policies -f name='v*' -f type='tag'
-```
-
-[Reproducible Central](https://github.com/jvm-repo-rebuild/reproducible-central) rebuilds each
-release independently in a Linux container and feeds the README badge. Its maintainers' scripts
-watch Central's `maven-metadata.xml` for tracked projects and open their own PR for a new version by
-copying the latest `content/io/github/teams4j/teams4j-cards/*.buildspec`, so a release normally
-needs nothing from here. If the rebuild command or the JDK changes, or a version is not picked up,
-copy the previous buildspec to the new version, run `./rebuild.sh` on it (Docker; on macOS `CI=true`
-and a patched `time` call) and open a PR with the `.buildspec`, `.buildinfo` and `.buildcompare` it
-wrote. Delete the project's `buildcache/` before a second run: the first leaves untracked files in
-the checkout, which turns the tag-derived version into a SNAPSHOT.
-
-Then point `examples/gradle.properties` (`teams4jVersion`) at the release -- the guides write
-`$version` and need no edit; CI checks that no release number crept in -- and check the previous
-release against the new one is no longer the baseline: `-PapiBaseline` in CONTRIBUTING and in
-`ci.yml` (the binary-compatibility step) move to the version just released.
-
-For a version that is already on Central but not on GitHub Packages (0.1.0 was published this way on
-2026-09-10): check out its tag with a clean tree, so the version derives correctly, and run step 4.
-The repository block is part of the build only from 0.2.0; on an older tag, supply it with an init
-script (`-I`) that declares the same `GitHubPackages` repository rather than editing the tree, which
-would make the version a SNAPSHOT.
+Then set `teams4jVersion` in `examples/gradle.properties` and `-PapiBaseline` in `ci.yml` to the
+new version.
 
 `jreleaserDeploy -PreleaseStage=FULL` publishes without the Portal step. Do not use it.
 
-## Why the key decisions are what they are
-
-- **Version from the tag, not a file.** The alternative is editing `gradle.properties` twice per release
-  and committing both edits, with the tag and the file free to disagree. The plugin only reads git; it
-  never tags or pushes, so the human steps stay human. It needs the tags to be present: CI checks out
-  with `fetch-depth: 0`.
-- **Local only.** A signing key or Portal token in GitHub is a standing credential that a compromised
-  action or workflow could use. Two commands on one machine are a smaller surface than a workflow with
-  secrets, and a release is rare enough that automation buys little.
-- **gpg agent, not an exported key.** `useGpgCmd()` means the armored private key is never written
-  to an environment variable or a file. `SIGNING_KEY` remains as a fallback for a machine without gpg.
-- **Upload stage, human publish.** Publishing cannot be undone, so the last step stays a click in the
-  Portal after looking at what arrived.
-- **ed25519 key, personal-email UID.** Chosen after checking eight comparable libraries. Whether Central
-  accepts it is what the first rehearsal checks.
-- **Reproducible by construction, verified after the fact.** Gradle 9 writes archives with fixed
-  entry order and timestamps, the version comes from the tag, and nothing in the build reads the
-  clock or the machine, so a rebuild of a tag matches Central (0.1.0 was checked this way on
-  2026-09-11: 39 jars, 14 POMs and 13 module files identical, and Reproducible Central's own rebuild in
-  a Linux container agreed, 40/40). The README badge is Reproducible Central's independent verdict on
-  each release, not a promise.
-- **No checksums of signatures.** Gradle writes checksum files for the `.asc` signatures as well.
-  Central does not need them but counts them against its [publishing
-  limits](https://central.sonatype.org/publish/reducing-publishing-usage/), so `jreleaserDeploy`
-  deletes them from the staging directory first. The GitHub Packages mirror is published by Gradle
-  directly and still carries them; the artifacts and signatures are the same.
-- **GitHub Packages is a mirror, not a second source of truth.** Downloading from it needs a token
-  even for a public repository, so the docs name Central and nothing else. It gets the same signed
-  files, after Central has accepted them, through plain `maven-publish` rather than a second JReleaser
-  deployer: one more repository block, no more moving parts.
+Gradle also writes checksums of the `.asc` signatures; `jreleaserDeploy` drops them, since Central
+counts them against its [publishing limits](https://central.sonatype.org/publish/reducing-publishing-usage/).

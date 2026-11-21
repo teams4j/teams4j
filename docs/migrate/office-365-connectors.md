@@ -6,8 +6,7 @@ Microsoft 365 connectors, the Incoming Webhook among them, were retired in May 2
 
 What has to change is the URL. The payload mostly does not: an existing `MessageCard` posted to a
 Workflows URL still renders its title, text, sections, facts, images and colour bar. **Its buttons do
-not.** Every `potentialAction`, `OpenUri` included, is dropped without an error, as is a `heroImage`
-([measured](../reference/measurements#connector-payloads-on-a-workflows-webhook-2026-10-24)). So a
+not.** Every `potentialAction`, `OpenUri` included, is dropped without an error, as is a `heroImage`. So a
 card without buttons migrates with step 1 alone, and a card with one has to move to Adaptive Cards.
 
 Even without buttons, that move is worth making. Microsoft calls
@@ -104,7 +103,7 @@ validates it against what Teams renders before it goes out.
 | `MessageCard` | Adaptive Card, in teams4j | Notes |
 |---|---|---|
 | `title` | `text(title, t -> t.style(TextBlockStyle.HEADING))` | Or `weight(BOLDER).size(LARGE)` for more control |
-| `text` | `text(...)` | `TextBlock` renders bold, italic, lists and links. The headings, tables, quotes and code blocks a `MessageCard` rendered do not carry over; rebuild them as elements: a heading as `style(TextBlockStyle.HEADING)`, a table as a [`Table`](../reference/measurements#tables-and-headings-2026-10-24) (four columns or fewer) or a `FactSet` |
+| `text` | `text(...)` | `TextBlock` renders bold, italic, lists and links. The headings, tables, quotes and code blocks a `MessageCard` rendered do not carry over; rebuild them as elements: a heading as `style(TextBlockStyle.HEADING)`, a table as a `Table` (four columns or fewer) or a `FactSet` |
 | `summary` | — | The Workflows envelope has no field for it |
 | `themeColor` | `color(Colors.ATTENTION)` on a `TextBlock`, or `ContainerStyle` on a `Container` | No arbitrary hex: the colours are semantic (`GOOD`, `WARNING`, `ATTENTION`, `ACCENT`) and the theme picks the shade |
 | `sections[]` | `container(c -> …)` | One container per section; `separator(true)` for the line between them |
@@ -133,14 +132,8 @@ So:
 
 ## What behaves differently
 
-Measured on a tenant; [Measurements](../reference/measurements) has the runs.
-
-- **`202 Accepted` is not delivery.** An oversized message (over 28 KB) and a burst of more than four
-  a second are both answered `202` and dropped. teams4j checks the size and paces sends for this
-  reason; keep both on.
-- **An attribution line** ("*name* used a Workflow template…") appears under every Adaptive Card. It comes
-  from the flow, and nothing on the sending side removes it.
-- **Schema version 1.5 at most.** A 1.6 card shows only its `fallbackText`. The DSL stamps 1.5.
+`202 Accepted` is not delivery, Workflows appends an attribution line, and Teams renders schema 1.5 at
+most; see [Teams limits](../reference/limits).
 
 ## Hand-written JSON
 

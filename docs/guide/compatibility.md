@@ -6,54 +6,38 @@ claimed.
 | | Supported | Notes |
 |---|---|---|
 | Java | **17+** | The card model uses sealed interfaces and records. Java 8 and 11 are not supported |
-| Kotlin (DSL modules) | **2.3+ on JVM 17+** | Only for the Kotlin modules: `teams4j-cards-kotlin`, `teams4j-cards-kotlinx`, `teams4j-webhook-kotlin`, `teams4j-bot-kotlin` and `teams4j-bot-ktor`. They are compiled at language and API version 2.3 against the 2.3 stdlib, so a 2.3 compiler reads them and your Kotlin version is never raised by ours. 2.3 is also what Spring Boot 4.1's BOM manages. CI builds the Kotlin examples on the 2.3 compiler. The core is plain Java and works without Kotlin |
+| Kotlin (DSL modules) | **2.3+ on JVM 17+** | Only for the Kotlin modules: `teams4j-cards-kotlin`, `teams4j-cards-kotlinx`, `teams4j-webhook-kotlin`, `teams4j-bot-kotlin` and `teams4j-bot-ktor`. Compiled at language and API version 2.3 against the 2.3 stdlib, so your Kotlin version is never raised by ours. The core is plain Java and works without Kotlin |
 | Java 21+ | bonus | Exhaustive `switch` and record patterns over the sealed model. The jar targets 17, but sealed information lives in the class file, so it works at *your* compile time: drop a case and you get a compile error. Java 17 consumers get the closed hierarchy and `instanceof` patterns |
-| Spring Boot (starters) | **3.5.x, 4.1.x** | One artifact each for both. CI runs both starters' tests on 3.5.16 and 4.1.1 and builds the examples against both |
-| Adaptive Cards | **1.5** | The model covers the full 1.6 schema, but **1.5 is the ceiling Teams renders**: on a real tenant a 1.6 card is rejected and falls back to `fallbackText` (2026-09-01). The DSL defaults to 1.5 |
-| JSON binding | **Jackson 2.18+** or **kotlinx.serialization 1.13+** | The model requires neither; see [JSON binding](./json-binding). `teams4j-cards-jackson` names 2.18 as a lower bound and nothing else: your own Jackson version wins. CI runs the tests on 2.18 and on the newest 2.x |
+| Spring Boot (starters) | **3.5.x, 4.1.x** | One artifact each for both |
+| Adaptive Cards | **1.5** | The model covers the full 1.6 schema, but **1.5 is the ceiling Teams renders**: on a real tenant a 1.6 card falls back to `fallbackText`. The DSL defaults to 1.5 |
+| JSON binding | **Jackson 2.18+** or **kotlinx.serialization 1.13+** | The model requires neither; see [JSON binding](./json-binding). 2.18 is a lower bound: your own Jackson version wins |
 | Coroutines | **kotlinx-coroutines 1.11+** | Only for `teams4j-webhook-kotlin`, `teams4j-bot-kotlin` and `teams4j-bot-ktor` |
-| Ktor | **3.0+** | Only for `teams4j-bot-ktor`, which depends on `ktor-server-core` alone. 3.0 is the lower bound in the POM; CI runs the tests on 3.0 and on the newest 3.x |
+| Ktor | **3.0+** | Only for `teams4j-bot-ktor`, which depends on `ktor-server-core` alone. 3.0 is a lower bound |
 | Nullness | **JSpecify `@NullMarked`** | Every module, without adding a runtime dependency. Below |
 
-The library is built with a Java 21 toolchain and targets Java 17 bytecode. The Boot compatibility
-row lists only what the `starter-boot-matrix` CI job runs.
+The library targets Java 17 bytecode. CI runs the tests on JDK 21 and 25, and the examples on JDK 17.
 
-## Modules and status
+## Modules
 
-The rows marked `0.1.0` shipped in that release. The bot modules were run against a real tenant on 2026-09-05; [Measurements](../reference/measurements#the-bot-2026-09-05)
-has what was seen.
+| Module | What it does |
+|---|---|
+| `teams4j-cards` | Adaptive Cards model + Java builder DSL. Pure specification, nothing Teams-specific. **Zero runtime dependencies** |
+| `teams4j-cards-kotlin` | Kotlin type-safe DSL, generated from the same schema |
+| `teams4j-cards-jackson` | Jackson binding |
+| `teams4j-cards-kotlinx` | kotlinx.serialization binding |
+| `teams4j-teams-profile` | Teams profile: platform limits + `TeamsProfileValidator` |
+| `teams4j-http` | What the clients share: the `HttpTransport` seam and the retry policy. **Zero runtime dependencies** |
+| `teams4j-webhook` | Sends cards to a channel through a Workflows webhook. **Zero runtime dependencies** |
+| `teams4j-webhook-kotlin` | Coroutine `sendAwait` |
+| `teams4j-webhook-spring-boot-starter` | Spring Boot auto-configuration |
+| `teams4j-bot` | Bots: the Activity model, inbound token verification, the Bot Connector client. **Zero runtime dependencies** |
+| `teams4j-bot-kotlin` | Coroutine `…Await` forms of the bot calls |
+| `teams4j-bot-spring-boot-starter` | Spring Boot auto-configuration for a bot, with a Spring MVC endpoint |
+| `teams4j-bot-ktor` | The bot endpoint as a Ktor route |
+| `teams4j-bom` | Version alignment for all of the above |
 
-| Module | What it does | Status |
-|---|---|---|
-| `teams4j-cards` | Adaptive Cards model + Java builder DSL. Pure specification, nothing Teams-specific. **Zero runtime dependencies** | 0.1.0 |
-| `teams4j-cards-kotlin` | Kotlin type-safe DSL, generated from the same schema | 0.1.0 |
-| `teams4j-cards-jackson` | Jackson binding | 0.1.0 |
-| `teams4j-cards-kotlinx` | kotlinx.serialization binding | 0.1.0 |
-| `teams4j-teams-profile` | Teams profile: platform limits + `TeamsProfileValidator` | 0.1.0 |
-| `teams4j-http` | What the clients share: the `HttpTransport` seam and the retry policy. **Zero runtime dependencies** | 0.1.0 |
-| `teams4j-webhook` | Sends cards to a channel through a Workflows webhook. **Zero runtime dependencies** | 0.1.0 |
-| `teams4j-webhook-kotlin` | Coroutine `sendAwait` | 0.1.0 |
-| `teams4j-webhook-spring-boot-starter` | Spring Boot auto-configuration | 0.1.0 |
-| `teams4j-bot` | Bots: the Activity model, inbound token verification, the Bot Connector client. **Zero runtime dependencies** | 0.1.0 |
-| `teams4j-bot-kotlin` | Coroutine `…Await` forms of the bot calls | 0.1.0 |
-| `teams4j-bot-spring-boot-starter` | Spring Boot auto-configuration for a bot, with a Spring MVC endpoint | 0.1.0 |
-| `teams4j-bot-ktor` | The bot endpoint as a Ktor route | 0.1.0 |
-| `teams4j-bom` | Version alignment for all of the above | 0.1.0 |
-
-### Roadmap
-
-Not started, and waiting on demand. There is no plan to begin these without adoption signals, and not
-starting them is a normal outcome.
-
-- **Bot single sign-on** (`signin/*` invokes and the Token Service), which needs stored conversation
-  state that the protocol client deliberately does not keep.
-- **Streaming replies**, **batch conversations** (`/v3/batch/conversation/*`) and **meeting APIs**
-  (`/v1/meetings`): Teams extensions of the Activity Protocol, each waiting for a concrete use.
-
-Not planned: **Microsoft Graph**. Graph is a different API with its own SDK
-([msgraph-sdk-java](https://github.com/microsoftgraph/msgraph-sdk-java)), and it does not let an
-application post chat messages without a signed-in user, so it would not cover a case a webhook or a
-bot misses.
+Not planned: **Microsoft Graph**, a different API with its own SDK
+([msgraph-sdk-java](https://github.com/microsoftgraph/msgraph-sdk-java)).
 
 ## The nullness contract
 
@@ -76,6 +60,4 @@ to read those would be the bigger defect; required-ness is enforced by the build
 
 The annotation jar is `compileOnly`, so it appears neither in your POM nor on your runtime classpath,
 and the contract still reaches you: Kotlin decides from the annotation name recorded in the class
-file, so the compile error above happens without the jspecify jar present. That was verified with a
-Kotlin consumer that had no jspecify jar anywhere. On the library side, NullAway enforces the same
-contract as a CI gate.
+file, so the compile error above happens without the jspecify jar present.

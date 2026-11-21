@@ -1,14 +1,13 @@
 # Contributing to teams4j
 
 Thanks for taking a look. This file covers what you need to build the project, what the
-build checks and why, and the few places where the obvious edit is the wrong one.
+build checks, and the few places where the obvious edit is the wrong one.
 
 ## Prerequisites
 
-A **Java 21** toolchain. Published bytecode targets **Java 17**, which is the floor teams4j
-claims; the toolchain is newer so the tests can use newer language features. Gradle will not
-download a JDK for you, so either have 21 on `PATH` or use [mise](https://mise.jdx.dev) —
-`mise.toml` in the repository root selects it.
+A **Java 21** toolchain; published bytecode targets **Java 17**, and the examples need a JDK 17.
+Gradle will not download a JDK for you, so either have them installed or use
+[mise](https://mise.jdx.dev) — `mise.toml` in the repository root selects 21.
 
 Nothing else. The Gradle wrapper brings its own Gradle.
 
@@ -16,7 +15,7 @@ Nothing else. The Gradle wrapper brings its own Gradle.
 
 ```bash
 ./gradlew build          # compile, test, Spotless, NullAway — the whole gate
-./gradlew test           # tests only (575 of them at the time of writing)
+./gradlew test           # tests only
 ./gradlew spotlessApply  # fix formatting rather than being told about it
 ```
 
@@ -31,9 +30,6 @@ both lines; locally you pick one:
 ./gradlew :teams4j-webhook-spring-boot-starter:test :teams4j-bot-spring-boot-starter:test -PbootLine=4   # default is 3
 ```
 
-If a change makes that matrix fail, the answer might be to split the artifact per Boot line
-rather than to patch the test.
-
 ### Ktor, against the newest 3.x
 
 `teams4j-bot-ktor` compiles and tests against the Ktor baseline in the catalog; CI also runs its
@@ -45,11 +41,8 @@ tests with the newest 3.x on the classpath, the way `-PjacksonLine=latest` probe
 
 ### The examples
 
-`examples/` is **a separate Gradle build** that resolves teams4j from a repository instead of
-from the source tree. That is deliberate: it is the only place that exercises the published
-POMs, the dependency scopes, the BOM's module list, and the `ServiceLoader` registration that
-picks a JSON binding — none of which a project dependency would prove. So it needs the
-artifacts installed first:
+`examples/` is **a separate Gradle build** that resolves teams4j from a repository, so publish
+first:
 
 ```bash
 ./gradlew publishToMavenLocal
@@ -115,8 +108,6 @@ which properties could not be narrowed, and which overrides no longer match anyt
 ./gradlew :codegen:report
 ```
 
-Filling in `overrides.json` from that output beats guessing, which is what it is for.
-
 ### Schema coverage is measured, not asserted
 
 `teams4j-cards-jackson/src/test/resources/samples/` holds the official sample cards, and
@@ -159,9 +150,7 @@ npm run dev      # live preview
 npm run build    # what CI runs; fails on a dead link or a missing snippet
 ```
 
-Code samples on the site are `<<<` includes of files CI compiles (the documented-cards tests, the
-examples), never pasted code. If a page needs a snippet that does not exist yet, add it to one of
-those sources first.
+Code samples on the site are `<<<` includes of files CI compiles (see above), never pasted code.
 
 ## Code style and static analysis
 
@@ -170,23 +159,18 @@ Formatting is applied, not reviewed: `./gradlew spotlessApply` runs **palantir-j
 `java`, `javax`, everything else, `io.github.teams4j`. Generated sources are not targets —
 the emitter owns their layout. `.editorconfig` carries the same 120-column limit for editors.
 
-`removeUnusedImports()` is deliberately not enabled; see the comment in
-`buildSrc/src/main/kotlin/teams4j.java-conventions.gradle.kts` for the reason.
-
 What the build enforces beyond formatting:
 
-- **Warnings are errors**, in both languages (`-Werror`, `allWarningsAsErrors`). The count is
-  zero and staying there is the point; if a JDK or Kotlin upgrade introduces new warnings, they
-  are dealt with on the upgrade commit.
+- **Warnings are errors**, in both languages (`-Werror`, `allWarningsAsErrors`).
 - **Error Prone runs with its default checks**, plus NullAway as an error. Every module is
   JSpecify `@NullMarked`, and `@Nullable` is a type-use annotation. Generated sources and
-  `codegen` are excluded, because a finding there is a codegen bug. One check is disabled
-  project-wide (`CanonicalDuration`); the reason sits next to the `disable(...)` call.
+  `codegen` are excluded, because a finding there is a codegen bug. `CanonicalDuration` is disabled
+  project-wide.
 - **detekt covers Kotlin** with deltas in `config/detekt.yml`, each carrying its reason.
 - **The public ABI is guarded twice.** Kotlin modules dump theirs to committed `api/*.api`
   files — after an intended API change, run `./gradlew updateKotlinAbi` and read the diff before
   committing it. Java modules are compared against the previous release with japicmp:
-  `./gradlew check -PapiBaseline=<last release>` (`0.3.0` at the time of writing).
+  `./gradlew check -PapiBaseline=<last release>`.
 - **Comments are in English.** This is a public project; the working language of the code is
   English regardless of the language a discussion happens in.
 
@@ -194,12 +178,7 @@ Suppressing a finding is fine when the tool is wrong about the specific case, bu
 suppression carries the argument: every `@Suppress` in the tree says why the rule does not
 apply there.
 
-### On comments
-
-The existing code explains *why*, not *what*, and cites evidence where a claim could be
-doubted — a measurement date, a documentation link, a sample that proves it. Constants that
-came from a live tenant say so. Please match that; a comment restating the line below it is
-worse than none.
+Comments explain *why* in a line or two; a comment restating the line below it is worse than none.
 
 ## Tests
 
@@ -212,21 +191,12 @@ on a few patterns worth knowing before adding to it:
   does not lose coverage.
 - Time is injected — `Clock`, `Sleeper`, `Delayer`, a nanosecond source. Retry and rate-limit
   tests assert on recorded waits rather than sleeping.
-- Anything claiming Teams platform behaviour needs a source. Several validator rules were
-  deleted once a live tenant showed them to be false, and [the measurements page](https://teams4j.github.io/teams4j/reference/measurements)
-  records those runs.
+- Anything claiming Teams platform behaviour needs a source: Microsoft's documentation or a run on a
+  real tenant.
 
 ## Pull requests
 
-Every job in the CI workflow has to be green:
-
-1. **build** — `./gradlew build`, then a check that regenerating the committed generated sources produces no diff
-2. **starter-boot-matrix** — the starter's tests on each supported Boot line (the `springBoot*` versions in the catalog)
-3. **jackson-latest** — the tests on the newest Jackson 2.x, where the POMs name the `jackson` baseline
-4. **examples** — `publishToMavenLocal`, then the separate `examples/` build, on each supported Boot line and on the Kotlin baseline
-5. **docs** — the docs site build, which fails on a dead link or a missing snippet
-
-Alongside it, a few security checks run on every pull request: CodeQL (`codeql.yml`), Trivy and
+Every job in `ci.yml` has to be green. Alongside it, a few security checks run on every pull request: CodeQL (`codeql.yml`), Trivy and
 Semgrep (`security.yml`), zizmor on the workflow files themselves, and a dependency review that
 compares the Gradle dependency graph with `main` and rejects a newly introduced vulnerable package.
 Actions are pinned to commit SHAs; `pinact run` updates them.
@@ -240,8 +210,7 @@ Beyond that:
   for a change a consumer has to act on (`feat!: ...`). The release notes are generated from these
   subjects (`RELEASING.md`), so write what changed for a consumer, not what was done to the tree.
 - If you change something a reader of the README or the cookbook would then find wrong, update
-  it in the same pull request. The same goes for `teams4j-smoke`, which no CI job compiles. Documentation that does not run is the worst failure mode here,
-  which is why the examples are wired into CI at all.
+  it in the same pull request.
 - New public API needs Javadoc that says what the caller has to know, including the failure
   mode.
 

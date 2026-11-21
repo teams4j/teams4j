@@ -28,9 +28,7 @@ val out = io.github.teams4j.cards.kotlinx.CardJson.encode(card)
 | `teams4j-cards-jackson` | `jackson-databind` |
 | `teams4j-cards-kotlinx` | `kotlinx-serialization-json` |
 
-The generated model carries Jackson annotations, but **they do not become a dependency**: the JVM
-ignores annotations whose types are absent from the classpath, and `teams4j-cards` declares
-`jackson-annotations` as `compileOnly`. For a kotlinx-only consumer, Jackson appears nowhere.
+The model's Jackson annotations are `compileOnly`: for a kotlinx-only consumer, Jackson appears nowhere.
 
 ## Jackson: two mappers
 
@@ -47,17 +45,12 @@ an `ObjectMapper`, `new CardsModule()` is what to register on it.
 ## kotlinx.serialization
 
 `CardJson.json` is the configured `Json` instance, and `decode`/`encode` are the two calls most code
-needs. The serializers are generated code rather than `@Serializable` annotations on the model,
-because the model has none and cannot have any without picking a library.
+needs.
 
-## The bindings agree, and a test says so
+## The bindings agree
 
-Both bindings make the same of a **valid** card: the same model, written back as the same JSON. The
-lenient-reading rules they share (ignore unknown properties, unknown enum values become `null`, enum
-matching is case-insensitive, an enum is read by name and never by ordinal) are mapper configuration
-on the Jackson side and generated code on the kotlinx side. The official sample cards are run through
-both and compared, including the samples they reject, and a fuzz test compares them on arbitrary
-input.
+Both bindings read a **valid** card into the same model and write it back as the same JSON. Both ignore
+unknown properties, read unknown enum values as `null`, and match enums case-insensitively by name.
 
 A card the schema rejects is read by each library's own rules. Jackson converts a scalar where its
 defaults do (`1` into `true`, `"3"` into a number); kotlinx wants each value to have its JSON type.
@@ -81,10 +74,7 @@ method and a priority. Bindings are located with `ServiceLoader`:
 | one | Uses it |
 | two or more | Uses the **highest priority** (Jackson) and warns via `System.Logger`. Jar order plays no part |
 
-Two bindings is not an error, for the same reason it is not in gRPC or the AWS SDK: an application
-may carry another binding for reasons of its own, and a library that dies over that is unusable.
-Instead the order is declared (`CardWriter.priority()`, 0–10, default 5) so it is deterministic. To
-choose explicitly, `builder(url).cardWriter(new KotlinxCardWriter())`.
+The order is declared (`CardWriter.priority()`, 0–10, default 5). To choose explicitly, `builder(url).cardWriter(new KotlinxCardWriter())`.
 
 ```kotlin
 // with Jackson
@@ -117,8 +107,3 @@ card model already uses for `Action.Submit.data`. Both bindings provide one (`Ja
 `CardWriter` and read back into the activity tree by the `JsonCodec`, which is why both are needed and
 why they should come from the same binding.
 
-## Adding a binding
-
-The codegen intermediate representation knows nothing about any JSON library, so a new binding is one
-more emitter. `KotlinxEmitter` is the evidence: it generates the whole kotlinx binding
-from the same IR the Java model and Kotlin DSL come from.

@@ -44,8 +44,7 @@ teams.sendAwait(card)
 ```
 
 Around that one call the client validates the card against the Teams profile, checks the 28 KB
-limit, paces to four requests per second, and retries 429 and 5xx with backoff. Each of those
-came from a measurement on a real tenant, not from the documentation.
+limit, paces to four requests per second, and retries 429 and 5xx with backoff.
 
 When a webhook is not enough -- you need to *receive* -- `teams4j-bot` is the Bot Framework side:
 verify what Teams posts, read the activity, answer through the Connector.
@@ -79,8 +78,8 @@ implementation("io.github.teams4j:teams4j-bot-spring-boot-starter:$version")
 - [Deploy notification in five minutes](https://teams4j.github.io/teams4j/cookbook/deploy-notification) — the Spring Boot walkthrough
 - [Building cards](https://teams4j.github.io/teams4j/guide/cards) · [Validation](https://teams4j.github.io/teams4j/guide/validation) · [The webhook client](https://teams4j.github.io/teams4j/guide/webhook) · [Bots](https://teams4j.github.io/teams4j/guide/bot)
 - Migrating: [from Office 365 connectors](https://teams4j.github.io/teams4j/migrate/office-365-connectors) (retired May 2026) · [from the Bot Framework Java SDK](https://teams4j.github.io/teams4j/migrate/botbuilder-java) (retired 2023)
-- [Compatibility](https://teams4j.github.io/teams4j/guide/compatibility) — supported Java, Kotlin and Spring Boot versions, the module list, and the roadmap
-- [Teams limits](https://teams4j.github.io/teams4j/reference/limits) and [Measurements](https://teams4j.github.io/teams4j/reference/measurements) — what was sent to a real tenant and what came back
+- [Compatibility](https://teams4j.github.io/teams4j/guide/compatibility) — supported Java, Kotlin and Spring Boot versions, and the module list
+- [Teams limits](https://teams4j.github.io/teams4j/reference/limits) — what the endpoint accepts, measured on a real tenant
 - [`examples/`](examples) — runnable Java, Kotlin coroutines and Spring Boot projects
 
 ## Contributing

@@ -29,9 +29,7 @@ how you measure a card or look at it in a test.
 
 ## Around the request
 
-Everything the webhook enforces, or fails to enforce, is handled before or around the HTTP call. Each
-of the four came from a measurement on a real tenant, and [Measurements](../reference/measurements)
-has the runs.
+Everything the webhook enforces, or fails to enforce, is handled before or around the HTTP call.
 
 ### Validation before sending
 
@@ -43,19 +41,15 @@ The card is checked with `TeamsProfileValidator.forWebhook()`. What happens next
 | `WARN` | Everything is logged, the card is sent regardless |
 | `OFF` | No validation |
 
-`ENFORCE` is the default because an error means Teams rejects the card or silently drops part of it,
-and a missing notification is worse than an exception.
-
 ### The 28 KB limit
 
 The message is measured against `TeamsLimits.WEBHOOK_MAX_PAYLOAD_BYTES` (28 × 1024) before it
 leaves, and an oversized one throws `PayloadTooLargeException` with `sizeBytes()` and `limitBytes()`.
 
 ::: danger Nothing on the wire enforces this, which is why the client does
-Measured on 2026-09-01: 20 KB and 28 KB messages were delivered, 40 KB and 100 KB were not, and all
-four were answered `202 Accepted`. The endpoint never returns a 4xx for an oversized message. It
-accepts it and drops it. `Builder.maxPayloadBytes` exists so the check can be tightened or tested;
-**raising it loses notifications under a successful response.**
+The endpoint answers an oversized message with `202 Accepted` and drops it. `Builder.maxPayloadBytes`
+exists so the check can be tightened or tested; **raising it loses notifications under a successful
+response.**
 :::
 
 The count is UTF-8 bytes of the serialised envelope. Non-Latin text costs up to three bytes a
@@ -74,11 +68,9 @@ notification a minute never waits. `RateLimitMode` says what happens when it wou
 | `OFF` | Do not pace. For a caller that paces itself, or runs several clients against one webhook |
 
 ::: warning What the pacing protects against is not throttling
-The premise was "4 requests per second, then 429 with Retry-After". Measured, the endpoint sends
-neither: 12 simultaneous requests were all answered `202`. In one such run nine of the twelve cards
-never reached the channel, with nothing in any response to say so. So the pacing is what keeps
-messages from disappearing, and **the retry path cannot stand in for it**: there is no failure to
-retry. If you turn it `OFF`, pace it yourself.
+The endpoint sends no 429: simultaneous requests are all answered `202` and some never reach the
+channel. Pacing is what prevents that, and **the retry path cannot stand in for it**. If you turn it
+`OFF`, pace it yourself.
 :::
 
 The limiter is per instance. Several application instances sharing one webhook each pace
@@ -117,8 +109,7 @@ Workflows menu.
 ## Exceptions
 
 All of them are unchecked and extend `WebhookException`, so one catch covers a notification that must
-not become the failure. Checked exceptions would have produced `catch (Exception e) {}`; a hierarchy
-lets you catch only what you would handle differently.
+not become the failure.
 
 | Exception | When | Worth retrying |
 |---|---|---|
@@ -129,7 +120,7 @@ lets you catch only what you would handle differently.
 | `WebhookTransportException` | Connection failure after the retries, or a timeout (not retried: it may have been delivered). `attempts()` | Yes, if a duplicate is acceptable |
 
 A successful send returns `WebhookResponse` with `statusCode()`, `body()` and `attempts()`. The
-endpoint answers `202 Accepted`, not `200`, and as the measurements above show, `202` means "queued",
+endpoint answers `202 Accepted`, not `200`, and as above, `202` means "queued",
 not "posted".
 
 ## Builder options
@@ -167,35 +158,14 @@ WebhookResponse response = client.send(card);                        // blocking
 CompletableFuture<WebhookResponse> sending = client.sendAsync(card); // non-blocking
 ```
 
-**They make identical decisions.** Whether to retry, the backoff, how `Retry-After` is interpreted,
-the `maxBackoff` cutoff: all of it lives in one `RetryPolicy.decide()` that both paths call. The rate
-limiter is one instance per client, so blocking and asynchronous sends pace against each other. The
-only difference is where the waiting happens: on the calling thread, or on the JDK's
-`CompletableFuture.delayedExecutor`. That the two paths decide alike in the same scenarios is asserted
-by a test, because a library that skipped it shipped a real bug
-([java-slack-sdk #1273](https://github.com/slackapi/java-slack-sdk/issues/1273)).
+**They make identical decisions**: one retry policy and one rate limiter per client, so blocking and
+asynchronous sends pace against each other. Only where the waiting happens differs: on the calling
+thread, or on the JDK's `CompletableFuture.delayedExecutor`.
 
 ### `send()` is the default, even on virtual threads
 
-On a virtual thread (Java 21), nothing this client waits on costs a carrier thread. There are three
-blocking points, the pacing sleep, the retry backoff sleep and `HttpClient.send()`, and all three were
-measured under a single-carrier scheduler with the JFR `jdk.VirtualThreadPinned` event recording.
-Eight concurrent sends to a 300 ms endpoint would serialise to roughly 2,400 ms if any of them pinned.
-
-| What was measured | Wall clock on one carrier | `VirtualThreadPinned` |
-|---|---|---|
-| `Thread.sleep` alone (control: known to unmount) | 306–311 ms | 0 |
-| `Thread.sleep` inside `synchronized` (control: known to pin) | **2,450–2,479 ms** | **8** |
-| `HttpClient.send()`, plain http | 432–436 ms | 0 |
-| `HttpClient.send()`, TLS | 601–625 ms | 0 |
-| Pacing sleep (4 rps limiter) | 1,817–1,832 ms | 0 |
-| Retry backoff sleep (429 → 300 ms backoff) | 399–408 ms | 0 |
-
-The `synchronized` control caught 8 events, so the zeros elsewhere are not an instrument that failed
-to switch on. The 1.8 s of pacing is the limiter pushing eight sends 250 ms apart, as designed. The
-limiter only computes inside its `synchronized` block and never sleeps there, which is why it does not
-hit the Java 21 `synchronized` pinning problem. Measured on Temurin 21.0.11, macOS aarch64, two
-repetitions; Java 21 is the last LTS where that pinning exists, so this is the worst case.
+On a virtual thread (Java 21+), none of the client's blocking points (the pacing sleep, the retry
+backoff and `HttpClient.send()`) pins a carrier thread, so blocking `send()` is the right call there.
 
 ### `sendAsync()` contracts
 
@@ -230,7 +200,5 @@ the coroutine cancels the send, in-flight request included.
 ::: details Why it is not called `send`
 `WorkflowsWebhookClient.send` is a member function, and Kotlin resolves members before extensions. A
 `suspend fun WorkflowsWebhookClient.send(card)` would be **silently shadowed**: `client.send(card)`
-inside a coroutine would compile against the blocking member and block the thread without a single
-warning. Verified rather than assumed, by declaring the extension as `send` and watching a call from
-outside a coroutine still compile, which only the member could do.
+inside a coroutine would block the thread without a warning.
 :::

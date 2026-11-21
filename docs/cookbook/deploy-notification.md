@@ -1,7 +1,6 @@
 # Deploy notification in five minutes
 
-Your deploy pipeline fails and a card lands in a Teams channel. Nothing more, nothing less: that is the
-one thing this library sets out to do well in 0.1.0.
+Your deploy pipeline fails and a card lands in a Teams channel.
 
 - Target: Spring Boot 3.5+ on Java 17+
 - Time: about five minutes, then one section that actually matters
@@ -82,8 +81,7 @@ That is the five minutes. **The next section is the part that matters.**
 has already failed. An exception escaping here replaces the failure you were reporting with a failure
 to report it. The example above catches `WebhookException` and logs; do the same.
 
-Every teams4j exception is unchecked. Checked exceptions would have produced `catch (Exception e) {}`
-everywhere; instead there is a hierarchy, so you can catch only what you would handle differently.
+Every teams4j exception is unchecked, in a hierarchy, so you can catch only what you would handle differently.
 
 | Exception | When | Worth retrying |
 |---|---|---|
@@ -91,7 +89,7 @@ everywhere; instead there is a hierarchy, so you can catch only what you would h
 | `PayloadTooLargeException` | Over 28 KB (`sizeBytes()`, `limitBytes()`) | No. Shrink the card |
 | `WebhookRateLimitException` | `fail_fast` mode and the pacer said wait (`retryAfter()`) | Yes |
 | `WebhookResponseException` | Non-2xx after the retries were used up (`statusCode()`, `attempts()`) | Depends on the status |
-| `WebhookTransportException` | Connection failure or timeout (`attempts()`) | Yes |
+| `WebhookTransportException` | Connection failure after the retries, or a timeout, which is not retried (`attempts()`) | Yes, if a duplicate is acceptable |
 
 **Retries are already inside the client.** 429 and 5xx are retried three times by default with
 exponential backoff and full jitter, honouring `Retry-After`. Do not stack another layer on top; the
@@ -150,28 +148,12 @@ If the send happens on a request-handling thread, `fail_fast` may suit you bette
 of a wait. If several application instances share one webhook, they pace independently, so lower
 `permits-per-second` to around 1.3 for three of them.
 
-Pacing is not about avoiding a 429. Measured, the endpoint never sends one; what it does with a burst of
-simultaneous requests is answer `202` to all of them and silently drop some. There is no failure to
-retry, so pacing is the only defence.
+The endpoint never sends a 429: it answers a burst with `202` and silently drops some, so pacing is the
+only defence.
 
 ## 7. Configuration reference
 
-Everything under `teams4j.webhook.`; IDE completion works because configuration metadata is generated.
-
-| Property | Default | Description |
-|---|---|---|
-| `url` | — | **Required** for a client to exist |
-| `validation` | `enforce` | `enforce` (an `ERROR` refuses the send), `warn` (log only), `off` |
-| `rate-limit` | `block` | `block` (wait), `fail_fast` (throw), `off` |
-| `permits-per-second` | `4` | Lower it when several instances share one webhook |
-| `max-attempts` | `3` | The first attempt included. `1` means no retries |
-| `initial-backoff` | `500ms` | Ceiling before the first retry; doubles after |
-| `max-backoff` | `30s` | A longer `Retry-After` throws instead of waiting |
-| `request-timeout` | `10s` | Per request |
-| `connect-timeout` | `10s` | |
-| `allow-plain-http` | `false` | **Development and testing only.** Lets `url` be plain http |
-
-Anything not here (a shared `HttpClient`, a custom `ObjectMapper`, the payload limit) means declaring
+Everything under `teams4j.webhook.` is listed in [Spring Boot](../guide/spring-boot#properties). Anything not there (a shared `HttpClient`, a custom `ObjectMapper`, the payload limit) means declaring
 the `WorkflowsWebhookClient` bean yourself. The auto-configuration backs off entirely.
 
 ```java
@@ -226,12 +208,9 @@ check disabled, or been part of a burst with pacing off; both are silent by desi
 
 **`CardValidationException`.** `e.issues()` carries the rule id, the JSON path and the reason. Rule ids
 are stable (`webhook-submit`, `image-format`, `image-size`, …), so if one rule genuinely does not apply
-to you, filter on it rather than switching validation off. Every rule exists because of something Teams
-was observed to do; the [validation rules reference](../reference/validation-rules) says what.
+to you, filter on it rather than switching validation off. The [validation rules reference](../reference/validation-rules) says what each one is for.
 
-**You want coloured buttons.** `ActionStyle.POSITIVE` renders blue and `DESTRUCTIVE` renders red,
-verified on a real tenant. Older documentation, and an earlier version of this cookbook, said Teams
-ignores both; the `action-style` warning that said so was deleted.
+**You want coloured buttons.** `ActionStyle.POSITIVE` renders blue and `DESTRUCTIVE` renders red.
 
 **The card does not appear and only `fallbackText` shows.** The schema version is above 1.5. Teams
 renders up to 1.5 and rejects 1.6; the DSL default is 1.5 for exactly this reason. If you raised it,

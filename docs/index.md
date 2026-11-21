@@ -20,7 +20,7 @@ features:
   - title: The Teams constraints, in the type system
     details: Action.Submit does not work in a webhook card, so a webhook card cannot be given one — at compile time, in Java and in Kotlin. What types cannot reach, the validator checks before every send.
   - title: Rules that were measured, not copied
-    details: Every validator rule was run against a real tenant. Two that came from Microsoft's documentation turned out to be false and were deleted; the schema ceiling turned out to be 1.5, not 1.6.
+    details: Every validator rule was checked against a real tenant. Teams renders schema 1.5 at most.
   - title: Zero runtime dependencies
     details: The model binds to no JSON library and the clients speak JDK HttpClient unless you hand them yours. You bring Jackson or kotlinx.serialization; a kotlinx-only application never sees Jackson.
   - title: Java and Kotlin, one JSON
@@ -35,8 +35,7 @@ Office 365 connectors were retired in May 2026, and the Bot Framework Java SDK i
 
 ## Thirty seconds
 
-The card the cookbook leads with, in both DSLs, and the JSON it becomes. The code is quoted from a
-test that CI compiles and compares against the JSON on the right, so what you read here is what runs.
+The card the cookbook leads with, in both DSLs, and the JSON it becomes.
 
 ::: code-group
 

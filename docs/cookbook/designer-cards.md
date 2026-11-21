@@ -16,9 +16,8 @@ reasons.
   real tenant ([limits](../reference/limits)). Elements above 1.5 are shown as unsupported there, which is
   the earliest warning you can get.
 
-The preview is still not Teams. The Teams host configuration the Designer ships was last updated in
-2021, and the renderer inside the Teams clients is closed. Treat the preview as a layout aid and the
-[validator](../guide/validation) as the check. To look at any card from this site in the Designer, open
+The preview is still not Teams: treat it as a layout aid and the [validator](../guide/validation) as
+the check. To look at any card from this site in the Designer, open
 it, paste the JSON tab into the **Card Payload Editor**, and select the Teams host.
 
 ## 2. Ship the JSON as a resource
@@ -81,16 +80,12 @@ singular. The two mappers react differently:
 | `CardJson.strictMapper()` | Rejected with an unknown-property error naming the path |
 
 This is the concrete reason the section above says strict. With the lenient mapper you would ship a
-table that lost its header styling and never learn why. The fix today is to rename the property to the
-singular form in your resource; whether teams4j should accept the plural as an alias is an open
-question, and the round-trip test suite tracks the affected official samples as expected failures until
-it is settled.
+table that lost its header styling and never learn why. Rename it to `firstRowAsHeader` in your resource.
 
 ## 5. Dynamic values
 
-A Designer card is a value, not a template, and the model has no templating language yet (the Adaptive
-Cards template syntax, `${...}`, is on the roadmap behind a demand gate). Today you have two options for
-a card with runtime data in it.
+A Designer card is a value, not a template, and the model has no templating. For a card with runtime
+data in it you have two options.
 
 - **Transcribe it into the DSL** once the layout is settled. The Designer is good at layout and the DSL
   is good at values; [Building cards](../guide/cards) shows every construct with its JSON, which makes
