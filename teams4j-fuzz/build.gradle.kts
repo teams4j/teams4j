@@ -36,6 +36,7 @@ tasks.withType<Test>().configureEach {
 // other modules already keep.
 val seeds = mapOf(
     "BotEndpointFuzzTest/body" to listOf("teams4j-bot/src/test/resources/playground"),
+    "BotEndpointFuzzTest/bodyStream" to listOf("teams4j-bot/src/test/resources/playground"),
     "JsonCodecAgreementFuzzTest/read" to listOf(
         "teams4j-bot/src/test/resources/playground",
         "teams4j-cards-jackson/src/test/resources/golden",

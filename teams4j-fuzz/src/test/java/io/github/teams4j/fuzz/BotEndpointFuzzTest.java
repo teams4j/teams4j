@@ -1,5 +1,6 @@
 package io.github.teams4j.fuzz;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -45,11 +46,27 @@ class BotEndpointFuzzTest {
             + SERVICE_URL + "\",\"conversation\":{\"id\":\"a:1\"}}";
     private static final Set<Integer> ANSWERS = Set.of(200, 400, 401);
 
-    private static final ActivityEndpoint ENDPOINT = endpoint();
+    private static final ActivityEndpoint ENDPOINT = endpoint(ActivityReceiver.DEFAULT_MAX_BODY_LENGTH);
+    // Small enough that inputs cross it both in characters and in bytes.
+    private static final int SMALL_LIMIT = 512;
+    private static final ActivityEndpoint SMALL = endpoint(SMALL_LIMIT);
 
     @FuzzTest
     void body(FuzzedDataProvider data) {
         answer(TOKEN, new String(data.consumeRemainingAsBytes(), StandardCharsets.UTF_8));
+    }
+
+    /** The adapters' path: bytes in, 413 exactly when the body is over the limit either way. */
+    @FuzzTest
+    void bodyStream(FuzzedDataProvider data) throws IOException {
+        byte[] bytes = data.consumeRemainingAsBytes();
+        int status = SMALL.handle(TOKEN, new ByteArrayInputStream(bytes), READ_EVERYTHING)
+                .status();
+        boolean over =
+                bytes.length > 3L * SMALL_LIMIT || new String(bytes, StandardCharsets.UTF_8).length() > SMALL_LIMIT;
+        if (over != (status == 413) || !(status == 413 || ANSWERS.contains(status))) {
+            throw new AssertionError("answered " + status + " to " + bytes.length + " bytes");
+        }
     }
 
     @FuzzTest
@@ -85,7 +102,7 @@ class BotEndpointFuzzTest {
         return null;
     };
 
-    private static ActivityEndpoint endpoint() {
+    private static ActivityEndpoint endpoint(int maxBodyLength) {
         // Not FakeTransport: it records every request, and an unknown kid is a fetch per input.
         HttpTransport transport = request -> {
             if (request.uri().equals(METADATA)) {
@@ -102,7 +119,7 @@ class BotEndpointFuzzTest {
                 .jsonCodec(codec)
                 .issuer(TestTokens.ISSUER, METADATA)
                 .build();
-        return new ActivityEndpoint(new ActivityReceiver(verifier, codec), codec);
+        return new ActivityEndpoint(new ActivityReceiver(verifier, codec, maxBodyLength), codec);
     }
 
     private static HttpExchange.Response json(String body) {

@@ -24,10 +24,12 @@ jobs:
       matrix:
         target:
           - BotEndpointFuzzTest.body
+          - BotEndpointFuzzTest.bodyStream
           - BotEndpointFuzzTest.authorizationHeader
           - JsonCodecAgreementFuzzTest.read
           - CardBindingAgreementFuzzTest.read
           - ConnectorResponseFuzzTest.response
+          - ConnectorResponseFuzzTest.tokenResponse
           - BotKeysFuzzTest.jwks
           - BotKeysFuzzTest.metadata
           - RetryPolicyFuzzTest.decide
