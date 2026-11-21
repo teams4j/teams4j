@@ -70,7 +70,7 @@ public final class EnvelopeWriter {
      * the controls below {@code U+0020}; the rest, non-ASCII included, is carried by UTF-8. Jackson
      * does the same, which is why the output is unchanged from when it wrote this envelope.
      */
-    static void escape(StringBuilder out, @Nullable String value) {
+    public static void escape(StringBuilder out, @Nullable String value) {
         if (value == null) {
             out.append("null");
             return;

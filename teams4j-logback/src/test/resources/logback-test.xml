@@ -1,0 +1,4 @@
+<!-- Keeps WireMock's own logging out of the test output. -->
+<configuration>
+  <root level="WARN"/>
+</configuration>

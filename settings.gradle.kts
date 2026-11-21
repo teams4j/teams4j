@@ -30,6 +30,10 @@ include(":teams4j-webhook-kotlin")
 include(":teams4j-webhook-spring-boot3-starter")
 include(":teams4j-webhook-spring-boot4-starter")
 
+// L2 - log appenders: events to a channel through the webhook client. The core is backend-neutral
+include(":teams4j-logging-core")
+include(":teams4j-logback")
+
 // L1 - Bot Framework: Activity model, Connector client, inbound token verification
 include(":teams4j-bot")
 include(":teams4j-bot-kotlin")

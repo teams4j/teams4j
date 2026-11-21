@@ -76,6 +76,7 @@ implementation("io.github.teams4j:teams4j-bot-spring-boot4-starter:$version")   
 
 - [Getting started](https://teams4j.github.io/teams4j/guide/getting-started) — webhook URL, dependency, first card
 - [Deploy notification in five minutes](https://teams4j.github.io/teams4j/cookbook/deploy-notification) — the Spring Boot walkthrough
+- [Logback appender](https://teams4j.github.io/teams4j/guide/logback) — errors to a channel from `logback.xml`, no code
 - [Building cards](https://teams4j.github.io/teams4j/guide/cards) · [Validation](https://teams4j.github.io/teams4j/guide/validation) · [The webhook client](https://teams4j.github.io/teams4j/guide/webhook) · [Bots](https://teams4j.github.io/teams4j/guide/bot)
 - Migrating: [from Office 365 connectors](https://teams4j.github.io/teams4j/migrate/office-365-connectors) (retired May 2026) · [from the Bot Framework Java SDK](https://teams4j.github.io/teams4j/migrate/botbuilder-java) (retired 2023)
 - [Compatibility](https://teams4j.github.io/teams4j/guide/compatibility) — supported Java, Kotlin and Spring Boot versions, and the module list

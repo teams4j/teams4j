@@ -13,6 +13,7 @@ claimed.
 | JSON binding | **Jackson 2.18+**, **Jackson 3.1+** or **kotlinx.serialization 1.13+** | The model requires none; see [JSON binding](./json-binding). These are lower bounds: your own version wins |
 | Coroutines | **kotlinx-coroutines 1.11+** | Only for `teams4j-webhook-kotlin`, `teams4j-bot-kotlin` and `teams4j-bot-ktor` |
 | Ktor | **3.0+** | Only for `teams4j-bot-ktor`, which depends on `ktor-server-core` alone. 3.0 is a lower bound |
+| Logback | **1.5.x** | Only for `teams4j-logback`, which uses your Logback and names none |
 | Nullness | **JSpecify `@NullMarked`** | Every module, without adding a runtime dependency. Below |
 
 The library targets Java 17 bytecode. CI runs the tests on JDK 21 and 25, and the examples on JDK 17.
@@ -35,6 +36,8 @@ The library targets Java 17 bytecode. CI runs the tests on JDK 21 and 25, and th
 | `teams4j-bot-kotlin` | Coroutine `…Await` forms of the bot calls |
 | `teams4j-bot-spring-boot3-starter`, `-boot4-starter` | Spring Boot 3 / 4 auto-configuration for a bot, with a Spring MVC endpoint |
 | `teams4j-bot-ktor` | The bot endpoint as a Ktor route |
+| `teams4j-logback` | Logback appender: log events to a channel, with suppression and a bounded queue |
+| `teams4j-logging-core` | What the appenders share. A dependency of `teams4j-logback`, not an API to build on |
 | `teams4j-bom` | Version alignment for all of the above |
 
 Not planned: **Microsoft Graph**, a different API with its own SDK

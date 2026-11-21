@@ -29,6 +29,7 @@ export default defineConfig({
           { text: 'Validation', link: '/guide/validation' },
           { text: 'The webhook client', link: '/guide/webhook' },
           { text: 'Bots', link: '/guide/bot' },
+          { text: 'Logback appender', link: '/guide/logback' },
           { text: 'Spring Boot', link: '/guide/spring-boot' },
           { text: 'JSON binding', link: '/guide/json-binding' },
           { text: 'Compatibility', link: '/guide/compatibility' },

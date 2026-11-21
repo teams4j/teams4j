@@ -34,6 +34,8 @@ springBoot4 = "4.1.1"
 # Lowest supported Ktor, the only version the POM names; a consumer's own wins. The newest 3.x is
 # tested with -PktorLine=latest (teams4j-bot-ktor).
 ktor = "3.0.3"
+# Compile-only in teams4j-logback, so no POM names it: the application's own Logback is the one used.
+logback = "1.5.38"
 spotless = "8.11.0"
 # Release only: uploads the locally staged repository to the Central Portal. It does not sign
 # -- Gradle's signing plugin does, and exactly one of the two may be active. It stays in the root
@@ -97,6 +99,8 @@ jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api" }
 # the newest ktor-bom on the test classpath instead (teams4j-bot-ktor).
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }

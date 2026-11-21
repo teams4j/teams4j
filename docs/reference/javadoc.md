@@ -16,6 +16,7 @@ release's javadoc jar is also on Maven Central, next to the sources jar.
 | [`teams4j-webhook`](/api/teams4j-webhook/) | the Workflows webhook client |
 | [`teams4j-webhook-kotlin`](/api/teams4j-webhook-kotlin/) | coroutine forms of the webhook client |
 | [`teams4j-webhook-spring-boot4-starter`](/api/teams4j-webhook-spring-boot4-starter/) | Spring Boot auto-configuration for the webhook (the `-boot3-` starter has the same API) |
+| [`teams4j-logback`](/api/teams4j-logback/) | the Logback appender |
 | [`teams4j-bot`](/api/teams4j-bot/) | Activity model, token verification, Connector client |
 | [`teams4j-bot-kotlin`](/api/teams4j-bot-kotlin/) | coroutine forms of the bot calls |
 | [`teams4j-bot-spring-boot4-starter`](/api/teams4j-bot-spring-boot4-starter/) | Spring Boot auto-configuration for a bot (likewise) |
