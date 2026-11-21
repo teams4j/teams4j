@@ -1,4 +1,4 @@
 [tools]
-java = "temurin-21"
+java = "temurin-25"
 # docs/ only
 node = "26"
