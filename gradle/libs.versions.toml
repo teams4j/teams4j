@@ -6,9 +6,9 @@ javaToolchain = "21"
 # Lowest supported Jackson, and the only version the POMs name; a consumer's own wins. The newest
 # 2.x is tested with -PjacksonLine=latest (teams4j.java-conventions).
 jackson = "2.18.12"
-# Lowest supported Jackson 3, the only version teams4j-cards-jackson3's POM names; tested on the
-# newest 3.x with -PjacksonLine=latest.
-jackson3 = "3.0.4"
+# Lowest supported Jackson 3, the only version teams4j-cards-jackson3's POM names: 3.0.x gets no
+# security fixes. Tested on the newest 3.x with -PjacksonLine=latest.
+jackson3 = "3.1.8"
 javapoet = "0.22.0"
 jspecify = "1.0.1"
 kotlin = "2.4.21"
