@@ -27,6 +27,10 @@ jobs:
           - BotEndpointFuzzTest.authorizationHeader
           - JsonCodecAgreementFuzzTest.read
           - CardBindingAgreementFuzzTest.read
+          - ConnectorResponseFuzzTest.response
+          - BotKeysFuzzTest.jwks
+          - BotKeysFuzzTest.metadata
+          - RetryPolicyFuzzTest.decide
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
