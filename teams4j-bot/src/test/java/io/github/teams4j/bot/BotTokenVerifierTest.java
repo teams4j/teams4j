@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 
 /**
  * Tokens signed with a real RSA key ({@link TestTokens}), and a key set served from a table: every

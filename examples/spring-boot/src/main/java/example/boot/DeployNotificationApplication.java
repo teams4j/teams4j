@@ -23,7 +23,7 @@ import io.github.teams4j.webhook.WorkflowsWebhookClient;
  * or test profile — hence the {@link Optional} injection here.
  *
  * <p>To write cards with kotlinx.serialization instead, declare a {@code CardWriter} bean; it wins
- * by {@code @ConditionalOnMissingBean}. Excluding {@code teams4j-cards-jackson} from the starter as
+ * by {@code @ConditionalOnMissingBean}. Excluding {@code teams4j-cards-jackson2} from the starter as
  * well takes Jackson out of the graph entirely.
  */
 @SpringBootApplication

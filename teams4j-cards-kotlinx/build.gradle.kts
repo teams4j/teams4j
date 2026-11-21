@@ -14,7 +14,7 @@ sourceSets {
     // has to read the very same files -- comparing against a copy would let the copy go stale and
     // quietly narrow what is being compared -- so the directory is shared rather than duplicated.
     test {
-        resources.srcDir("../teams4j-cards-jackson/src/test/resources")
+        resources.srcDir("../teams4j-cards-jackson2/src/test/resources")
     }
 }
 
@@ -24,7 +24,7 @@ dependencies {
 
     // The suite reads the same official samples the Jackson binding does and checks the bindings
     // agree, so it needs the other binding to compare against.
-    testImplementation(project(":teams4j-cards-jackson"))
+    testImplementation(project(":teams4j-cards-jackson2"))
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj)

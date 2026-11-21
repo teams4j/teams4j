@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.CardWriter;
 import io.github.teams4j.cards.dsl.Cards;
-import io.github.teams4j.cards.jackson.JacksonCardWriter;
+import io.github.teams4j.cards.jackson2.JacksonCardWriter;
 import io.github.teams4j.http.HttpExchange;
 import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.teams.profile.ValidationMode;

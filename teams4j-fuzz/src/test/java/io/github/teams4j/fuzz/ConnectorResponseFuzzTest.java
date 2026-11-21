@@ -16,7 +16,7 @@ import io.github.teams4j.bot.ConnectorClient;
 import io.github.teams4j.bot.ConversationParameters;
 import io.github.teams4j.bot.ConversationReference;
 import io.github.teams4j.bot.TokenProvider;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 import io.github.teams4j.http.HttpExchange;
 
 /**

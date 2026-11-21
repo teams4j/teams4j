@@ -94,6 +94,8 @@ val apiBaseline = providers.gradleProperty("apiBaseline").orNull
 if (apiBaseline != null) {
     plugins.withId("java-library") {
         if (pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")) return@withId
+        // A module new or renamed since the baseline sets this in its gradle.properties.
+        if (findProperty("teams4j.noApiBaseline") == "true") return@withId
 
         apply(plugin = "me.champeau.gradle.japicmp")
 

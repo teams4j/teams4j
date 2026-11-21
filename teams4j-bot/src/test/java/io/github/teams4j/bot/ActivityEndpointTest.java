@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import io.github.teams4j.cards.CardValue;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 
 /** The status mapping the adapters lean on, with real tokens and no framework. */
 class ActivityEndpointTest {

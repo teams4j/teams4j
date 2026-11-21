@@ -35,11 +35,11 @@ The shape most notifications take: a heading, a fact set, one button.
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#deploy-failure [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#deploy-failure [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#deploy-failure [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/deploy-failure.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/deploy-failure.json [JSON]
 
 :::
 
@@ -53,11 +53,11 @@ highest version Teams renders.
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#columns-and-container [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#columns-and-container [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#columns-and-container [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/columns-and-container.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/columns-and-container.json [JSON]
 
 :::
 
@@ -73,11 +73,11 @@ That is per the specification.
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#show-card-nested [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#show-card-nested [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#show-card-nested [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/show-card-nested.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/show-card-nested.json [JSON]
 
 :::
 
@@ -89,11 +89,11 @@ everywhere else. The schema does not require a version on a card behind `Action.
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#submit-with-data [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#submit-with-data [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#submit-with-data [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/submit-with-data.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/submit-with-data.json [JSON]
 
 :::
 
@@ -105,11 +105,11 @@ numbers, booleans, `null`) for you. See [Open values](#open-values-cardvalue-and
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#toggle-visibility [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#toggle-visibility [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#toggle-visibility [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/toggle-visibility.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/toggle-visibility.json [JSON]
 
 :::
 
@@ -120,11 +120,11 @@ That is the escape hatch in action: anything the DSL does not surface is one gen
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#escape-hatches [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#escape-hatches [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#escape-hatches [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/escape-hatches.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/escape-hatches.json [JSON]
 
 :::
 

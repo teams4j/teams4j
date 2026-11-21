@@ -8,7 +8,7 @@ release's javadoc jar is also on Maven Central, next to the sources jar.
 |---|---|
 | [`teams4j-cards`](/api/teams4j-cards/) | the Adaptive Cards model and builders |
 | [`teams4j-cards-kotlin`](/api/teams4j-cards-kotlin/) | the Kotlin DSL |
-| [`teams4j-cards-jackson`](/api/teams4j-cards-jackson/) | Jackson binding |
+| [`teams4j-cards-jackson2`](/api/teams4j-cards-jackson2/) | Jackson binding |
 | [`teams4j-cards-kotlinx`](/api/teams4j-cards-kotlinx/) | kotlinx.serialization binding |
 | [`teams4j-teams-profile`](/api/teams4j-teams-profile/) | what Teams renders, as a validator |
 | [`teams4j-http`](/api/teams4j-http/) | the HTTP transport SPI |

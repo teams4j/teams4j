@@ -12,7 +12,7 @@ dependencies {
     // javac warns ("unknown enum constant Include.NON_NULL") when it reads a class file whose
     // annotations it cannot resolve. Putting the binding on the compile classpath silences that
     // and costs nothing -- it is on the runtime classpath either way.
-    implementation("io.github.teams4j:teams4j-cards-jackson")
+    implementation("io.github.teams4j:teams4j-cards-jackson2")
 }
 
 application {

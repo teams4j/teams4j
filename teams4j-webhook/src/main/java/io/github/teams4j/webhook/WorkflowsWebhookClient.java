@@ -63,7 +63,7 @@ import io.github.teams4j.webhook.internal.TokenBucket;
  *
  * <p>No third-party runtime dependency: HTTP goes through {@link HttpTransport}, by default the
  * JDK's {@link HttpClient}, and the JSON binding is the consumer's to choose. Put
- * {@code teams4j-cards-jackson} or {@code teams4j-cards-kotlinx} on the classpath and
+ * {@code teams4j-cards-jackson2} or {@code teams4j-cards-kotlinx} on the classpath and
  * {@link CardWriter#discover()} finds it, or name one with {@link Builder#cardWriter(CardWriter)}.
  * With neither, the client fails at construction naming the artifacts to add, rather than at the
  * first send.

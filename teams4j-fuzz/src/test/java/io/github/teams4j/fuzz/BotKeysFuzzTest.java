@@ -14,7 +14,7 @@ import com.code_intelligence.jazzer.junit.FuzzTest;
 import io.github.teams4j.bot.BotTokenVerifier;
 import io.github.teams4j.bot.TestTokens;
 import io.github.teams4j.bot.TokenVerificationException;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 import io.github.teams4j.http.HttpExchange;
 
 /** Whatever the OpenID metadata or the key set says, a token is accepted or refused with TokenVerificationException. */

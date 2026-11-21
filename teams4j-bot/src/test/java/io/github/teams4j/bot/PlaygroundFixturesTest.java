@@ -11,7 +11,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import io.github.teams4j.cards.JsonCodec;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 
 /**
  * Activities the Microsoft 365 Agents Playground (0.2.28, channel {@code msteams}) sent to the Ktor

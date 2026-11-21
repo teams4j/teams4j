@@ -22,7 +22,7 @@ dependencies {
     api(project(":teams4j-bot"))
     // The starter picks the binding, as the webhook starter does and for the same reason: one
     // dependency should be enough, and a Boot application is a Jackson world already.
-    api(project(":teams4j-cards-jackson"))
+    api(project(":teams4j-cards-jackson2"))
 
     implementation(libs.spring.boot.autoconfigure)
     // The endpoint is a Spring MVC controller. Compile-only, so an application without MVC still

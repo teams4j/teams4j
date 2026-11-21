@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.TextBlock;
-import io.github.teams4j.cards.jackson.CardJson;
-import io.github.teams4j.cards.jackson.JacksonCardWriter;
+import io.github.teams4j.cards.jackson2.CardJson;
+import io.github.teams4j.cards.jackson2.JacksonCardWriter;
 import io.github.teams4j.webhook.WebhookMessage;
 
 /**

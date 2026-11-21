@@ -8,7 +8,7 @@ import org.junit.jupiter.api.TestFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.streams.asSequence
-import io.github.teams4j.cards.jackson.CardJson as JacksonCardJson
+import io.github.teams4j.cards.jackson2.CardJson as JacksonCardJson
 
 /**
  * Runs the official samples through both bindings and checks they agree.

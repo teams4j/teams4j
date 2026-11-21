@@ -33,7 +33,7 @@ redelivers on anything else.
 
 ```kotlin
 implementation("io.github.teams4j:teams4j-bot")
-implementation("io.github.teams4j:teams4j-cards-jackson")   // or teams4j-cards-kotlinx; see JSON binding
+implementation("io.github.teams4j:teams4j-cards-jackson2")   // or teams4j-cards-kotlinx; see JSON binding
 implementation("io.github.teams4j:teams4j-bot-kotlin")      // coroutines, optional
 
 // or a hosted endpoint, which brings teams4j-bot with it
@@ -280,7 +280,7 @@ Properties and the beans on offer are on the [Spring Boot page](./spring-boot#bo
 
 ```kotlin
 implementation("io.github.teams4j:teams4j-bot-ktor")
-runtimeOnly("io.github.teams4j:teams4j-cards-kotlinx")   // or teams4j-cards-jackson
+runtimeOnly("io.github.teams4j:teams4j-cards-kotlinx")   // or teams4j-cards-jackson2
 ```
 
 `Route.teamsBot` is the same endpoint as a route, and the handler suspends:

@@ -67,7 +67,7 @@ implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
 
 // Plain Java: the client plus the JSON binding you already use
 implementation("io.github.teams4j:teams4j-webhook:$version")
-implementation("io.github.teams4j:teams4j-cards-jackson:$version")
+implementation("io.github.teams4j:teams4j-cards-jackson2:$version")
 
 // A bot: three properties (teams4j.bot.app-id, app-secret, tenant-id) and one ActivityHandler bean.
 // teams4j-bot-ktor is the same endpoint as a Ktor route

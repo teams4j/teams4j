@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
  * val text = CardJson.encode(card)
  * ```
  *
- * One of two bindings for the model; the other is `teams4j-cards-jackson`. Both read the same cards
+ * One of two bindings for the model; the other is `teams4j-cards-jackson2`. Both read the same cards
  * the same way, which the suite checks against the official samples.
  *
  * Reading is forgiving, as it must be: unknown properties are skipped, an unrecognised enum value

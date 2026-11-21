@@ -7,7 +7,7 @@ description = "Jazzer fuzz tests over the inputs teams4j reads from outside. Not
 
 dependencies {
     testImplementation(project(":teams4j-bot"))
-    testImplementation(project(":teams4j-cards-jackson"))
+    testImplementation(project(":teams4j-cards-jackson2"))
     testImplementation(project(":teams4j-cards-kotlinx"))
     testImplementation(testFixtures(project(":teams4j-bot")))
     testImplementation(libs.jazzer.junit)
@@ -39,11 +39,11 @@ val seeds = mapOf(
     "BotEndpointFuzzTest/bodyStream" to listOf("teams4j-bot/src/test/resources/playground"),
     "JsonCodecAgreementFuzzTest/read" to listOf(
         "teams4j-bot/src/test/resources/playground",
-        "teams4j-cards-jackson/src/test/resources/golden",
+        "teams4j-cards-jackson2/src/test/resources/golden",
     ),
     "CardBindingAgreementFuzzTest/read" to listOf(
-        "teams4j-cards-jackson/src/test/resources/samples",
-        "teams4j-cards-jackson/src/test/resources/golden",
+        "teams4j-cards-jackson2/src/test/resources/samples",
+        "teams4j-cards-jackson2/src/test/resources/golden",
     ),
 )
 

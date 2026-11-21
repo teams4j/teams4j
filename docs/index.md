@@ -39,11 +39,11 @@ The card the cookbook leads with, in both DSLs, and the JSON it becomes.
 
 ::: code-group
 
-<<< ../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#deploy-failure [Java]
+<<< ../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#deploy-failure [Java]
 
 <<< ../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#deploy-failure [Kotlin]
 
-<<< ../teams4j-cards-jackson/src/test/resources/golden/deploy-failure.json [JSON]
+<<< ../teams4j-cards-jackson2/src/test/resources/golden/deploy-failure.json [JSON]
 
 :::
 

@@ -14,7 +14,7 @@ include(":teams4j-cards-kotlin")
 
 // L0 - JSON bindings for the model. The model itself binds to nothing; each of these teaches one
 // library how to read and write it, and a consumer takes the one they already use.
-include(":teams4j-cards-jackson")
+include(":teams4j-cards-jackson2")
 include(":teams4j-cards-kotlinx")
 
 // L0 - Teams profile: platform limits and validation

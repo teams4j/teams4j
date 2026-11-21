@@ -31,7 +31,7 @@ kind before calling the migration done.
 
 ```kotlin
 implementation("io.github.teams4j:teams4j-webhook:$version")
-implementation("io.github.teams4j:teams4j-cards-jackson:$version")   // or teams4j-cards-kotlinx
+implementation("io.github.teams4j:teams4j-cards-jackson2:$version")   // or teams4j-cards-kotlinx
 ```
 
 or, in Spring Boot, `teams4j-webhook-spring-boot-starter` and `teams4j.webhook.url`; see

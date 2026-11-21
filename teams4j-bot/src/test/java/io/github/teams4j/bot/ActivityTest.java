@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.teams4j.cards.CardValue;
 import io.github.teams4j.cards.JsonCodec;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 
 /** Reads activities the shape Teams sends, and writes the shape the Connector accepts. */
 class ActivityTest {

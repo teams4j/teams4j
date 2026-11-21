@@ -31,7 +31,7 @@ dependencies {
     // does not. A starter exists to make one dependency enough, and a Boot application is a
     // Jackson world already. Anyone who wants the other binding uses teams4j-webhook directly --
     // that consumer is exactly who the split is for, and they are not reaching for a starter.
-    api(project(":teams4j-cards-jackson"))
+    api(project(":teams4j-cards-jackson2"))
 
     // Pin the version directly as a lower bound rather than exporting a BOM import in the POM.
     // A consumer's own BOM or dependencyManagement overrides it.

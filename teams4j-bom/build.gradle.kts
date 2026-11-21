@@ -9,7 +9,7 @@ dependencies {
     constraints {
         api(project(":teams4j-cards"))
         api(project(":teams4j-cards-kotlin"))
-        api(project(":teams4j-cards-jackson"))
+        api(project(":teams4j-cards-jackson2"))
         api(project(":teams4j-cards-kotlinx"))
         api(project(":teams4j-teams-profile"))
         api(project(":teams4j-http"))

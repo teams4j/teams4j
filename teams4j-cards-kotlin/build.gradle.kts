@@ -18,7 +18,7 @@ dependencies {
     // Test-only: the DSL builds model objects and never serialises one, so the published module
     // stays as free of a JSON binding as the model it wraps. The tests assert on JSON, and for that
     // they need a binding like any other consumer.
-    testImplementation(project(":teams4j-cards-jackson"))
+    testImplementation(project(":teams4j-cards-jackson2"))
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

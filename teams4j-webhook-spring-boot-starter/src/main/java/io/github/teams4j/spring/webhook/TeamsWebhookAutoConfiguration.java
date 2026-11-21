@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.teams4j.cards.CardWriter;
-import io.github.teams4j.cards.jackson.JacksonCardWriter;
+import io.github.teams4j.cards.jackson2.JacksonCardWriter;
 import io.github.teams4j.http.HttpTransport;
 import io.github.teams4j.webhook.WorkflowsWebhookClient;
 
@@ -47,7 +47,7 @@ public class TeamsWebhookAutoConfiguration {
 
     /**
      * The default binding, nested so the Jackson types load only when they are there to load: an
-     * application that excluded {@code teams4j-cards-jackson} skips this rather than failing.
+     * application that excluded {@code teams4j-cards-jackson2} skips this rather than failing.
      */
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(JacksonCardWriter.class)

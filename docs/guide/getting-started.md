@@ -44,7 +44,7 @@ implementation("io.github.teams4j:teams4j-webhook-spring-boot-starter:$version")
 // build.gradle.kts — the client, plus the JSON binding you already use. Without a binding
 // the client fails when you construct it, naming the artifact to add.
 implementation("io.github.teams4j:teams4j-webhook:$version")
-implementation("io.github.teams4j:teams4j-cards-jackson:$version")
+implementation("io.github.teams4j:teams4j-cards-jackson2:$version")
 ```
 
 ```kotlin [Kotlin]
@@ -75,11 +75,11 @@ Both DSLs below produce the JSON on the third tab.
 
 ::: code-group
 
-<<< ../../teams4j-cards-jackson/src/test/java/io/github/teams4j/cards/jackson/DocumentedCardsTest.java#deploy-failure [Java]
+<<< ../../teams4j-cards-jackson2/src/test/java/io/github/teams4j/cards/jackson2/DocumentedCardsTest.java#deploy-failure [Java]
 
 <<< ../../teams4j-cards-kotlin/src/test/kotlin/io/github/teams4j/cards/kotlin/DocumentedCardsTest.kt#deploy-failure [Kotlin]
 
-<<< ../../teams4j-cards-jackson/src/test/resources/golden/deploy-failure.json [JSON]
+<<< ../../teams4j-cards-jackson2/src/test/resources/golden/deploy-failure.json [JSON]
 
 :::
 

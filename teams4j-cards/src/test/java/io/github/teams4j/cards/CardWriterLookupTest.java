@@ -72,7 +72,7 @@ class CardWriterLookupTest {
     void namesTheArtifactsToAddWhenThereIsNoBinding() {
         assertThatThrownBy(() -> CardWriterLookup.discover(loaderRegistering()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("teams4j-cards-jackson")
+                .hasMessageContaining("teams4j-cards-jackson2")
                 .hasMessageContaining("teams4j-cards-kotlinx")
                 .as("and the other way out, which is the one AWS's own message points at")
                 .hasMessageContaining("cardWriter");

@@ -79,7 +79,7 @@ fun cardWriter(): CardWriter = KotlinxCardWriter()
 ```
 
 That bean wins by `@ConditionalOnMissingBean`, like every other Boot default. If you want Jackson out
-of the dependency graph entirely, `exclude` `teams4j-cards-jackson` from the starter as well; the
+of the dependency graph entirely, `exclude` `teams4j-cards-jackson2` from the starter as well; the
 default `CardWriter` bean stops applying because its class is gone.
 
 ::: info Batch and scheduler applications

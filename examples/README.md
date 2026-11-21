@@ -71,7 +71,7 @@ TEAMS_WEBHOOK_URL='http://127.0.0.1:8099/hook' TEAMS_WEBHOOK_ALLOW_PLAIN_HTTP=tr
 
 | Example | The point | JSON binding |
 |---|---|---|
-| [`java-plain`](java-plain) | No framework. Two dependencies, one of which exists only to pick a binding | `teams4j-cards-jackson` |
+| [`java-plain`](java-plain) | No framework. Two dependencies, one of which exists only to pick a binding | `teams4j-cards-jackson2` |
 | [`kotlin-coroutines`](kotlin-coroutines) | Coroutine `sendAwait` + the type-safe DSL. **No Jackson anywhere** | `teams4j-cards-kotlinx` |
 | [`spring-boot`](spring-boot) | The starter. One property is the whole configuration | brought in by the starter |
 | [`bot-spring-boot`](bot-spring-boot) | A bot on the bot starter: one `ActivityHandler` bean, the endpoint comes with it | brought in by the starter |

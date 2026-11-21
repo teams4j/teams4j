@@ -8,7 +8,7 @@ import io.github.teams4j.cards.Dimension
 import io.github.teams4j.cards.FontSize
 import io.github.teams4j.cards.FontWeight
 import io.github.teams4j.cards.ImageSize
-import io.github.teams4j.cards.jackson.CardJson
+import io.github.teams4j.cards.jackson2.CardJson
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -23,7 +23,7 @@ import kotlin.io.path.nameWithoutExtension
  * files, read-only. Update the files from the Java side with `-PgoldenUpdate=true`.
  */
 class DocumentedCardsTest {
-    private val goldenDir = Path.of("../teams4j-cards-jackson/src/test/resources/golden")
+    private val goldenDir = Path.of("../teams4j-cards-jackson2/src/test/resources/golden")
     private val writer = CardJson.strictMapper().writerWithDefaultPrettyPrinter()
 
     private val cases: Map<String, () -> AdaptiveCard> =

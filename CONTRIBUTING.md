@@ -110,7 +110,7 @@ which properties could not be narrowed, and which overrides no longer match anyt
 
 ### Schema coverage is measured, not asserted
 
-`teams4j-cards-jackson/src/test/resources/samples/` holds the official sample cards, and
+`teams4j-cards-jackson2/src/test/resources/samples/` holds the official sample cards, and
 `SampleRoundTripTest` parses and re-serialises every one of them with a strict mapper.
 `samples/UNSUPPORTED.txt` lists the ones the model cannot round-trip, with a reason each.
 
@@ -120,13 +120,13 @@ change makes an entry pass, deleting it is part of the change.
 
 ### Golden files, and the docs that quote them
 
-The DSL has golden-file snapshots: `DocumentedCardsTest` in `teams4j-cards-jackson` pins the JSON each
+The DSL has golden-file snapshots: `DocumentedCardsTest` in `teams4j-cards-jackson2` pins the JSON each
 Java DSL shape produces, and its namesake in `teams4j-cards-kotlin` builds the same cases with the
 Kotlin DSL and compares them against the same files, read-only. After an intended change to what the
 DSL emits:
 
 ```bash
-./gradlew :teams4j-cards-jackson:test -PgoldenUpdate=true
+./gradlew :teams4j-cards-jackson2:test -PgoldenUpdate=true
 ```
 
 Read the resulting diff before committing it. Without the flag a difference is a test failure,

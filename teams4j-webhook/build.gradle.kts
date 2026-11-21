@@ -12,7 +12,7 @@ dependencies {
     api(project(":teams4j-http"))
     // No JSON binding, and so no third-party runtime dependency at all. The client writes the
     // envelope itself and hands the card to whichever CardWriter the consumer put on the
-    // classpath -- teams4j-cards-jackson or teams4j-cards-kotlinx. Depending on one here would
+    // classpath -- teams4j-cards-jackson2 or teams4j-cards-kotlinx. Depending on one here would
     // put Jackson in the graph of a consumer who already has kotlinx.serialization.
     // HTTP goes through teams4j-http's HttpTransport, the JDK HttpClient by default; no third-party
     // HTTP dependency, and a consumer with another client implements the one-method interface.
@@ -26,7 +26,7 @@ dependencies {
 
     // The suite needs a binding like any other consumer. Jackson, because it is the one whose
     // output the byte-exact envelope assertions were written against.
-    testImplementation(project(":teams4j-cards-jackson"))
+    testImplementation(project(":teams4j-cards-jackson2"))
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj)

@@ -12,7 +12,7 @@ import io.github.teams4j.cards.FontWeight
 import io.github.teams4j.cards.TextBlock
 import io.github.teams4j.cards.dsl.CardBuilder
 import io.github.teams4j.cards.dsl.Cards
-import io.github.teams4j.cards.jackson.CardJson
+import io.github.teams4j.cards.jackson2.CardJson
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test

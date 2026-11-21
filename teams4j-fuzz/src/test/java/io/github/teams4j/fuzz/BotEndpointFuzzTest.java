@@ -28,7 +28,7 @@ import io.github.teams4j.bot.SearchInvokeValue;
 import io.github.teams4j.bot.TabRequest;
 import io.github.teams4j.bot.TaskModuleRequest;
 import io.github.teams4j.bot.TestTokens;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 import io.github.teams4j.http.HttpExchange;
 import io.github.teams4j.http.HttpTransport;
 

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.teams4j.cards.CardValue;
 import io.github.teams4j.cards.JsonCodec;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 
 /** Each Teams invoke read from the shape Teams sends, and each answer written in the shape Teams expects. */
 class TeamsInvokesTest {

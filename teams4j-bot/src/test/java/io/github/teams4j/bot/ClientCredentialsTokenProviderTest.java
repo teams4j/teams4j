@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 import io.github.teams4j.http.HttpExchange;
 
 class ClientCredentialsTokenProviderTest {

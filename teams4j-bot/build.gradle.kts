@@ -16,7 +16,7 @@ dependencies {
     // No JSON binding of its own, like teams4j-webhook: activities and tokens are read and written
     // through whichever JsonCodec the consumer's binding registers.
 
-    testImplementation(project(":teams4j-cards-jackson"))
+    testImplementation(project(":teams4j-cards-jackson2"))
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj)

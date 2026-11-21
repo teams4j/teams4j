@@ -6,7 +6,7 @@ dependencies. Reading and writing live in separate modules, and you pick the one
 ::: code-group
 
 ```java [Jackson]
-ObjectMapper mapper = io.github.teams4j.cards.jackson.CardJson.mapper();
+ObjectMapper mapper = io.github.teams4j.cards.jackson2.CardJson.mapper();
 AdaptiveCard card = mapper.readValue(json, AdaptiveCard.class);
 String out = mapper.writeValueAsString(card);
 ```
@@ -25,7 +25,7 @@ val out = io.github.teams4j.cards.kotlinx.CardJson.encode(card)
 | `teams4j-http` | **none** |
 | `teams4j-webhook` | **none** (the JDK `HttpClient` by default, plus a `CardWriter` found at runtime) |
 | `teams4j-bot` | **none** (the JDK `HttpClient` by default, plus a `CardWriter` and a `JsonCodec` found at runtime) |
-| `teams4j-cards-jackson` | `jackson-databind` |
+| `teams4j-cards-jackson2` | `jackson-databind` |
 | `teams4j-cards-kotlinx` | `kotlinx-serialization-json` |
 
 The model's Jackson annotations are `compileOnly`: for a kotlinx-only consumer, Jackson appears nowhere.
@@ -79,7 +79,7 @@ The order is declared (`CardWriter.priority()`, 0–10, default 5). To choose ex
 ```kotlin
 // with Jackson
 implementation("io.github.teams4j:teams4j-webhook")
-implementation("io.github.teams4j:teams4j-cards-jackson")
+implementation("io.github.teams4j:teams4j-cards-jackson2")
 
 // or with kotlinx.serialization — Jackson appears nowhere
 implementation("io.github.teams4j:teams4j-webhook")

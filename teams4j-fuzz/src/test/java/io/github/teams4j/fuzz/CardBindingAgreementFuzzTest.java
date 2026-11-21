@@ -22,8 +22,8 @@ import org.jspecify.annotations.Nullable;
 import io.github.teams4j.cards.AdaptiveCard;
 import io.github.teams4j.cards.CardValue;
 import io.github.teams4j.cards.JsonCodec;
-import io.github.teams4j.cards.jackson.CardJson;
-import io.github.teams4j.cards.jackson.JacksonJsonCodec;
+import io.github.teams4j.cards.jackson2.CardJson;
+import io.github.teams4j.cards.jackson2.JacksonJsonCodec;
 import io.github.teams4j.cards.kotlinx.KotlinxJsonCodec;
 
 /**

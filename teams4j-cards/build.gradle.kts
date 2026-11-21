@@ -18,7 +18,7 @@ dependencies {
     // Jackson annotations only, and only at compile time. The generated model carries them so that
     // the Jackson binding needs no configuration, but nothing here references a Jackson *type*, so
     // they never reach a consumer's classpath -- the JVM ignores an annotation whose class is
-    // absent. Binding the model to Jackson is teams4j-cards-jackson's job; other bindings are free
+    // absent. Binding the model to Jackson is teams4j-cards-jackson2's job; other bindings are free
     // to ignore these entirely.
     compileOnly(platform(libs.jackson.bom))
     compileOnly(libs.jackson.annotations)

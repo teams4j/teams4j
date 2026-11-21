@@ -23,7 +23,7 @@ The library targets Java 17 bytecode. CI runs the tests on JDK 21 and 25, and th
 |---|---|
 | `teams4j-cards` | Adaptive Cards model + Java builder DSL. Pure specification, nothing Teams-specific. **Zero runtime dependencies** |
 | `teams4j-cards-kotlin` | Kotlin type-safe DSL, generated from the same schema |
-| `teams4j-cards-jackson` | Jackson binding |
+| `teams4j-cards-jackson2` | Jackson binding |
 | `teams4j-cards-kotlinx` | kotlinx.serialization binding |
 | `teams4j-teams-profile` | Teams profile: platform limits + `TeamsProfileValidator` |
 | `teams4j-http` | What the clients share: the `HttpTransport` seam and the retry policy. **Zero runtime dependencies** |
