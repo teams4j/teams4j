@@ -110,7 +110,7 @@ jobs:
 
   jackson-latest:
     # The POMs name the Jackson baseline; this proves the newest 2.x still works.
-    name: tests on the newest Jackson 2.x
+    name: tests on the newest Jackson 2.x and 3.x
     runs-on: ubuntu-latest
     steps:
       - name: Harden runner

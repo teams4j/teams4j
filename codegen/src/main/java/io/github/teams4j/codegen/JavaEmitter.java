@@ -456,7 +456,11 @@ final class JavaEmitter {
         return MethodSpec.methodBuilder("fromShorthand")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(self)
-                .addAnnotation(ClassName.get(JACKSON_ANN, "JsonCreator"))
+                // Explicitly delegating: Jackson 3 reads the parameter name and would otherwise
+                // take this for a one-property creator.
+                .addAnnotation(AnnotationSpec.builder(ClassName.get(JACKSON_ANN, "JsonCreator"))
+                        .addMember("mode", "$T.Mode.DELEGATING", ClassName.get(JACKSON_ANN, "JsonCreator"))
+                        .build())
                 .addParameter(String.class, target.javaName())
                 .addJavadoc(
                         "Builds a {@link $T} from the schema's bare-string shorthand, which is\n"

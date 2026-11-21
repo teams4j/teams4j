@@ -6,6 +6,9 @@ javaToolchain = "21"
 # Lowest supported Jackson, and the only version the POMs name; a consumer's own wins. The newest
 # 2.x is tested with -PjacksonLine=latest (teams4j.java-conventions).
 jackson = "2.18.12"
+# Lowest supported Jackson 3, the only version teams4j-cards-jackson3's POM names; tested on the
+# newest 3.x with -PjacksonLine=latest.
+jackson3 = "3.0.4"
 javapoet = "0.22.0"
 jspecify = "1.0.1"
 kotlin = "2.4.21"
@@ -68,6 +71,7 @@ japicmp = "0.4.6"
 jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson3-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson3" }
 
 # The nullness contract. A 3.8KB annotations-only jar, applied compileOnly so it never reaches a
 # consumer's runtime classpath -- the JVM ignores annotations whose type it cannot resolve.

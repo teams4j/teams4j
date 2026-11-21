@@ -25,8 +25,9 @@ final class BindingLookup {
         ServiceLoader.load(service, loader).forEach(found::add);
         if (found.isEmpty()) {
             throw new IllegalStateException("no " + service.getSimpleName()
-                    + " on the classpath: add a JSON binding, either io.github.teams4j:teams4j-cards-jackson2 or"
-                    + " io.github.teams4j:teams4j-cards-kotlinx -- or pass one to the client builder's " + setting);
+                    + " on the classpath: add a JSON binding, io.github.teams4j:teams4j-cards-jackson3,"
+                    + " teams4j-cards-jackson2 or teams4j-cards-kotlinx -- or pass one to the client builder's "
+                    + setting);
         }
         // By class name within a tie, so the result never depends on class loader order.
         found.sort(Comparator.comparingInt(priority)

@@ -36,7 +36,9 @@ public record TargetElement(@JsonProperty("type") @Nullable String type,
      * Builds a {@link TargetElement} from the schema's bare-string shorthand, which is
      * equivalent to setting only {@code elementId}.
      */
-    @JsonCreator
+    @JsonCreator(
+            mode = JsonCreator.Mode.DELEGATING
+    )
     public static TargetElement fromShorthand(String elementId) {
         return new TargetElement(null, elementId, null);
     }

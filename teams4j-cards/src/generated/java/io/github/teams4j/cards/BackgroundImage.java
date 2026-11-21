@@ -42,7 +42,9 @@ public record BackgroundImage(@JsonProperty("type") @Nullable String type,
      * Builds a {@link BackgroundImage} from the schema's bare-string shorthand, which is
      * equivalent to setting only {@code url}.
      */
-    @JsonCreator
+    @JsonCreator(
+            mode = JsonCreator.Mode.DELEGATING
+    )
     public static BackgroundImage fromShorthand(String url) {
         return new BackgroundImage(null, url, null, null, null);
     }

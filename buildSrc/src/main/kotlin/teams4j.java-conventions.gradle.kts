@@ -109,13 +109,14 @@ tasks.withType<Javadoc>().configureEach {
     }
 }
 
-// -PjacksonLine=latest tests against the newest Jackson 2.x (test classpath only). Dynamic on
-// purpose, so the probe follows Jackson's releases; Jackson 3 is `tools.jackson`, so this stays 2.x.
+// -PjacksonLine=latest tests against the newest Jackson 2.x and 3.x (test classpath only). Dynamic on
+// purpose, so the probe follows Jackson's releases.
 val jacksonLine = providers.gradleProperty("jacksonLine").getOrElse("baseline")
 when (jacksonLine) {
     "baseline" -> {}
     "latest" -> dependencies {
         "testImplementation"(platform("com.fasterxml.jackson:jackson-bom:latest.release"))
+        "testImplementation"(platform("tools.jackson:jackson-bom:latest.release"))
     }
     else -> error("jacksonLine must be baseline or latest, got '$jacksonLine'")
 }

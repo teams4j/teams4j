@@ -19,6 +19,7 @@ updates:
       # line is covered by the -PjacksonLine=latest / -PktorLine=latest CI jobs, not by bumping these.
       # This also hides jacksonBuild (same coordinates); bump that one by hand.
       - dependency-name: "com.fasterxml.jackson*"
+      - dependency-name: "tools.jackson*"
       - dependency-name: "io.ktor:*"
 
   - package-ecosystem: github-actions

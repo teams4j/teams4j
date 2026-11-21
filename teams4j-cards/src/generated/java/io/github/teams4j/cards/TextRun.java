@@ -63,7 +63,9 @@ public record TextRun(@JsonProperty("type") @Nullable String type,
      * Builds a {@link TextRun} from the schema's bare-string shorthand, which is
      * equivalent to setting only {@code text}.
      */
-    @JsonCreator
+    @JsonCreator(
+            mode = JsonCreator.Mode.DELEGATING
+    )
     public static TextRun fromShorthand(String text) {
         return new TextRun(TYPE, text, null, null, null, null, null, null, null, null, null, null);
     }

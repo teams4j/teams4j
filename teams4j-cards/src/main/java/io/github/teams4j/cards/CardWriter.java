@@ -32,8 +32,8 @@ public interface CardWriter {
     }
 
     /**
-     * The single {@code CardWriter} on the classpath — add {@code teams4j-cards-jackson2} or
-     * {@code teams4j-cards-kotlinx} and this finds it. Several is not an error: the highest
+     * The single {@code CardWriter} on the classpath — add {@code teams4j-cards-jackson3},
+     * {@code teams4j-cards-jackson2} or {@code teams4j-cards-kotlinx} and this finds it. Several is not an error: the highest
      * {@link #priority()} wins and the losers are named in a warning, so nothing depends on jar
      * order.
      *
