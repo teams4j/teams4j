@@ -173,6 +173,16 @@ class BotTokenVerifierTest {
     }
 
     @Test
+    void aJwksUriThatIsNotAUriIsARefusal() {
+        BotTokenVerifier verifier = verifier();
+        transport.on(METADATA, () -> FakeTransport.json(200, "{\"jwks_uri\":\"h ttps://x\"}"));
+
+        assertThatThrownBy(() -> verifier.verify(token("k1", k1), SERVICE_URL))
+                .isInstanceOf(TokenVerificationException.class)
+                .hasMessageContaining("jwks_uri is not a URI");
+    }
+
+    @Test
     void aFailedRefreshOnAMissIsNotRetriedWithinTheHour() throws Exception {
         BotTokenVerifier verifier = verifier();
         verifier.verify(token("k1", k1), SERVICE_URL);

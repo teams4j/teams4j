@@ -482,7 +482,14 @@ public final class BotTokenVerifier {
                         if (jwksUri == null) {
                             throw new TokenVerificationException("OpenID metadata has no jwks_uri");
                         }
-                        return get(URI.create(jwksUri));
+                        URI uri;
+                        try {
+                            uri = URI.create(jwksUri);
+                        } catch (IllegalArgumentException e) {
+                            throw new TokenVerificationException(
+                                    "OpenID metadata jwks_uri is not a URI: " + quote(jwksUri), e);
+                        }
+                        return get(uri);
                     })
                     .thenApply(this::parse)
                     // A transport that ignores the request timeout must not hold `fetching` forever.
