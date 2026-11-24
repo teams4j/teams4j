@@ -25,7 +25,9 @@ stack trace.
 
 ::: warning The URL is a secret
 A Workflows webhook URL carries its signature in the query string. Keep it out of the XML: take it
-from the environment as above, or from a Spring property with `<springProperty>`.
+from the environment as above, or from a Spring property with `<springProperty>`. Logback's own
+status output (`debug="true"`, or a status listener) prints every substituted value, this one
+included.
 :::
 
 ## What happens around a send

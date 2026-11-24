@@ -20,6 +20,7 @@ dependencies {
         api(project(":teams4j-webhook-spring-boot4-starter"))
         api(project(":teams4j-logging-core"))
         api(project(":teams4j-logback"))
+        api(project(":teams4j-log4j2"))
         api(project(":teams4j-bot"))
         api(project(":teams4j-bot-kotlin"))
         api(project(":teams4j-bot-spring-boot3-starter"))

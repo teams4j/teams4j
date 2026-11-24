@@ -30,6 +30,7 @@ export default defineConfig({
           { text: 'The webhook client', link: '/guide/webhook' },
           { text: 'Bots', link: '/guide/bot' },
           { text: 'Logback appender', link: '/guide/logback' },
+          { text: 'Log4j 2 appender', link: '/guide/log4j2' },
           { text: 'Spring Boot', link: '/guide/spring-boot' },
           { text: 'JSON binding', link: '/guide/json-binding' },
           { text: 'Compatibility', link: '/guide/compatibility' },
