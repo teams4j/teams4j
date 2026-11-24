@@ -33,6 +33,7 @@ jobs:
           - BotKeysFuzzTest.jwks
           - BotKeysFuzzTest.metadata
           - RetryPolicyFuzzTest.decide
+          - AlertCardFuzzTest.write
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0

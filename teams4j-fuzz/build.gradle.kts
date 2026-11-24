@@ -9,6 +9,7 @@ dependencies {
     testImplementation(project(":teams4j-bot"))
     testImplementation(project(":teams4j-cards-jackson2"))
     testImplementation(project(":teams4j-cards-kotlinx"))
+    testImplementation(project(":teams4j-logging-core"))
     testImplementation(testFixtures(project(":teams4j-bot")))
     testImplementation(libs.jazzer.junit)
     testImplementation(libs.json.schema.validator)
