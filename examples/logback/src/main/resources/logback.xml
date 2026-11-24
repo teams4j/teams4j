@@ -1,0 +1,21 @@
+<configuration>
+  <!-- Drains the appender's queue when the JVM exits; Spring Boot does this by itself. -->
+  <shutdownHook/>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss} %-5level %logger{20} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- ERROR and above only, so the root logger is a safe place for it. -->
+  <appender name="TEAMS" class="io.github.teams4j.logback.TeamsAppender">
+    <url>${TEAMS_WEBHOOK_URL}</url>
+    <title>nightly-job</title>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="TEAMS"/>
+  </root>
+</configuration>

@@ -21,6 +21,8 @@ export TEAMS_WEBHOOK_URL='https://...'      # never commit this: the URL *is* wr
 ./gradlew :kotlin-coroutines:run
 ./gradlew :spring-boot:run
 ./gradlew :spring-boot:run -PbootVersion=<Boot 4.x version>
+./gradlew :logback:run
+./gradlew :log4j2:run
 ```
 
 The two bot examples need a bot registration instead of a webhook URL, and a tunnel to your machine
@@ -74,6 +76,8 @@ TEAMS_WEBHOOK_URL='http://127.0.0.1:8099/hook' TEAMS_WEBHOOK_ALLOW_PLAIN_HTTP=tr
 | [`java-plain`](java-plain) | No framework. Two dependencies, one of which exists only to pick a binding | `teams4j-cards-jackson2` |
 | [`kotlin-coroutines`](kotlin-coroutines) | Coroutine `sendAwait` + the type-safe DSL. **No Jackson anywhere** | `teams4j-cards-kotlinx` |
 | [`spring-boot`](spring-boot) | The starter. One property is the whole configuration | brought in by the starter |
+| [`logback`](logback) | The Logback appender: an error in the log is a card in the channel. No teams4j code | none needed |
+| [`log4j2`](log4j2) | The same with the Log4j 2 appender | none needed |
 | [`bot-spring-boot`](bot-spring-boot) | A bot on the bot starter: one `ActivityHandler` bean, the endpoint comes with it | brought in by the starter |
 | [`bot-ktor`](bot-ktor) | The same bot as a Ktor route, suspending all the way. **No Jackson anywhere** | `teams4j-cards-kotlinx` |
 

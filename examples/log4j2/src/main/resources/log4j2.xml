@@ -1,0 +1,17 @@
+<Configuration>
+  <Appenders>
+    <Console name="CONSOLE">
+      <PatternLayout pattern="%d{HH:mm:ss} %-5level %logger{1.} - %msg%n"/>
+    </Console>
+
+    <!-- ERROR and above only, so the root logger is a safe place for it. -->
+    <Teams name="TEAMS" url="${env:TEAMS_WEBHOOK_URL}" title="nightly-job"/>
+  </Appenders>
+
+  <Loggers>
+    <Root level="INFO">
+      <AppenderRef ref="CONSOLE"/>
+      <AppenderRef ref="TEAMS"/>
+    </Root>
+  </Loggers>
+</Configuration>

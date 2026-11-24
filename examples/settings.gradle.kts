@@ -25,6 +25,8 @@ dependencyResolutionManagement {
 include(":java-plain")
 include(":kotlin-coroutines")
 include(":spring-boot")
+include(":logback")
+include(":log4j2")
 include(":bot-spring-boot")
 include(":bot-ktor")
 // Opt-in: the Spring bot against a real Agents Playground, headless. `-PplaygroundE2e` runs it.
