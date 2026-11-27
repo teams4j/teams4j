@@ -9,7 +9,7 @@ jackson = "2.18.12"
 # Lowest supported Jackson 3, the only version teams4j-cards-jackson3's POM names: 3.0.x gets no
 # security fixes. Tested on the newest 3.x with -PjacksonLine=latest.
 jackson3 = "3.1.8"
-javapoet = "0.22.0"
+javapoet = "0.23.0"
 jspecify = "1.0.1"
 kotlin = "2.4.21"
 # Lowest supported Kotlin; the modules compile at this language version and stdlib. Read by CI;
@@ -35,7 +35,7 @@ springBoot4 = "4.1.1"
 # tested with -PktorLine=latest (teams4j-bot-ktor).
 ktor = "3.0.3"
 # Compile-only in teams4j-logback, so no POM names it: the application's own Logback is the one used.
-logback = "1.5.38"
+logback = "1.6.8"
 # Compile-only in teams4j-log4j2, as Logback is above.
 log4j = "2.26.1"
 spotless = "8.11.0"
@@ -51,9 +51,9 @@ jacksonBuild = "2.23.0"
 # it and a release is a tag rather than a commit. Read-only: it never tags or pushes.
 gitVersion = "5.2.0"
 # Nullness enforcement. NullAway runs as an Error Prone plugin, so the three move together.
-errorprone = "2.52.0"
+errorprone = "2.53.0"
 errorpronePlugin = "5.1.1"
-nullaway = "0.14.3"
+nullaway = "0.14.4"
 
 # Kotlin static analysis, the counterpart to Error Prone + NullAway on the Java side. ktlint is
 # formatting and runs through Spotless; detekt is the analyser and has a task of its own.

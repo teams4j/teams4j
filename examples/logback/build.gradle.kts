@@ -5,7 +5,7 @@ plugins {
 dependencies {
     // The appender is the only teams4j dependency: no client code and no JSON binding to pick.
     implementation("io.github.teams4j:teams4j-logback")
-    implementation("ch.qos.logback:logback-classic:1.5.38")
+    implementation("ch.qos.logback:logback-classic:1.6.8")
 }
 
 application {
